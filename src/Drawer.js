@@ -1,4 +1,4 @@
-//import liraries
+//import libraries
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { 
@@ -9,14 +9,17 @@ var { Router, Scene } = require('react-native-router-flux');
 import SideBar from './components/sidebar/SideBar'
 import Dashboard from './screen/Dashboard'
 import Friends from './screen/Friends'
+import Settings from './screen/Settings'
+import ProfileEdit from './screen/ProfileEdit'
+import About from './screen/About'
 
 const Drawer = DrawerNavigator(
     {   
         Dashboard: { screen: Dashboard },
         Friends: { screen: Friends },
-    //     Settings: { screen: Settings },
-    //     About: { screen: About },
-    //     Logout: { screen: Logout },
+        Settings: { screen: Settings },
+        ProfileEdit: { screen: ProfileEdit },
+        About: { screen: About },
     },
     {
         initialRouterName: 'Dashboard',

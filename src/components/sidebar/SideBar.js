@@ -1,6 +1,6 @@
-//import liraries
+//import libraries
 import React, { Component } from 'react';
-import { StyleSheet, StatusBar, Image } from 'react-native';
+import { StyleSheet, StatusBar, Image, TouchableOpacity } from 'react-native';
 import {
     Content,
 	Text,
@@ -22,24 +22,24 @@ import Constant from '../../common/Constant'
 
 const datas = [
 	{
-		name: "Edit",
-		route: "Edit",
-	},
-	{
 		name: "Friends",
-		route: "Friends",
+		route: "",
+        icon: require('../../assets/img/two-men.png'),
 	},
     {
 		name: "Settings",
 		route: "Settings",
+        icon: require('../../assets/img/settings_icon.png'),
 	},
     {
 		name: "About",
 		route: "About",
+        icon: require('../../assets/img/about_icon.png'),
 	},
     {
 		name: "Logout",
 		route: "Logout",
+        icon: require('../../assets/img/logout_icon.png'),
 	},
 ]
 // create a component
@@ -51,24 +51,37 @@ class SideBar extends Component {
 			shadowRadius: 4,
 		};
 	}
+    _onEdit = () => {
+        this.props.navigation.navigate('ProfileEdit')
+    }
 
     render() {
         return (
             <Container>
-                <Content bounces={false} style={{ flex: 1, backgroundColor: Constant.APP_COLOR}}>
-                    {/*<Content style = {styles.drawer}>
-                        <Image source = {require('../../assets/img/zahironline-white.png')} style = {styles.drawerCover} /> 
-                    </Content>*/}
-                    <View style = {styles.line}/>
-                    <List 
-                        dataArray={datas}
-                        renderRow={data =>
-                            <ListItem button noBorder onPress={() => this.props.navigation.navigate(data.route)} style = {{height:50, padding:10}}>
-                                <Text style = {styles.menuItem}>{data.name}</Text>
-                            </ListItem>
-                        }
-                        style = {{marginTop:15}}>
-                    </List>
+                <Content bounces={false} style={{ flex: 1, backgroundColor: 'white'}}>
+                    <Content>
+                        <View style = {styles.drawer}>
+                            <Image source = {require('../../assets/img/app_bar_bg.png')} style = {styles.drawerCover} /> 
+                            <Image source = {require('../../assets/img/userphotos/user0.jpg')} style = {styles.userPhoto} />
+                            <Text style = {styles.name}>Ihor Dzjuba</Text>
+                            <TouchableOpacity style = {styles.editBtn} onPress = {this._onEdit}>
+                                <Text style = {styles.edit}>Edit</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Content>
+                    <Content>
+                        <List
+                            style = {{marginTop:15, paddingBottom: 100, backgroundColor:'white', height: 400}} 
+                            dataArray={datas}
+                            renderRow={data =>
+                                <ListItem button noBorder onPress={() => this.props.navigation.navigate(data.route)} style = {{height:50, padding:10}}>
+                                    <Image source = {data.icon} style = {styles.menuIcon}/>
+                                    <Text style = {styles.menuItem}>{data.name}</Text>
+                                </ListItem>
+                            }
+                        >
+                        </List>
+                    </Content>
                 </Content>
             </Container>
         );
@@ -90,14 +103,16 @@ const styles = StyleSheet.create({
     },
     drawer:{
         flex: 1,
-        height: 80,
+        height: 150,
+        padding: 20,
         justifyContent: 'center',
-        alignItems: 'center',
+        // alignItems: 'center',
     },
     drawerCover: {
-        alignSelf: "stretch",
-        height: 47*0.7,
-        width: 218*0.7,
+        height: 150,
+        position: 'absolute',
+        top: 0,
+        left: 0,
     },
     line: {
         height: 1,
@@ -109,10 +124,34 @@ const styles = StyleSheet.create({
         opacity:0.3,
     },
     menuItem:{
-        color: 'white',
+        color: 'black',
         opacity: 1,
-        fontSize: 13,
-    }
+        fontSize: 15,
+        marginLeft: 15,
+    },
+    menuIcon: {
+        width: 18,
+        height: 18,
+    },
+    userPhoto: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        marginTop: 20,
+    },
+    name: {
+        color: 'white',
+        fontSize: 18,
+        marginTop: 10
+    },
+    edit: {
+        color: 'white'
+    },
+    editBtn: {
+        position: 'absolute',
+        top: 40,
+        right: 20,
+    },
 });
 
 //make this component available to the app

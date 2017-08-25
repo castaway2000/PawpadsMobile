@@ -1,13 +1,13 @@
-//import libraries
+//import liraries
 import React, { Component } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 // create a component
-class Friends extends Component {
+class DeleteAccount extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text>Friends</Text>
+                <Text>DeleteAccount</Text>
             </View>
         );
     }
@@ -24,4 +24,4 @@ const styles = StyleSheet.create({
 });
 
 //make this component available to the app
-export default Friends;
+export default DeleteAccount;

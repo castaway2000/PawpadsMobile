@@ -1,7 +1,7 @@
-//import liraries
+//import libraries
 import React, { Component } from 'react';
-import { View,  StyleSheet,Text, Image, TextInput, ScrollView, TouchableOpacity } from 'react-native';
-
+import { View,  StyleSheet,Text, Image, TextInput, ScrollView, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import { KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import Constant from '../../common/Constant'
 import { Font } from 'expo'
 
@@ -20,16 +20,16 @@ class Login extends Component {
         }
     }
     _onLogin = () => {
-        if(!this.validateEmail(this.state.name)){
-            alert('The email address is not a valid format')
-        }else{
-            if(this.state.password.length < 6){
-                alert('The password must be at least 6 letters.')
-            }else{
+        // if(!this.validateEmail(this.state.name)){
+        //     alert('The email address is not a valid format')
+        // }else{
+        //     if(this.state.password.length < 6){
+        //         alert('The password must be at least 6 letters.')
+        //     }else{
                 const { navigate } = this.props.navigation
-                navigate ('Register')
-            }
-        }
+                navigate ('Drawer')
+        //     }
+        // }
 
     }
     validateEmail = (email) => {
@@ -44,12 +44,7 @@ class Login extends Component {
         this.props.navigation.navigate('Passwordrecovery')
     }
 
-//     async componentWillMount() {
-//   await Expo.Font.loadAsync({
-//     'Roboto': require('native-base/Fonts/Roboto.ttf'),
-//     'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf'),
-//   });
-// }
+
 
     setUserName(text){
         this.setState({ name: text })
@@ -62,7 +57,12 @@ class Login extends Component {
         return (
             <View style = {styles.container}>
                 <Image source = {require('../../assets/img/splash.png')} style = {styles.bg}/>
-                <ScrollView >
+                <KeyboardAwareScrollView 
+                    contentContainerStyle = {styles.container} 
+                    scrollEnabled = {false}
+                    style = {{backgroundColor: 'transparent'}}
+                    resetScrollToCoords = {{x:0, y:0}}
+                >
                     <View style = {styles.wrapperView}>
                         <View style = {styles.logoView}>
                             <Text style = {styles.logotitle}>PawPads</Text>
@@ -106,7 +106,6 @@ class Login extends Component {
                                 <Text style = {styles.register}>  Register </Text>
                             </TouchableOpacity>
                         </View>
-                        
 
                         <Text style = {styles.loginwith}>Login with</Text>
                         
@@ -120,7 +119,7 @@ class Login extends Component {
                         </View>
                         
                     </View>
-                </ScrollView>
+                </KeyboardAwareScrollView>
                 
             </View>
         );
@@ -133,7 +132,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'white',
+        backgroundColor: 'transparent',
     },
     bg: {
         position:'absolute',

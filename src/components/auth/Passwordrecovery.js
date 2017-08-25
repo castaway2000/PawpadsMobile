@@ -1,4 +1,4 @@
-//import liraries
+//import libraries
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView } from 'react-native';
 import Constant from '../../common/Constant'
