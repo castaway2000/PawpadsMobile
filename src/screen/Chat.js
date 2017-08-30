@@ -82,7 +82,7 @@ class Chat extends Component {
 	}
 
 	renderListMessages(item, index) {
-
+		console.log(item, index)
 		if (item.sender_user_id != this.props.doctorId) {
 			return (
 				<ChatBoxDoctor
@@ -155,20 +155,45 @@ class Chat extends Component {
 
 	}
 
+	chatEdit(){
+		var {params} = this.props.navigation.state
+		if(params.GroupChatting){
+			return(
+				<TouchableOpacity style = {styles.backButton} onPress = {() => this.props.navigation.navigate('ChatGroupEdit')}>
+					<Image source = {require('../assets/img/edit_white.png')} style = {{width: 18, height: 18, resizeMode:'contain'}}/>
+				</TouchableOpacity>
+			);
+		}else{
+			return null
+		}
+	}
+	createGroup(){
+		var {params} = this.props.navigation.state
+		if(params.GroupChatting){
+			return(
+				<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('CreateGroupChat')}>
+					<Image source = {require('../assets/img/add_participant.png')} style = {{width: 26, height: 26, resizeMode:'contain'}}/>
+				</TouchableOpacity>
+			)
+		}
+		else{
+			return null
+		}
+	}
+
 	render() {
+		var {params} = this.props.navigation.state 
 		return (
 			<View style={styles.container}>
 				<View style = {styles.tabView}>
                     <TouchableOpacity style = {styles.backButton} onPress = {() => this.props.navigation.goBack()}>
                         <Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
                     </TouchableOpacity>
-                    <Text style = {styles.title}>{this.props.navigation.state.params.GroupName}</Text>
-					<TouchableOpacity style = {styles.backButton} onPress = {() => this.props.navigation.navigate('ChatGroupEdit')}>
-                        <Image source = {require('../assets/img/edit_white.png')} style = {{width: 18, height: 18, resizeMode:'contain'}}/>
-                    </TouchableOpacity>
-					<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('CreateGroupChat')}>
-                        <Image source = {require('../assets/img/add_participant.png')} style = {{width: 26, height: 26, resizeMode:'contain'}}/>
-                    </TouchableOpacity>
+                    <Text style = {styles.title}>{params.GroupName}</Text>
+
+					{this.chatEdit()}
+
+					{this.createGroup()}					
                 </View>
                 <View style = {styles.bodyView}>
                     {this.renderChat()}
@@ -208,7 +233,6 @@ const styles = {
         width: Constant.WIDTH_SCREEN,
 		height: Constant.HEIGHT_SCREEN - 80,
         backgroundColor: 'white',
-        // paddingBottom: 80
     },
 };
 

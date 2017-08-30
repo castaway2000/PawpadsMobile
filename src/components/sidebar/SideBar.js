@@ -62,7 +62,9 @@ class SideBar extends Component {
                     <Content>
                         <View style = {styles.drawer}>
                             <Image source = {require('../../assets/img/app_bar_bg.png')} style = {styles.drawerCover} /> 
-                            <Image source = {require('../../assets/img/userphotos/user0.jpg')} style = {styles.userPhoto} />
+                            <TouchableOpacity onPress = {() => this.props.navigation.navigate('Profile')}>
+                                <Image source = {require('../../assets/img/userphotos/user0.jpg')} style = {styles.userPhoto} />
+                            </TouchableOpacity>
                             <Text style = {styles.name}>Ihor Dzjuba</Text>
                             <TouchableOpacity style = {styles.editBtn} onPress = {this._onEdit}>
                                 <Text style = {styles.edit}>Edit</Text>
@@ -113,6 +115,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         left: 0,
+        resizeMode: 'cover'
     },
     line: {
         height: 1,

@@ -44,6 +44,7 @@ class TabChannels extends Component {
         super(props)
         this.state = {
             refreshing: false,
+            userName: ''
         }
     }
     _onRefresh() {
@@ -68,7 +69,7 @@ class TabChannels extends Component {
                         style = {styles.mList} 
                         dataArray={datas}
                         renderRow={data =>
-                            <ListItem button noBorder onPress={() => this.props.navigation.navigate('Chat', {GroupName: data.name})} style = {{height:70, padding:10}}>
+                            <ListItem button noBorder onPress={() => this.props.navigation.navigate('Chat', {GroupName: data.name, GroupChatting: true})} style = {{height:70, padding:10}}>
                                 <Image source = {data.icon} style = {styles.menuIcon}/>
                                 <Text style = {styles.menuItem}>{data.name}</Text>
                             </ListItem>
@@ -77,6 +78,9 @@ class TabChannels extends Component {
                     </List>
 
                 </Content>
+                <TouchableOpacity style = {styles.chatBtn} onPress = {() => this.props.navigation.navigate('Chat', {GroupName: 'Channel', GroupChatting: true})}>
+                    <Image source = {require('../assets/img/chat_button_new.png')} style = {{width: 70, height: 70}}/>
+                </TouchableOpacity>
             </Container>
         );
     }
@@ -106,6 +110,11 @@ const styles = StyleSheet.create({
         height: 40,
         borderRadius: 20,
     },
+    chatBtn: {
+        position:'absolute',
+        bottom: 20,
+        right: 20,
+    }
 });
 
 //make this component available to the app

@@ -62,7 +62,7 @@ class Profile extends Component {
                         </TouchableOpacity>
                         
                         <Image source = {require('../assets/img/userphotos/user0.jpg')} style = {styles.userphoto}/>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('Chat', {GroupName: 'Channel', GroupChatting: false})}>
                             <Image source = {require('../assets/img/chat_button_new.png')} style = {styles.addphoto}/>
                         </TouchableOpacity>
                     </View>

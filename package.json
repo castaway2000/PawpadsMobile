@@ -18,6 +18,11 @@
   "jest": {
     "preset": "jest-expo"
   },
+  "rnpm": {
+    "assets": [
+      "src/assets/fonts"
+    ]
+  },
   "dependencies": {
     "@expo/vector-icons": "^5.1.0",
     "expo": "^19.0.0",

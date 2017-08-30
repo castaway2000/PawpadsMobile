@@ -73,7 +73,7 @@ class TabChats extends Component {
                         style = {styles.mList} 
                         dataArray={datas}
                         renderRow={data =>
-                            <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile')} style = {{height:70, padding:10}}>
+                            <ListItem button noBorder onPress={() => this.props.navigation.navigate('Chat', {GroupName: data.name, GroupChatting: false})} style = {{height:70, padding:10}}>
                                 <Image source = {data.icon} style = {styles.menuIcon}/>
                                 <View style = {{marginLeft: 15,  flex: 1}}>
                                     <Text style = {styles.customerName}>{data.name}</Text>
@@ -85,7 +85,7 @@ class TabChats extends Component {
                     >
                     </List>
                 </Content>
-                <TouchableOpacity style = {styles.chatBtn}>
+                <TouchableOpacity style = {styles.chatBtn} onPress = {() => this.props.navigation.navigate('Chat', {GroupName: 'Channel', GroupChatting: false} )}>
                     <Image source = {require('../assets/img/chat_button_new.png')} style = {{width: 70, height: 70}}/>
                 </TouchableOpacity>
             </Container>

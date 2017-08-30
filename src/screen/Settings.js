@@ -5,6 +5,7 @@ import Constant from '../common/Constant'
 import CheckBox from 'react-native-icon-checkbox';
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
 import {Button} from 'native-base';
+import {colors} from '../actions/const';
 
 // create a component
 class Settings extends Component {
@@ -19,7 +20,8 @@ class Settings extends Component {
             isMediumSelected: true,
             isLowSelected: false,
             isTogglepushSelected: false,
-            isToggleMessagingSelected: true
+            isToggleMessagingSelected: true,
+            userage: Number,
         };
     }
 
@@ -58,14 +60,12 @@ class Settings extends Component {
     }
     handleSelectedPush = (checked) => {
         this.setState({
-            isTogglepushSelected: true,
-            isToggleMessagingSelected: false
+            isTogglepushSelected: checked,
         })
     }
     handleSelectedMessaging = (checked) => {
         this.setState({
-            isTogglepushSelected: false,
-            isToggleMessagingSelected: true
+            isToggleMessagingSelected: checked
         })
     }
 
@@ -110,9 +110,9 @@ class Settings extends Component {
                                     style = {styles.inputText}
                                     onChangeText = {(text) => this.setState({userage:text})}
                                     value = {this.state.userage}
-                                    placeholder = '105 miles'
+                                    placeholder = '0'
                                     placeholderTextColor = {Constant.APP_COLOR}
-                                    keyboardType = 'default'
+                                    keyboardType = 'numeric'
                                     underlineColorAndroid = 'transparent'
                                 />
                                 <Image source = {require('../assets/img/pencil_icon.png')} style = {styles.icon}/>
@@ -292,6 +292,11 @@ const styles = StyleSheet.create({
         height: 40, 
         alignItems:'center', 
         justifyContent:'center'
+    },
+    inputText: {
+        backgroundColor: 'transparent',
+        flex: 1,
+        color: Constant.APP_COLOR,
     }
 });
 
