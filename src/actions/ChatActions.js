@@ -1,6 +1,4 @@
-/**
- * Created by mponomarets on 7/5/17.
- */
+
 import {
 	START_LOAD_CHAT_MESSAGE,
 	LOAD_CHAT_MESSAGE_SUCCESS,
@@ -29,28 +27,37 @@ const loadingChatMessageFail = (dispatch, error) => {
 };
 
 export const getChatMessage = () => {
-	return dispatch => {
-		dispatch({type: START_LOAD_CHAT_MESSAGE});
-		getKeyFromStorage('chat').then((store) => {
-			const {token, email, userId, doctorId, profile} = store;
-			let url = HOST + 'api/v2/mobile/chat';
-			let body = 'userName=' + encodeURIComponent(email) + '&token=' + token;
-			let chatOptions = createOptions('POST', body);
-			sendRequest(url, chatOptions).then(result => {
-				if (result === 'timeout') {
-					loadingChatMessageFail(dispatch, timeoutMessage);
-				}
-				if (result.message && result.message.toLowerCase() === 'access denied' && result.status === 'fail') {
-					Actions.auth({type: 'replace'});
-				} else if (result.status === 'fail') {
-					loadingChatMessageFail(dispatch, result.message);
-				}
-				if (result.status === 'success') {
-					loadingChatMessageSuccess(dispatch, result.messages, Number(userId), Number(doctorId), profile);
-				}
-			});
-		});
-	};
+	alert('chatting room')
+	var { dispatch } = this.props;
+	dispatch({
+		type: LOAD_CHAT_MESSAGE_SUCCESS,
+		payload: 'messages',
+		userId: 'user',
+		doctorId: 'doctor',
+		profile: "profile"
+	});
+	// return dispatch => {
+	// 	dispatch({type: START_LOAD_CHAT_MESSAGE});
+	// 	getKeyFromStorage('chat').then((store) => {
+	// 		const {token, email, userId, doctorId, profile} = store;
+	// 		let url = HOST + 'api/v2/mobile/chat';
+	// 		let body = 'userName=' + encodeURIComponent(email) + '&token=' + token;
+	// 		let chatOptions = createOptions('POST', body);
+	// 		sendRequest(url, chatOptions).then(result => {
+	// 			if (result === 'timeout') {
+	// 				loadingChatMessageFail(dispatch, timeoutMessage);
+	// 			}
+	// 			if (result.message && result.message.toLowerCase() === 'access denied' && result.status === 'fail') {
+	// 				Actions.auth({type: 'replace'});
+	// 			} else if (result.status === 'fail') {
+	// 				loadingChatMessageFail(dispatch, result.message);
+	// 			}
+	// 			if (result.status === 'success') {
+	// 				loadingChatMessageSuccess(dispatch, result.messages, Number(userId), Number(doctorId), profile);
+	// 			}
+	// 		});
+	// 	});
+	// };
 };
 
 const changeMessageArray = (dispatch, messages) => {

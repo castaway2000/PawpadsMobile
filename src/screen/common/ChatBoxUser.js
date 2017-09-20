@@ -1,6 +1,4 @@
-/**
- * Created by mponomarets on 7/22/17.
- */
+
 import React, {Component} from 'react';
 import {
 	Text,
@@ -32,16 +30,16 @@ const styles = {
 	userMessageContainer: {
 		borderWidth: 1,
 		paddingVertical: 5,
-		maxWidth: 230,
+		maxWidth: 260,
 		marginRight: 10,
-		borderColor: 'rgba(44, 194, 107, 1)',
+		borderColor: '#24A2B1',
 		flexDirection: 'column',
 		justifyContent: 'flex-end',
 		alignItems: 'flex-end',
 		paddingHorizontal: 10,
 		borderRadius: 15,
 		borderBottomRightRadius: 0,
-		backgroundColor: 'rgba(44, 194, 107, 1)'
+		backgroundColor: '#24A2B1'
 
 	},
 	messageTime: {

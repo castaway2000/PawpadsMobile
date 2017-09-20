@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView,AsyncStorage,RefreshControl, ActivityIndicator } from 'react-native';
 import {
     Content,
 	List,
@@ -25,29 +25,7 @@ var isPassword = false
 var isConfirm = false
 var isEmail = false
 
-const datas = [
-    {
-		name: "Mabelle Baldwin",
-		route: "Friends",
-        icon: require('../assets/img/userphotos/user5.png'),
-	},
-    {
-		name: "Antonie Jirad",
-		route: "Settings",
-        icon: require('../assets/img/userphotos/user6.jpg'),
-	},
-    {
-		name: "Nathan Cook",
-		route: "Friends",
-        icon: require('../assets/img/userphotos/user1.jpg'),
-	},
-    {
-		name: "Margaret Caldwell",
-		route: "Settings",
-        icon: require('../assets/img/userphotos/user2.jpg'),
-	},
-    
-]
+const datas = []
 
 // create a component
 class CreateGroupChat extends Component {
@@ -57,15 +35,148 @@ class CreateGroupChat extends Component {
             email: '',
             isEmail: false,
             isKilometerSelected: false,
+            dialogs: [],
+            token: '',
+            refresh: false,
+            userID: '',
+            refreshing: false,
+            loading: true,
         }
+    }
+    componentWillMount() {
+        currentPage = 0
+        datas = []
+        AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
+            this.setState({ userID: value })
+        })
+        this.loadData()     
+    }
+    loadData(){
+        AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
+            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?type[in]=2,3' + '&limit=10' + '&skip=' + currentPage*10
+            console.log(REQUEST_URL)
+            fetch(REQUEST_URL, {
+                method: 'GET',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'QB-Token': token
+                },
+            })
+            .then((response) => response.json())
+            .then((responseData) => {
+                if(responseData.limit > 0){
+                    console.log(responseData)
+                    datas.push(responseData.items)
+                    console.log(datas)
+                    currentPage ++
+                    this.setState({ 
+                        dialogs: JSON.parse(JSON.stringify(datas[0])),
+                        token: token,
+                        loading: false 
+                    })
+                }else{
+                    this.setState({ loading: false })
+                }
+                
+            }).catch((e) => {
+                console.log(e)
+            })   
+        })
     }
     _onback = () => {
         this.props.navigation.goBack()
+    }
+    _onRefresh() {
+        this.loadData() 
+        this.setState({refreshing: true});
+        setTimeout(() => {
+            this.loadData() 
+            this.setState({
+                refreshing: false
+            })
+        }, 2000)
     }
     handleSelectedKilometers = (checked) => {
         this.setState({
             isKilometerSelected: true,
         });
+    }
+    downloadLastUser(occupants_ids){
+        var last_message_userid = ''
+        for(var j=0; j<occupants_ids.length; j++){
+            if(occupants_ids[j] != this.state.userID){
+                last_message_userid = occupants_ids[j].toString()
+            }
+        }
+        var REQUEST_URL = Constant.USERS_URL + last_message_userid +'.json'
+        console.log(REQUEST_URL)
+        fetch(REQUEST_URL, {
+            method: 'GET',
+            headers: { 
+                'Content-Type': 'application/json',
+                'QB-Token': this.state.token
+            },
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+            console.log('====')
+            console.log(responseData)
+            console.log('--')
+            console.log(responseData.user.custom_data)
+
+            for(var i = 0;i < this.state.dialogs.length; i++){
+                if(this.state.dialogs[i].name == responseData.user.login || this.state.dialogs[i].name == responseData.user.full_name){
+                    this.state.dialogs[i]['blob_id'] = responseData.user.blob_id.toString();
+                    this.state.dialogs[i]['custom_data'] = responseData.user.custom_data;
+                }
+            }
+            this.setState({
+                refresh: true
+            });
+        }).catch((e) => {
+            console.log(e)
+        })
+    }
+    renderCreateChats(){
+        if(this.state.loading){
+            return (
+				<View style={styles.loadingView}>
+					<ActivityIndicator color={'black'} size={'large'}/>
+				</View>
+			);
+        }
+        else{
+            return(
+                this.state.dialogs.map((data, index) => {
+                    console.log(data)
+                    return(
+                      <TouchableOpacity style = {styles.tabChannelListCell} key = {index} onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})}>
+                        {this.state.refresh == false? this.downloadLastUser(data.occupants_ids) : null}
+                        <CheckBox
+                            size={25}
+                            checked={this.state.isKilometerSelected}
+                            onPress={this.handleSelectedKilometers}
+                            uncheckedIconName="radio-button-unchecked"
+                            checkedIconName="radio-button-checked"
+                            iconStyle = {{color: Constant.APP_COLOR}}
+                        />
+                        <Image source = {{
+                            uri: Constant.BLOB_URL + data.blob_id + '/download.json',
+                            method:'GET',
+                            headers: { 
+                                    'Content-Type': 'application/json',
+                                    'QB-Token': this.state.token
+                                },
+                            }}
+                            defaultSource = {require('../assets/img/user_placeholder.png')}
+                            style = {styles.menuIcon} 
+                        />
+                        <Text style = {styles.customerName}>{data.name}</Text>
+                      </TouchableOpacity>
+                    )    
+                })
+            )
+        }   
     }
     render() {
         <StatusBar
@@ -88,26 +199,17 @@ class CreateGroupChat extends Component {
                     <View style = {styles.serarchView}>
                         <SearchBox />
                     </View>
-                    <Content bounces={false} style={{ flex: 1, backgroundColor: 'white'}}>
-                        <List
-                            style = {styles.mList} 
-                            dataArray={datas}
-                            renderRow={data =>
-                                <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile')} style = {{height:70, padding:10}}>
-                                    <CheckBox
-                                        size={25}
-                                        checked={this.state.isKilometerSelected}
-                                        onPress={this.handleSelectedKilometers}
-                                        uncheckedIconName="radio-button-unchecked"
-                                        checkedIconName="radio-button-checked"
-                                        iconStyle = {{color: Constant.APP_COLOR}}
-                                    />
-                                    <Image source = {data.icon} style = {styles.menuIcon}/>
-                                    <Text style = {styles.customerName}>{data.name}</Text>
-                                </ListItem>
+                    <Content bounces={false} contentContainerStyle={{ flex: 1, backgroundColor: 'white',alignItems:'center'}}>
+                        <ScrollView
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={this.state.refreshing}
+                                    onRefresh={this._onRefresh.bind(this)}
+                                />
                             }
                         >
-                        </List>
+                            {this.renderCreateChats()}
+                        </ScrollView>
                     </Content>
                     
                 </View>
@@ -185,6 +287,19 @@ const styles = StyleSheet.create({
         height: 40,
         borderRadius: 20,
     },
+    loadingView: {
+        flex: 1,
+        justifyContent:'center',
+        top: 200
+    },
+    tabChannelListCell: {
+        width: Constant.WIDTH_SCREEN, 
+        height: 70, 
+        flexDirection:'row', 
+        padding: 10, 
+        paddingLeft: 20,
+        alignItems:'center',
+    }
 });
 
 //make this component available to the app

@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight, AsyncStorage } from 'react-native';
 import Constant from '../common/Constant'
 import CheckBox from 'react-native-icon-checkbox';
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
@@ -21,10 +21,48 @@ class Settings extends Component {
             isLowSelected: false,
             isTogglepushSelected: false,
             isToggleMessagingSelected: true,
-            userage: Number,
+            searchRange: '60',
         };
     }
-
+    componentWillMount() {
+        AsyncStorage.getItem(Constant.SETTINGS_DISTANCE_UNIT).then((value) => {
+            if(value == 'km'){
+                this.setState({ 
+                    isKilometerSelected: true,
+                    isMilesSelected: false
+                })
+            }else{
+                this.setState({ 
+                    isKilometerSelected: false,
+                    isMilesSelected: true
+                })
+            }
+        })
+        AsyncStorage.getItem(Constant.SETTINGS_RANGE).then((value) => {
+            this.setState({ searchRange: value })
+        })
+        AsyncStorage.getItem(Constant.SETTINGS_GPS_ACCURACY).then((value) => {
+            if(value == 'High'){
+                this.setState({ 
+                    isHighSelected: true,
+                    isMediumSelected: false,
+                    isLowSelected: false,
+                })
+            }else if(value == 'Medium'){
+                this.setState({ 
+                    isHighSelected: false,
+                    isMediumSelected: true,
+                    isLowSelected: false,
+                })
+            }else{
+                this.setState({ 
+                    isHighSelected: false,
+                    isMediumSelected: false,
+                    isLowSelected: true,
+                })
+            }
+        })
+    }
     handleSelectedKilometers = (checked) => {
         this.setState({
             isKilometerSelected: true,
@@ -70,6 +108,29 @@ class Settings extends Component {
     }
 
     _onback = () => {
+        if(this.state.isKilometerSelected){
+            AsyncStorage.setItem(Constant.SETTINGS_DISTANCE_UNIT, 'km');
+        }
+        if(this.state.isMilesSelected){
+            AsyncStorage.setItem(Constant.SETTINGS_DISTANCE_UNIT, 'miles');
+        }
+        AsyncStorage.setItem(Constant.SETTINGS_RANGE, this.state.searchRange);
+        if(this.state.isHighSelected){
+            AsyncStorage.setItem(Constant.SETTINGS_GPS_ACCURACY, 'High');
+        }
+        if(this.state.isMediumSelected){
+            AsyncStorage.setItem(Constant.SETTINGS_GPS_ACCURACY, 'Medium');
+        }
+        if(this.state.isLowSelected){
+            AsyncStorage.setItem(Constant.SETTINGS_GPS_ACCURACY, 'Low');
+        }
+        if(this.state.isTogglepushSelected){
+            AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_PUSH_NOTIFICATIONS, 'push_notification');
+        }
+        if(this.state.isToggleMessagingSelected){
+            AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_MESSAGING_POPUPS, 'messaging_popups')
+        }
+
         this.props.navigation.goBack()
     }
     render() {
@@ -108,9 +169,8 @@ class Settings extends Component {
                                 <View style = {styles.lineTop}/>
                                 <TextInput
                                     style = {styles.inputText}
-                                    onChangeText = {(text) => this.setState({userage:text})}
-                                    value = {this.state.userage}
-                                    placeholder = '0'
+                                    onChangeText = {(text) => this.setState({searchRange:text})}
+                                    value = {this.state.searchRange.toString()}
                                     placeholderTextColor = {Constant.APP_COLOR}
                                     keyboardType = 'numeric'
                                     underlineColorAndroid = 'transparent'

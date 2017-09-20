@@ -18,10 +18,8 @@ export default class App extends React.Component {
     }
     
     async componentWillMount() {
-        await Expo.Font.loadAsync({
-            Roboto: require("native-base/Fonts/Roboto.ttf"),
-            Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
-            Ionicons: require("@expo/vector-icons/fonts/Ionicons.ttf")
+        Expo.Font.loadAsync({
+            // 'Bellota_BoldItalic': require('./src/assets/fonts/Bellota_BoldItalic.otf'),
         });
 
         this.setState({ isReady: true })

@@ -13,6 +13,7 @@ import Passwordrecovery from './components/auth/Passwordrecovery'
 import Dashboard from './screen/Dashboard'
 import Profile from './screen/Profile'
 import Chat from './screen/Chat'
+import ChatGroup from './screen/ChatGroup'
 import ChatGroupEdit from './screen/ChatGroupEdit'
 import CreateGroupChat from './screen/CreateGroupChat'
 
@@ -35,6 +36,7 @@ const LoginStack = StackNavigator(
         Drawer: { screen: Drawer },
         Profile: { screen: Profile },
         Chat: { screen: Chat },
+        ChatGroup: { screen: ChatGroup },
         ChatGroupEdit: { screen: ChatGroupEdit },
         CreateGroupChat: { screen: CreateGroupChat },
     },

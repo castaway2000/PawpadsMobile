@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight,AsyncStorage } from 'react-native';
 import { Container, Header, Content, Button } from 'native-base';
 import Constant from '../common/Constant'
 import reactNativeKeyboardAwareScrollView from 'react-native-keyboard-aware-scroll-view';
@@ -11,17 +11,154 @@ class Profile extends Component {
     constructor(props){
         super(props)
         this.state = {
+            isalert: false,
+            token: '',
             username:'',
             userage:'',
             usergender:'',
             userhobby: '',
             userdetail: '',
+            userid:'',
         }
+    }
+    componentWillMount() {
+        AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
+            this.setState({ token: token })
+        })
+        AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
+            this.setState({ userid: value })
+        })
     }
     _onback = () => {
         this.props.navigation.goBack()
     }
+    showAlertUserPhoto(){
+        var {params} = this.props.navigation.state
+        return(
+            <Image source = {{
+                uri: Constant.BLOB_URL + params.UserInfo.blob_id + '/download.json',
+                method:'GET',
+                headers: { 
+                        'Content-Type': 'application/json',
+                        'QB-Token': this.state.token
+                    },
+                }}
+                defaultSource = {require('../assets/img/user_placeholder.png')}
+                style = {[styles.addphoto, {marginTop: -40}]}
+            />
+        )
+    }
+    showUserPhoto() {
+        var {params} = this.props.navigation.state
+        return(
+            <Image source = {{
+                uri: Constant.BLOB_URL + params.UserInfo.blob_id + '/download.json',
+                method:'GET',
+                headers: { 
+                        'Content-Type': 'application/json',
+                        'QB-Token': this.state.token
+                    },
+                }}
+                defaultSource = {require('../assets/img/user_placeholder.png')}
+                style = {styles.userphoto} 
+            />
+        )
+    }
+    showUserAbout(){
+        var {params} = this.props.navigation.state
+        var json = JSON.parse(params.UserInfo.custom_data)
+        console.log(json)
+        return(
+                <Text style = {styles.detail}>
+                    { json ?
+                        json.about :
+                        null
+                     }
+                </Text> 
+        )
+    }
+    showUserAge(){
+        var {params} = this.props.navigation.state
+        console.log(params.UserInfo.custom_data)
+        var json = JSON.parse(params.UserInfo.custom_data)
+        if(json){
+            var today = new Date()
+            if(json.age > 0){
+                var currentage = today.getFullYear() - json.age           
+                return(
+                    <View style = {{flexDirection:'row', alignItems:'center', marginTop: 20}}>
+                        <Image source ={require('../assets/img/male_icon.png')} style = {{width: 17, height: 23}}/>
+                        <Text style = {{color: 'gray'}}> Age :<Text> {currentage}</Text></Text>
+                    </View>
+                )
+            } 
+        }   
+    }
+    showUserHobby(){
+        var {params} = this.props.navigation.state
+        var json = JSON.parse(params.UserInfo.custom_data)
+        return(
+            <Text style = {styles.job}>
+                { json ?
+                    json.hobby :
+                    null
+                    }
+            </Text> 
+        )
+    }
+    showAlertUserName(){
+        var {params} = this.props.navigation.state
+        return(
+            <Text style = {{fontWeight:'bold'}}>
+                { params.UserInfo.full_name?
+                    params.UserInfo.full_name :
+                    params.UserInfo.login
+                } 
+            </Text> 
+        )
+    }
+    showUserName(){
+        var {params} = this.props.navigation.state
+        return(
+                <Text style = {styles.name}>
+                    { params.UserInfo.full_name?
+                        params.UserInfo.full_name :
+                        params.UserInfo.login
+                    } 
+                </Text> 
+        )
+    }
+    onCreateDialog = () =>{
+        var {params} = this.props.navigation.state
+        let formdata = new FormData()
+        formdata.append('type', '3')
+        formdata.append('name', params.UserInfo.full_name)
+        formdata.append('occupants_ids', params.UserInfo.id + ',' + this.state.userid)
+        var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL
+        console.log(REQUEST_URL)
+        fetch(REQUEST_URL, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'QB-Token': this.state.token
+            },
+            body: formdata
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+            console.log('====//////////')
+            console.log(responseData)
+            params.UserInfo['_id'] = responseData._id
+            this.props.navigation.navigate('Chat', {GroupName: params.UserInfo.login, GroupChatting: false, Dialog: params.UserInfo, Token: this.state.token})
+            
+        }).catch((e) => {
+            console.log(e)
+        })
+    }
     render() {
+        var {params} = this.props.navigation.state
+        console.log('userprofile ----->')
+        console.log(params)
         return (
             <ScrollView style = {{backgroundColor: 'white'}}>
                 <View style={styles.container}>
@@ -36,19 +173,16 @@ class Profile extends Component {
                     </View>
 
                     <View style = {styles.bodyView}>
-                        
                             <View style = {styles.mscrollView}>
-                                <Text style = {styles.name}>Igor Dzjuba</Text>
-                                <Text style = {styles.job}>UI/UX designer, artist, movie maker</Text>
-                                <View style = {{flexDirection:'row', alignItems:'center', marginTop: 20}}>
-                                    <Image source ={require('../assets/img/male_icon.png')} style = {{width: 17, height: 23}}/>
-                                    <Text style = {{color: 'gray'}}> Age :<Text> 25</Text></Text>
-                                </View>
-                                <Text style = {styles.detail}>Doodling, daydraming, writing, and reading fiction have been my favorite things since birth.  I am newly obseseed with performing improv. I am also an avid hugger.</Text>
+                                { this.showUserName() }
+                                { this.showUserHobby() }
+                                { this.showUserAge() }
+                                { this.showUserAbout() }
+                                
                                 <View style = {styles.buttonView}>
-                                    <TouchableOpacity style = {styles.removeBtn}>
+                                    {/*<TouchableOpacity style = {styles.removeBtn}>
                                         <Text style = {{color: Constant.APP_COLOR}}>Remove from friends</Text>
-                                    </TouchableOpacity>
+                                    </TouchableOpacity>*/}
                                     <TouchableOpacity style = {styles.blockBtn}>
                                         <Text style = {{color: '#de380a'}}>Block user</Text>
                                     </TouchableOpacity>
@@ -60,9 +194,9 @@ class Profile extends Component {
                         <TouchableOpacity onPress={() => { this.popupDialog.show(); }}>
                             <Image source = {require('../assets/img/add_to_friend.png')} style = {styles.addphoto}/>
                         </TouchableOpacity>
-                        
-                        <Image source = {require('../assets/img/userphotos/user0.jpg')} style = {styles.userphoto}/>
-                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('Chat', {GroupName: 'Channel', GroupChatting: false})}>
+                        { this.showUserPhoto() }    
+                        {/*<TouchableOpacity onPress = {() => this.props.navigation.navigate('Chat', {GroupName: params.UserInfo.login, GroupChatting: false, Dialog: params.UserInfo, Token: this.state.token})}>*/}
+                        <TouchableOpacity onPress = {this.onCreateDialog} >
                             <Image source = {require('../assets/img/chat_button_new.png')} style = {styles.addphoto}/>
                         </TouchableOpacity>
                     </View>
@@ -76,8 +210,8 @@ class Profile extends Component {
                     height = {50}
                 >
                     <View style = {{alignItems:'center', backgroundColor:'white', padding: 10}}>
-                        <Image source = {require('../assets/img/userphotos/user0.jpg')} style = {[styles.addphoto, {marginTop: -40}]}/>
-                        <Text style = {{textAlign:'center', marginTop: 20}}>You are about to add <Text style = {{fontWeight:'bold'}}>Margaret Caldwell</Text> to friends</Text>
+                        { this.showAlertUserPhoto() }
+                        <Text style = {{textAlign:'center', marginTop: 20}}>You are about to add <Text style = {{fontWeight:'bold'}}>{ this.showAlertUserName() }</Text> to friends</Text>
                         <View style = {{width:Constant.WIDTH_SCREEN*0.7, height:1, backgroundColor:'#e4e4e4', marginTop: 25}}/>
                         <TouchableOpacity style = {{marginTop: 12}} onPress = {() => this.popupDialog.dismiss()}>
                             <Text style = {{textAlign:'center', color:'#fb5e33'}}>Cancel</Text>
@@ -85,7 +219,7 @@ class Profile extends Component {
                     </View>
                     <View style = {{width:Constant.WIDTH_SCREEN*0.7, backgroundColor:'transparent', marginTop: 5}}/>
                     <TouchableHighlight style = {styles.cancelBtn} onPress = {() => this.popupDialog.dismiss()}>
-                        <Text style = {{textAlign:'center', color:'white', fontWeight:'bold'}}>Send request</Text>
+                        <Text style = {styles.requestButton}>Send request</Text>
                     </TouchableHighlight>
                 </PopupDialog>
             </ScrollView>
@@ -219,6 +353,11 @@ const styles = StyleSheet.create({
         height: 40, 
         alignItems:'center', 
         justifyContent:'center'
+    },
+    requestButton: {
+        textAlign:'center', 
+        color:'white', 
+        fontWeight:'bold'
     }
 });
 

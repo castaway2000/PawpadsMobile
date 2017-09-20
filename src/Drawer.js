@@ -12,6 +12,7 @@ import Friends from './screen/Friends'
 import Settings from './screen/Settings'
 import ProfileEdit from './screen/ProfileEdit'
 import About from './screen/About'
+import UserProfile from './screen/UserProfile'
 
 const Drawer = DrawerNavigator(
     {   
@@ -20,6 +21,7 @@ const Drawer = DrawerNavigator(
         Settings: { screen: Settings },
         ProfileEdit: { screen: ProfileEdit },
         About: { screen: About },
+        UserProfile: { screen: UserProfile },
     },
     {
         initialRouterName: 'Dashboard',

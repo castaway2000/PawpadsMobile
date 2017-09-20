@@ -1,9 +1,21 @@
 //import libraries
 import React, { Component } from 'react';
-import { View,  StyleSheet,Text, Image, TextInput, ScrollView, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
-import { KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
+import { View,  StyleSheet,Text, Image, TextInput, ScrollView, TouchableOpacity, KeyboardAvoidingView, ActivityIndicator, Keyboard, AsyncStorage } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { connect } from 'react-redux';
+import { loginUser, passwordChanged } from '../../actions';
 import Constant from '../../common/Constant'
 import { Font } from 'expo'
+var CryptoJS = require("crypto-js")
+import hmacSHA1 from 'crypto-js/hmac-sha1'
+import {formatDate} from '../../actions/const';
+import {
+    EMAIL_CHANGED,
+    PASSWORD_CHANGED,
+    LOGIN_USER_SUCCESS ,
+    LOGIN_USER_FAIL,
+    LOGIN_USER,
+} from '../../actions/types'
 
 // create a component
 class Login extends Component {
@@ -16,22 +28,103 @@ class Login extends Component {
         super(props)
         this.state = {
             name: '',
-            password: '',    
+            password: '',
+            qb_token: '',
+            loading: this.props.loading,
+            isname: true,
+            ispassword: true
         }
     }
-    _onLogin = () => {
-        // if(!this.validateEmail(this.state.name)){
-        //     alert('The email address is not a valid format')
-        // }else{
-        //     if(this.state.password.length < 6){
-        //         alert('The password must be at least 6 letters.')
-        //     }else{
-                const { navigate } = this.props.navigation
-                navigate ('Drawer')
-        //     }
-        // }
+
+    componentWillMount() {
+        var time = parseInt(Date.now()/1000)
+        var signatureParams = 'application_id='+ Constant.QB_APPID + '&auth_key=' + Constant.QB_AUTH_KEY + '&nonce=' + time + '&timestamp=' + time
+        var signature = ''
+        signature = hmacSHA1(signatureParams, Constant.QB_AUTH_SECRET).toString()
+        this.getQB_Token(time, signature)
+    }
+
+    getQB_Token(time, signature){
+        let formdata = new FormData()
+        formdata.append('application_id', Constant.QB_APPID)
+        formdata.append('auth_key', Constant.QB_AUTH_KEY)
+        formdata.append('timestamp', time)
+        formdata.append('nonce', time)
+        formdata.append('signature', signature)
+
+        var REQUEST_URL = Constant.SESSION_URL
+        fetch(REQUEST_URL, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+            },
+            body:formdata
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+            console.log(responseData)
+            var token = responseData.session.token
+            AsyncStorage.setItem(Constant.QB_TOKEN, token);
+            this.setState({
+                qb_token: token
+            })
+        }).catch((e) => {
+            console.log(e)
+        })   
 
     }
+    
+    _onLogin = () => {
+        if(this.state.name.length < 1){
+            this.setState({ isname: false })
+        }else{
+            if(this.state.password.length < 1){
+                this.setState({ ispassword: false })
+            }else{
+                this.Login()
+		        Keyboard.dismiss();
+            }
+        }
+    }
+    Login(){
+        this.setState({ loading: true })
+        let formdata = new FormData()
+        formdata.append('login', this.state.name)
+        formdata.append('password', this.state.password)
+
+        var REQUEST_URL = Constant.LOGIN_URL
+        fetch(REQUEST_URL, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'QB-Token': this.state.qb_token
+            },
+            body:formdata
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+            this.setState({ loading: false })
+            if(responseData.user){
+                var id = responseData.user.id
+                console.log(id)
+                console.log(responseData)
+
+                
+                AsyncStorage.setItem(Constant.QB_USERID, id.toString());
+                AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
+                AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
+
+                const { navigate } = this.props.navigation
+                navigate ('Drawer')
+            }
+            else{
+                alert(responseData.errors)
+            }
+        }).catch((e) => {
+            console.log(e)
+        })   
+    }
+
     validateEmail = (email) => {
         var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return re.test(email);
@@ -44,7 +137,15 @@ class Login extends Component {
         this.props.navigation.navigate('Passwordrecovery')
     }
 
-
+    showLoading(){
+        if (this.state.loading) {
+			return (
+				<View style={styles.loadingView}>
+					<ActivityIndicator color={'black'} size={'large'}/>
+				</View>
+			);
+		}
+    }
 
     setUserName(text){
         this.setState({ name: text })
@@ -71,8 +172,8 @@ class Login extends Component {
                             <TextInput
                                 style = {styles.nameInput}
                                 returnKeyType = 'next'
-                                placeholder = 'Login'
-                                placeholderTextColor = 'black'
+                                placeholder = {this.state.isname == true ? 'Login': 'Name is required'}
+                                placeholderTextColor = { this.state.isname == true ? 'black': 'red' }
                                 autoCorrect = {true}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.name}
@@ -83,8 +184,8 @@ class Login extends Component {
                             <TextInput
                                 style = {styles.passwordInput}
                                 returnKeyType = 'done'
-                                placeholder = 'Password'
-                                placeholderTextColor = 'black'
+                                placeholder = {this.state.ispassword == true ? 'Password': 'Passowrd is required'}
+                                placeholderTextColor = { this.state.ispassword == true ? 'black': 'red' }
                                 autoCorrect = {true}
                                 secureTextEntry = {true}
                                 underlineColorAndroid = 'transparent'
@@ -120,6 +221,8 @@ class Login extends Component {
                         
                     </View>
                 </KeyboardAwareScrollView>
+
+                {this.showLoading()}
                 
             </View>
         );
@@ -254,8 +357,21 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignItems:'center',
         justifyContent:'center'
+    },
+    loadingView: {
+        flex: 1,
+        position: 'absolute',
+        top: Constant.HEIGHT_SCREEN/2
     }
 });
 
 //make this component available to the app
-export default Login;
+// export default Login;
+
+const mapStateToProps = ({auth}) => {
+	const {email, password, error, platform, loading} = auth;
+	return {email, password, error, platform, loading};
+};
+
+export default connect(mapStateToProps)(Login);
+

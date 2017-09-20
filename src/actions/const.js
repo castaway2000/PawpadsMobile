@@ -1,6 +1,4 @@
-/**
- * Created by mponomarets on 6/25/17.
- */
+
 import {DatePickerAndroid, AsyncStorage, Animated} from 'react-native';
 export const colors = {
 	primaryOrange: 'rgb(234, 98, 80)',

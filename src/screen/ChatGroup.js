@@ -37,14 +37,13 @@ import InvertibleScrollView from 'react-native-invertible-scroll-view';
 var messages = []
 var currentUserid = ''
 
-class Chat extends Component {
+class ChatGroup extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			messages: this.props.chatMessages,
 			loading: true,
 			protected: this.props.profile,
-			token: ''
 		};
 	}
 
@@ -70,8 +69,6 @@ class Chat extends Component {
         messages = []
         AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
             var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=15'
-			console.log('\\\\\\\\\\\\\\')
-			console.log(REQUEST_URL)
             fetch(REQUEST_URL, {
                 method: 'GET',
                 headers: { 
@@ -82,15 +79,13 @@ class Chat extends Component {
             .then((response) => response.json())
             .then((responseData) => {
                 if(responseData.limit > 0){
-					console.log('get chat messages ========')
                     console.log(responseData)
                     responseData.items.map((item, index) => {
                         messages.push(item)
                     })
                     this.setState({
 						messages: messages,
-                        loading: false,
-						token: value
+                        loading: false
                     })
                 }else{
                     this.setState({ loading: false })
@@ -155,10 +150,9 @@ class Chat extends Component {
 					newArray.push(this.state.messages[i])
 				}
 
-				console.log('============+++++')
 				console.log(newArray)
 				this.setState({
-					messages:newArray
+					message:newArray
 				});
 
 				var {dispatch} = this.props
@@ -185,6 +179,7 @@ class Chat extends Component {
 					key={index}
 					messageBody={item.message}
 					navigation = {this.props.navigation}
+					messageSenderPhoto={item.sender_id}
 					messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
 						hour: '2-digit',
 						minute: '2-digit',
@@ -201,7 +196,7 @@ class Chat extends Component {
 					//messageSender={item.sender_name}
 					messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
 						hour: '2-digit',
-						minute: '2-digit',
+						minute: '2-digit'
 					})}/>
 			);
 		}
@@ -252,31 +247,36 @@ class Chat extends Component {
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
 					<ChatMessageBox sendMessage={(text) => this.sendMessage(text)}/>
-				</KeyboardAvoidingView> 
+				</KeyboardAvoidingView>
 			);
 		}
 
 	}
 
+	chatEdit(){
+		var {params} = this.props.navigation.state
+		if(params.GroupChatting){
+			return(
+				<TouchableOpacity style = {styles.backButton} onPress = {() => this.props.navigation.navigate('ChatGroupEdit')}>
+					<Image source = {require('../assets/img/edit_white.png')} style = {{width: 18, height: 18, resizeMode:'contain'}}/>
+				</TouchableOpacity>
+			);
+		}else{
+			return null
+		}
+	}
 	createGroup(){
 		var {params} = this.props.navigation.state
-		console.log('chat group user profile link')
-		console.log(params)
-		return(
-			<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('CreateGroupChat')}>
-				<Image source = {{
-					uri: Constant.BLOB_URL + params.Dialog.blob_id + '/download.json',
-					method:'GET',
-					headers: { 
-							'Content-Type': 'application/json',
-							'QB-Token': params.Token,
-						},
-					}}
-					defaultSource = {require('../assets/img/user_placeholder.png')}
-					style = {styles.menuIcon} />
-			</TouchableOpacity>
-		)
-
+		if(params.GroupChatting){
+			return(
+				<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('CreateGroupChat')}>
+					<Image source = {require('../assets/img/add_participant.png')} style = {{width: 26, height: 26, resizeMode:'contain'}}/>
+				</TouchableOpacity>
+			)
+		}
+		else{
+			return null
+		}
 	}
 
 	render() {
@@ -288,6 +288,9 @@ class Chat extends Component {
                         <Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
                     </TouchableOpacity>
                     <Text style = {styles.title} numberOfLines = {1} ellipsizeMode = 'tail'>{params.GroupName}</Text>
+
+					{this.chatEdit()}
+
 					{this.createGroup()}					
                 </View>
                 <View style = {styles.bodyView}>
@@ -330,12 +333,6 @@ const styles = {
 		height: Constant.HEIGHT_SCREEN - 80,
         backgroundColor: 'white',
     },
-	menuIcon: {
-		width: 30, 
-		height: 30,
-		borderRadius: 15, 
-		resizeMode:'contain'
-	}
 };
 
 
@@ -344,6 +341,6 @@ const mapStateToProps = ({chat}) => {
 	return {loading, chatMessages, error, userId, doctorId, profile};
 };
 
-export default connect(mapStateToProps)(Chat);
+export default connect(mapStateToProps)(ChatGroup);
 
 // export default ChatGroup;

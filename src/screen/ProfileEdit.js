@@ -115,7 +115,7 @@ class ProfileEdit extends Component {
 
                 </View>
                 
-                <Image source = {require('../assets/img/userphotos/user0.jpg')} style = {styles.userphoto}/>
+                <Image defaultSource = {require('../assets/img/user_placeholder.png')} style = {styles.userphoto}/>
 
             </View>
         );

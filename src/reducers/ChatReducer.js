@@ -1,6 +1,4 @@
-/**
- * Created by mponomarets on 7/5/17.
- */
+
 import {
 	START_LOAD_CHAT_MESSAGE,
 	LOAD_CHAT_MESSAGE_SUCCESS,

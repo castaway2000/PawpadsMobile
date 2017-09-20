@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, AsyncStorage } from 'react-native';
 import { Container, Header, Title, Button, Icon, Tabs, Tab, Right, Left, Body, TabHeading} from 'native-base'
 import Constant from '../common/Constant'
 import TabChannels from './TabChannels'
@@ -9,10 +9,13 @@ import TabNearBy from './TabNearBy'
 
 // create a component
 class Dashboard extends Component {
-    static navigationOptions = {
+    static navigationOptions = { 
         title:'',
         header: null
     };
+    
+    
+
     _onMenu = () =>{
         this.props.navigation.navigate('DrawerOpen')
     }
@@ -29,7 +32,7 @@ class Dashboard extends Component {
                     </TouchableOpacity>
                 </View>
                 <Container style = {{backgroundColor:'white'}}>
-                    <Tabs initialPage = {0} tabBarUnderlineStyle = {{backgroundColor: 'white'}}>
+                    <Tabs initialPage = {0} tabBarUnderlineStyle = {{backgroundColor: 'white'}} locked = {true}>
                         <Tab heading = { <TabHeading style = {{backgroundColor: Constant.APP_COLOR}}><Text style = {{color: 'white'}}>NEARBY</Text></TabHeading> }>
                             <TabNearBy navigation = {this.props.navigation}/>
                         </Tab>

@@ -4,7 +4,7 @@ export const createOptions = (type, body) => {
 		method: type,
 		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded',
-			'Accept': 'application/json'
+			// 'Accept': 'application/json'
 		},
 		body: body
 	};

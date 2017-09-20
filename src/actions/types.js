@@ -17,8 +17,13 @@ export const SEND_NEW_PASSWORD = 'send_new_password';
 export const SEND_NEW_PASSWORD_SUCCESS = 'send_measurements_success';
 export const SEND_NEW_PASSWORD_FAIL = 'send_measurements_fail';
 
+/*types for auth actions */
+export const EMAIL_CHANGED = 'email_changed';
+export const PASSWORD_CHANGED = 'password_changed';
+export const LOGIN_USER_SUCCESS = 'login_user_success';
+export const LOGIN_USER_FAIL = 'login_user_fail';
+export const LOGIN_USER = 'login_user';
 
-
-
-
+/* Quickblox */
+export const QB_LOAD_SUCCESS = 'qb_load_success';
 

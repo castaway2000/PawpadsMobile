@@ -1,6 +1,4 @@
-/**
- * Created by mponomarets on 7/22/17.
- */
+
 import React, {Component} from 'react';
 import {
 	View,

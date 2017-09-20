@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { StyleSheet, StatusBar, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, StatusBar, Image, TouchableOpacity,AsyncStorage } from 'react-native';
 import {
     Content,
 	Text,
@@ -49,8 +49,18 @@ class SideBar extends Component {
 		this.state = {
 			shadowOffsetWidth: 1,
 			shadowRadius: 4,
+            name:''
 		};
 	}
+    componentWillMount() {
+        this.loadUserData()     
+    }
+    loadUserData(){
+        AsyncStorage.getItem(Constant.USER_FULL_NAME).then((value) => {
+            this.setState({ name: value })
+        })
+    }
+
     _onEdit = () => {
         this.props.navigation.navigate('ProfileEdit')
     }
@@ -62,10 +72,10 @@ class SideBar extends Component {
                     <Content>
                         <View style = {styles.drawer}>
                             <Image source = {require('../../assets/img/app_bar_bg.png')} style = {styles.drawerCover} /> 
-                            <TouchableOpacity onPress = {() => this.props.navigation.navigate('Profile')}>
-                                <Image source = {require('../../assets/img/userphotos/user0.jpg')} style = {styles.userPhoto} />
+                            <TouchableOpacity onPress = {() => this.props.navigation.navigate('UserProfile')}>
+                                <Image defaultSource = {require('../../assets/img/user_placeholder.png')} style = {styles.userPhoto} />
                             </TouchableOpacity>
-                            <Text style = {styles.name}>Ihor Dzjuba</Text>
+                            <Text style = {styles.name}>{this.state.name}</Text>
                             <TouchableOpacity style = {styles.editBtn} onPress = {this._onEdit}>
                                 <Text style = {styles.edit}>Edit</Text>
                             </TouchableOpacity>
