@@ -1,14 +1,18 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView,Keyboard,AsyncStorage } from 'react-native';
 import Constant from '../../common/Constant'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import hmacSHA1 from 'crypto-js/hmac-sha1'
 
 var isAlert = false
 var isName = false
 var isEmail = false
 var isPassword = false
 var isConfirm = false
+let nextInput1;
+let nextInput2;
+let nextInput3;
 
 // create a component
 class Register extends Component {
@@ -24,8 +28,66 @@ class Register extends Component {
             isEmail: false,
             isPassword: false,
             isConfirm: false,
+            qb_token: '',
         }
     }
+    componentWillMount() {
+        var time = parseInt(Date.now()/1000)
+        var signatureParams = 'application_id='+ Constant.QB_APPID + '&auth_key=' + Constant.QB_AUTH_KEY + '&nonce=' + time + '&timestamp=' + time
+        var signature = ''
+        signature = hmacSHA1(signatureParams, Constant.QB_AUTH_SECRET).toString()
+        this.getQB_Token(time, signature)
+    }
+    getQB_Token(time, signature){
+        let formdata = new FormData()
+        formdata.append('application_id', Constant.QB_APPID)
+        formdata.append('auth_key', Constant.QB_AUTH_KEY)
+        formdata.append('timestamp', time)
+        formdata.append('nonce', time)
+        formdata.append('signature', signature)
+
+        var REQUEST_URL = Constant.SESSION_URL
+        fetch(REQUEST_URL, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+            },
+            body:formdata
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+            console.log(responseData)
+            var token = responseData.session.token
+            this.setState({
+                qb_token: token
+            })
+        }).catch((e) => {
+            console.log(e)
+        })   
+    }
+
+    getNextInput1(data) {
+		nextInput1 = data;
+	}
+    getNextInput2(data) {
+		nextInput2 = data;
+	}
+    getNextInput3(data) {
+		nextInput3 = data;
+	}
+
+	changeFocus1() {
+		if (nextInput1 !== undefined) {
+			nextInput1.focus();
+		}
+	}
+    changeFocus2() {
+		nextInput2.focus();
+	}
+    changeFocus3() {
+		nextInput3.focus();
+	}
+
     _onback = () => {
         this.props.navigation.goBack()
     }
@@ -54,20 +116,22 @@ class Register extends Component {
         }
 
         if(!this.validateEmail(this.state.email)){
-            alert('The email address is not a valid format')
+            alert('Wrong email format')
         }else{
-            if(this.state.password.length < 6){
-                alert('The password must be at least 6 letters.')
+            if(this.state.password.length < 8){
+                alert('Password is to short (mimimum 8 characters).')
             }else{
-                // const { navigate } = this.props.navigation
-                // navigate ('Register')
+                if(this.state.password == this.state.confirm){
+                    // const { navigate } = this.props.navigation
+                    // navigate ('Register')
+                    this.signup()
+                }
+                else{
+                    alert('Passwords do not match')
+                }
             }
         }
-
-        validateEmail = (email) => {
-            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            return re.test(email);
-        };
+ 
         if(isAlert == true){
             this.setState({ 
                 isAlert: isAlert, 
@@ -77,7 +141,41 @@ class Register extends Component {
                 isConfirm: isConfirm,
             })
         }
+        Keyboard.dismiss();
     }
+    signup(){
+        let formdata = new FormData()
+        formdata.append('user[login]', this.state.name)
+        formdata.append('user[password]', this.state.password)
+        formdata.append('user[email]', this.state.email)
+
+        var REQUEST_URL = Constant.REGISTER_URL
+        fetch(REQUEST_URL, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'multipart/form-data',
+                'QB-Token': this.state.qb_token
+            },
+            body:formdata
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+            console.log('====>>>>>>')
+            console.log(responseData)
+            if(responseData.errors){
+                alert(responseData.errors.email[0])
+            }else{
+                this.props.navigation.goBack()
+            }
+        }).catch((e) => {
+            console.log(e)
+        })   
+    }
+    validateEmail = (email) => {
+        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    };
+
     render() {
         return (
             <View style={styles.container}>
@@ -99,10 +197,12 @@ class Register extends Component {
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.name}
                                 onChangeText = {(text) => {this.setState({ name: text })}}
+                                onSubmitEditing={this.changeFocus1.bind(this)}
                             />
                         </View>
                         <View style = {styles.nameView}>
                             <TextInput
+                                ref={this.getNextInput1.bind(this)}
                                 style = {styles.nameInput}
                                 returnKeyType = 'next'
                                 placeholder = 'Email'
@@ -111,10 +211,12 @@ class Register extends Component {
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.email}
                                 onChangeText = {(text) => {this.setState({ email: text })}}
+                                onSubmitEditing={this.changeFocus2.bind(this)}
                             />
                         </View>
                         <View style = {styles.nameView}>
                             <TextInput
+                                ref={this.getNextInput2.bind(this)}
                                 style = {styles.nameInput}
                                 returnKeyType = 'next'
                                 placeholder = 'Password'
@@ -124,12 +226,14 @@ class Register extends Component {
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.password}
                                 onChangeText = {(text) => {this.setState({ password: text })}}
+                                onSubmitEditing={this.changeFocus3.bind(this)}
                             />
                         </View>
                         <View style = {styles.nameView}>
                             <TextInput
+                                ref={this.getNextInput3.bind(this)}
                                 style = {styles.nameInput}
-                                returnKeyType = 'next'
+                                returnKeyType = 'go'
                                 placeholder = 'Confirm password'
                                 placeholderTextColor = {this.state.isConfirm == false? 'black': '#f94746'}
                                 secureTextEntry = {true}
@@ -137,6 +241,7 @@ class Register extends Component {
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.confirm}
                                 onChangeText = {(text) => {this.setState({ confirm: text })}}
+                                onSubmitEditing={this._onSignup}
                             />
                         </View>
                         {this.state.isAlert == true?

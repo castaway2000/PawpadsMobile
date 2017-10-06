@@ -43,8 +43,8 @@ class TabChannels extends Component {
         this.topIndicatorRender = this.topIndicatorRender.bind(this);
     }
     onPullRelease(resolve){
+        this.setState({refreshing: true});
         setTimeout(() => {
-            console.log('\\\\\\\\\\\===')
            this.loadData() 
            resolve()
         }, 3000)
@@ -63,7 +63,7 @@ class TabChannels extends Component {
     loadData(){
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             token = token
-            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?limit=10' + '&type[in]=1,2' + '&skip=' + currentPage*10 
+            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?limit=100' + '&type[in]=1,2' + '&skip=' + currentPage*10 
             fetch(REQUEST_URL, {
                 method: 'GET',
                 headers: { 
@@ -122,7 +122,6 @@ class TabChannels extends Component {
         // this.loadData()   
         this.setState({refreshing: true});
         setTimeout(() => {
-            console.log('\\\\\\\\\\\===')
             this.setState({
                 refreshing: false
             })
@@ -215,9 +214,9 @@ class TabChannels extends Component {
                 <Content bounces={false} contentContainerStyle={{ flex: 1, backgroundColor: 'white', alignItems:'center' }}>
                     <PullView 
                         style = {{flex: 1, width:Constant.WIDTH_SCREEN}} 
-                        onPullRelease = {this.onPullRelease}
-                        topIndicatorRender = {this.topIndicatorRender}
-                        onRefresh={this._onRefresh.bind(this)}
+                        //onPullRelease = {this.onPullRelease}
+                        //topIndicatorRender = {this.topIndicatorRender}
+                        //onRefresh={this._onRefresh.bind(this)}
                         >
                         {/*<ScrollView
                             refreshControl={

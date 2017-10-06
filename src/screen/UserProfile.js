@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight, AsyncStorage } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, ActivityIndicator, TouchableHighlight,AsyncStorage } from 'react-native';
 import { Container, Header, Content, Button } from 'native-base';
 import Constant from '../common/Constant'
 import reactNativeKeyboardAwareScrollView from 'react-native-keyboard-aware-scroll-view';
@@ -11,27 +11,181 @@ class UserProfile extends Component {
     constructor(props){
         super(props)
         this.state = {
+            isalert: false,
+            token: '',
             username:'',
-            userage:'',
-            usergender:'',
-            userhobby: '',
-            userdetail: '',
+            userid:'',
+            userinfo:'',
+            blob_id:'',
+            loading:true,
         }
     }
     componentWillMount() {
-        this.loadUserData()
+        AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
+            this.setState({ token: token })
+        })
+        AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
+            this.setState({ userid: value })
+        })
+        this.downloadProfile()
     }
-    loadUserData(){
-        AsyncStorage.getItem(Constant.USER_FULL_NAME).then((value) => {
-            this.setState({ username: value })
+    downloadProfile(){
+        AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
+            AsyncStorage.getItem(Constant.QB_USERID).then((userid) => {
+                var REQUEST_URL = Constant.USERS_URL + userid + '.json'
+                fetch(REQUEST_URL, {
+                    method: 'GET',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'QB-Token': token
+                    },
+                })
+                .then((response) => response.json())
+                .then((responseData) => {
+                    console.log(responseData)
+                    if(responseData.user.custom_data){
+                        this.setState({ 
+                            username: responseData.user.login,
+                            userinfo: responseData.user.custom_data,
+                            token: token,
+                            loading: false,
+                        }) 
+                        if(responseData.user.blob_id){
+                            this.setState({ blob_id: responseData.user.blob_id})
+                        }
+                    }else{
+                        this.setState({ 
+                            username: responseData.user.login,
+                            token: token,
+                            loading: false,
+                        })
+                        if(responseData.user.blob_id){
+                            this.setState({ blob_id: responseData.user.blob_id})
+                        }
+                    }
+                     
+                }).catch((e) => {
+                    console.log(e)
+                })   
+            })
         })
     }
     _onback = () => {
         this.props.navigation.goBack()
     }
+    showUserPhoto() {
+        return(
+            <Image source = {{
+                uri: Constant.BLOB_URL + this.state.blob_id + '/download.json',
+                method:'GET',
+                headers: { 
+                        'Content-Type': 'application/json',
+                        'QB-Token': this.state.token
+                    },
+                }}
+                defaultSource = {require('../assets/img/user_placeholder.png')}
+                style = {styles.userphoto} 
+            />
+        )
+    }
+    showUserAbout(){
+        if(this.state.userinfo.length > 0){
+            var json = JSON.parse(this.state.userinfo)
+            return(
+                <Text style = {styles.job}>
+                    {json.about}
+                </Text> 
+            )
+        }else{
+            return null
+        }
+    }
+    showUserAge(){
+        if(this.state.userinfo.length > 0){
+            var json = JSON.parse(this.state.userinfo)
+            if(json.age > 0){
+                var today = new Date()
+                var currentage = today.getFullYear() - json.age
+                return(
+                    <View style = {{flexDirection:'row', alignItems:'center', marginTop: 20}}>
+                        <Image source ={require('../assets/img/male_icon.png')} style = {{width: 17, height: 23}}/>
+                        <Text style = {{color: 'gray'}}> Age :<Text> {currentage}</Text></Text>
+                    </View>
+                )
+            }
+        }else{
+            return null
+        }
+    }
+    showUserHobby(){
+        if(this.state.userinfo.length > 0){
+            var json = JSON.parse(this.state.userinfo)
+            return(
+                <Text style = {styles.job}>
+                    {json.hobby}
+                </Text> 
+            )
+        }else{
+            return null
+        }
+    }
+    showAlertUserName(){
+        var {params} = this.props.navigation.state
+        return(
+            <Text style = {{fontWeight:'bold'}}>
+                { params.UserInfo.full_name?
+                    params.UserInfo.full_name :
+                    params.UserInfo.login
+                } 
+            </Text> 
+        )
+    }
+    showUserName(){
+        return(
+            <Text style = {styles.name}>
+                {this.state.username}
+            </Text> 
+        )
+    }
+    onCreateDialog = () =>{
+        var {params} = this.props.navigation.state
+        let formdata = new FormData()
+        formdata.append('type', '3')
+        formdata.append('name', params.UserInfo.full_name)
+        formdata.append('occupants_ids', params.UserInfo.id + ',' + this.state.userid)
+        var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL
+        fetch(REQUEST_URL, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'QB-Token': this.state.token
+            },
+            body: formdata
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+            params.UserInfo['_id'] = responseData._id
+            this.props.navigation.navigate('Chat', {GroupName: params.UserInfo.login, GroupChatting: false, Dialog: params.UserInfo, Token: this.state.token})
+            
+        }).catch((e) => {
+            console.log(e)
+        })
+    }
+    
+    loadingView(){
+        if(this.state.loading){
+            return (
+				<View style={styles.loadingView}>
+					<ActivityIndicator color={'black'} size={'large'}/>
+				</View>
+			);
+        }
+    }
+
     render() {
+        var {params} = this.props.navigation.state
         return (
-            <ScrollView style = {{backgroundColor: 'white'}}>
+            <View style = {{backgroundColor: 'white', flex: 1}}>
                 <View style={styles.container}>
                     <View style = {styles.tabView}>
                         <Image source = {require('../assets/img/app_bar_bg.png')} style = {styles.tabViewBg}/>
@@ -45,32 +199,29 @@ class UserProfile extends Component {
 
                     <View style = {styles.bodyView}>
                             <View style = {styles.mscrollView}>
-                                <Text style = {styles.name}>{this.state.username}</Text>
-                                <Text style = {styles.job}>{this.state.userhobby}</Text>
-                                {this.state.userage.length > 0?
-                                    <View style = {{flexDirection:'row', alignItems:'center', marginTop: 20}}>
-                                        <Image source ={require('../assets/img/male_icon.png')} style = {{width: 17, height: 23}}/>
-                                        <Text style = {{color: 'gray'}}> Age :<Text> {this.state.userage}</Text></Text>
-                                    </View> : null}
-                                <Text style = {styles.detail}>{this.state.userdetail}</Text>
-                                {/*<View style = {styles.buttonView}>
-                                    <TouchableOpacity style = {styles.removeBtn}>
+                                { this.showUserName() }
+                                { this.showUserHobby() }
+                                { this.showUserAge() }
+                                { this.showUserAbout() }
+                                
+                                <View style = {styles.buttonView}>
+                                    {/*<TouchableOpacity style = {styles.removeBtn}>
                                         <Text style = {{color: Constant.APP_COLOR}}>Remove from friends</Text>
-                                    </TouchableOpacity>
+                                    </TouchableOpacity>*/}
                                     <TouchableOpacity style = {styles.blockBtn}>
                                         <Text style = {{color: '#de380a'}}>Block user</Text>
                                     </TouchableOpacity>
-                                </View>*/}
+                                </View>
                             </View>
                     </View>
 
-                    <View style = {styles.editView}>                        
-                        <Image defaultSource = {require('../assets/img/user_placeholder.png')} style = {styles.userphoto}/>
+                    <View style = {styles.editView}>
+                        { this.showUserPhoto() }    
                     </View>
-
+                    {this.loadingView()}
                 </View>
-                
-            </ScrollView>
+
+            </View>
         );
     }
 }
@@ -150,7 +301,7 @@ const styles = StyleSheet.create({
     },
     name: {
         marginTop: 20,
-        color: 'gray',
+        color: 'black',
         fontSize: 20,
         fontWeight: 'bold'
     },
@@ -201,7 +352,18 @@ const styles = StyleSheet.create({
         height: 40, 
         alignItems:'center', 
         justifyContent:'center'
-    }
+    },
+    requestButton: {
+        textAlign:'center', 
+        color:'white', 
+        fontWeight:'bold'
+    },
+    loadingView: {
+        position:'absolute',
+        justifyContent:'center',
+        top: 300,
+        left: Constant.WIDTH_SCREEN/2-15,
+    },
 });
 
 //make this component available to the app

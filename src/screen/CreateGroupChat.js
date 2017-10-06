@@ -25,8 +25,8 @@ var isPassword = false
 var isConfirm = false
 var isEmail = false
 
-const datas = []
-
+var datas = []
+var filteredData = []
 // create a component
 class CreateGroupChat extends Component {
     constructor(props){
@@ -34,7 +34,7 @@ class CreateGroupChat extends Component {
         this.state = {
             email: '',
             isEmail: false,
-            isKilometerSelected: false,
+            isUserSelected: false,
             dialogs: [],
             token: '',
             refresh: false,
@@ -84,6 +84,8 @@ class CreateGroupChat extends Component {
         })
     }
     _onback = () => {
+        var emptyArry = []
+        this.props.SearchResult(emptyArry)
         this.props.navigation.goBack()
     }
     _onRefresh() {
@@ -109,7 +111,6 @@ class CreateGroupChat extends Component {
             }
         }
         var REQUEST_URL = Constant.USERS_URL + last_message_userid +'.json'
-        console.log(REQUEST_URL)
         fetch(REQUEST_URL, {
             method: 'GET',
             headers: { 
@@ -119,15 +120,13 @@ class CreateGroupChat extends Component {
         })
         .then((response) => response.json())
         .then((responseData) => {
-            console.log('====')
             console.log(responseData)
-            console.log('--')
-            console.log(responseData.user.custom_data)
 
             for(var i = 0;i < this.state.dialogs.length; i++){
                 if(this.state.dialogs[i].name == responseData.user.login || this.state.dialogs[i].name == responseData.user.full_name){
                     this.state.dialogs[i]['blob_id'] = responseData.user.blob_id.toString();
                     this.state.dialogs[i]['custom_data'] = responseData.user.custom_data;
+                    this.state.dialogs[i]['ischecked'] = false
                 }
             }
             this.setState({
@@ -137,7 +136,21 @@ class CreateGroupChat extends Component {
             console.log(e)
         })
     }
-    renderCreateChats(){
+    handleSelectUser(flag){
+        for(var i = 0;i < this.state.dialogs.length; i++){
+            if(flag==i){
+                if(this.state.dialogs[i]['ischecked'] == false){
+                    this.state.dialogs[i]['ischecked'] = true
+                }else{
+                    this.state.dialogs[i]['ischecked'] = false
+                }
+            }
+        }
+        this.setState({
+            refresh: true
+        });
+    }
+    renderCreateChats(List){
         if(this.state.loading){
             return (
 				<View style={styles.loadingView}>
@@ -147,15 +160,16 @@ class CreateGroupChat extends Component {
         }
         else{
             return(
-                this.state.dialogs.map((data, index) => {
+                List.map((data, index) => {
                     console.log(data)
                     return(
                       <TouchableOpacity style = {styles.tabChannelListCell} key = {index} onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})}>
                         {this.state.refresh == false? this.downloadLastUser(data.occupants_ids) : null}
                         <CheckBox
+                            key = {index}
                             size={25}
-                            checked={this.state.isKilometerSelected}
-                            onPress={this.handleSelectedKilometers}
+                            checked={data.ischecked}
+                            onPress={()=>this.handleSelectUser(index)}
                             uncheckedIconName="radio-button-unchecked"
                             checkedIconName="radio-button-checked"
                             iconStyle = {{color: Constant.APP_COLOR}}
@@ -179,6 +193,7 @@ class CreateGroupChat extends Component {
         }   
     }
     render() {
+        var { filteredData } = this.props;
         <StatusBar
             barStyle = "light-content"
             backgroundColor = 'blue'
@@ -197,7 +212,7 @@ class CreateGroupChat extends Component {
                 </View>
                 <View style = {styles.bodyView}>
                     <View style = {styles.serarchView}>
-                        <SearchBox />
+                        <SearchBox users = {this.state.dialogs}/>
                     </View>
                     <Content bounces={false} contentContainerStyle={{ flex: 1, backgroundColor: 'white',alignItems:'center'}}>
                         <ScrollView
@@ -208,7 +223,7 @@ class CreateGroupChat extends Component {
                                 />
                             }
                         >
-                            {this.renderCreateChats()}
+                            {filteredData.length == 0 ? this.renderCreateChats(this.state.dialogs): this.renderCreateChats(filteredData)}
                         </ScrollView>
                     </Content>
                     
@@ -309,7 +324,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-
+    SearchResult: emptyArry => dispatch({type: 'Search_ClearResult'})
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateGroupChat);

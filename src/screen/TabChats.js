@@ -46,7 +46,7 @@ class TabChats extends Component {
     }
     loadData(){
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
-            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?type[in]=2,3' + '&limit=10' + '&skip=' + currentPage*10
+            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?type[in]=2,3' + '&limit=100' + '&skip=' + currentPage*10
             console.log(REQUEST_URL)
             fetch(REQUEST_URL, {
                 method: 'GET',
@@ -109,7 +109,7 @@ class TabChats extends Component {
 
             for(var i = 0;i < this.state.dialogs.length; i++){
                 if(this.state.dialogs[i].name == responseData.user.login || this.state.dialogs[i].name == responseData.user.full_name){
-                    this.state.dialogs[i]['blob_id'] = responseData.user.blob_id.toString();
+                    this.state.dialogs[i]['blob_id'] = responseData.user.blob_id;
                 }
             }
             this.setState({

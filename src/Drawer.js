@@ -13,6 +13,7 @@ import Settings from './screen/Settings'
 import ProfileEdit from './screen/ProfileEdit'
 import About from './screen/About'
 import UserProfile from './screen/UserProfile'
+import Login from './components/auth/Login'
 
 const Drawer = DrawerNavigator(
     {   
@@ -22,6 +23,7 @@ const Drawer = DrawerNavigator(
         ProfileEdit: { screen: ProfileEdit },
         About: { screen: About },
         UserProfile: { screen: UserProfile },
+        Logout: { screen: Login },
     },
     {
         initialRouterName: 'Dashboard',

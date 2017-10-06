@@ -79,7 +79,6 @@ class Profile extends Component {
     }
     showUserAge(){
         var {params} = this.props.navigation.state
-        console.log(params.UserInfo.custom_data)
         var json = JSON.parse(params.UserInfo.custom_data)
         if(json){
             var today = new Date()
@@ -135,7 +134,6 @@ class Profile extends Component {
         formdata.append('name', params.UserInfo.full_name)
         formdata.append('occupants_ids', params.UserInfo.id + ',' + this.state.userid)
         var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL
-        console.log(REQUEST_URL)
         fetch(REQUEST_URL, {
             method: 'POST',
             headers: { 
@@ -146,8 +144,6 @@ class Profile extends Component {
         })
         .then((response) => response.json())
         .then((responseData) => {
-            console.log('====//////////')
-            console.log(responseData)
             params.UserInfo['_id'] = responseData._id
             this.props.navigation.navigate('Chat', {GroupName: params.UserInfo.login, GroupChatting: false, Dialog: params.UserInfo, Token: this.state.token})
             
@@ -157,11 +153,11 @@ class Profile extends Component {
     }
     render() {
         var {params} = this.props.navigation.state
-        console.log('userprofile ----->')
-        console.log(params)
         return (
-            <ScrollView style = {{backgroundColor: 'white'}}>
+            
                 <View style={styles.container}>
+                    <View style = {styles.statusbar}/>
+                    <ScrollView style = {{backgroundColor: 'white'}}>
                     <View style = {styles.tabView}>
                         <Image source = {require('../assets/img/app_bar_bg.png')} style = {styles.tabViewBg}/>
                         <View style = {styles.backView}>
@@ -195,13 +191,12 @@ class Profile extends Component {
                             <Image source = {require('../assets/img/add_to_friend.png')} style = {styles.addphoto}/>
                         </TouchableOpacity>
                         { this.showUserPhoto() }    
-                        {/*<TouchableOpacity onPress = {() => this.props.navigation.navigate('Chat', {GroupName: params.UserInfo.login, GroupChatting: false, Dialog: params.UserInfo, Token: this.state.token})}>*/}
                         <TouchableOpacity onPress = {this.onCreateDialog} >
                             <Image source = {require('../assets/img/chat_button_new.png')} style = {styles.addphoto}/>
                         </TouchableOpacity>
                     </View>
-                </View>
-                <PopupDialog
+                    </ScrollView>
+                    <PopupDialog
                     ref={(popupDialog) => { this.popupDialog = popupDialog; }}
                     dialogAnimation = { new SlideAnimation({ slideFrom: 'bottom' })}
                     dialogStyle = {styles.dialogView}
@@ -222,7 +217,9 @@ class Profile extends Component {
                         <Text style = {styles.requestButton}>Send request</Text>
                     </TouchableHighlight>
                 </PopupDialog>
-            </ScrollView>
+                </View>
+                
+            
         );
     }
 }
@@ -238,8 +235,15 @@ const styles = StyleSheet.create({
         width: Constant.WIDTH_SCREEN,
         height: Constant.HEIGHT_SCREEN*0.25,
         paddingLeft: 5,
-        marginTop: (Platform.OS == 'ios')? 20 : StatusBar.currentHeight,
-
+        // marginTop: (Platform.OS == 'ios')? 20 : StatusBar.currentHeight,
+    },
+    statusbar:{
+        width: Constant.WIDTH_SCREEN,
+        height: (Platform.OS == 'ios')? 20 : StatusBar.currentHeight,
+        backgroundColor: Constant.APP_COLOR,
+        position: 'absolute',
+        top: 0,
+        left: 0,
     },
     backView: {
         width: Constant.WIDTH_SCREEN,
@@ -293,7 +297,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         position:'absolute',
         left: 0,
-        top: (Platform.OS == 'ios')? Constant.HEIGHT_SCREEN/4-30:Constant.HEIGHT_SCREEN/4-26
+        top: (Platform.OS == 'ios')? Constant.HEIGHT_SCREEN/4-55:Constant.HEIGHT_SCREEN/4-51
     },
     mscrollView: {
         // flex: 1,
@@ -344,8 +348,7 @@ const styles = StyleSheet.create({
         width: Constant.WIDTH_SCREEN*0.75,
         backgroundColor: 'transparent',
         justifyContent:'center',
-        alignItems:'center',
-        
+        alignItems:'center', 
     },
     cancelBtn: {
         backgroundColor: '#fb5e33', 

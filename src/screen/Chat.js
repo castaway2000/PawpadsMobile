@@ -1,6 +1,4 @@
-/**
- * Created by mponomarets on 7/5/17.
- */
+
 import React, {Component} from 'react';
 import {
 	View,
@@ -31,7 +29,6 @@ import {Actions} from 'react-native-router-flux';
 import {getChatMessage, sendMessage} from '../actions';
 import {colors} from '../actions/const';
 import {ChatMessageBox, ChatBoxUser, ChatBoxDoctor} from './common';
-import InvertibleScrollView from 'react-native-invertible-scroll-view';
 
 
 var messages = []
@@ -44,14 +41,17 @@ class Chat extends Component {
 			messages: this.props.chatMessages,
 			loading: true,
 			protected: this.props.profile,
-			token: ''
+			token: '',
+			userprofile: [],
 		};
 	}
 
 	componentWillMount() {
         this.getChatMessage()
+		
 		AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
 			currentUserid = value
+			this.downloadLastUser()
 		})
 	}
 
@@ -69,8 +69,7 @@ class Chat extends Component {
 		var {params} = this.props.navigation.state
         messages = []
         AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
-            var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=15'
-			console.log('\\\\\\\\\\\\\\')
+            var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=50'
 			console.log(REQUEST_URL)
             fetch(REQUEST_URL, {
                 method: 'GET',
@@ -82,7 +81,6 @@ class Chat extends Component {
             .then((response) => response.json())
             .then((responseData) => {
                 if(responseData.limit > 0){
-					console.log('get chat messages ========')
                     console.log(responseData)
                     responseData.items.map((item, index) => {
                         messages.push(item)
@@ -99,8 +97,37 @@ class Chat extends Component {
                 console.log(e)
             })   
         })
+    } 
+	
+	downloadLastUser(){
+		
+		var {params} = this.props.navigation.state
+		var last_message_userid = ''
+        for(var j=0; j<params.Dialog.occupants_ids.length; j++){
+            if(params.Dialog.occupants_ids[j] != currentUserid){
+                last_message_userid = params.Dialog.occupants_ids[j].toString()
+            }
+        }
+		AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
+			var REQUEST_URL = Constant.USERS_URL +  last_message_userid + '.json'
+			fetch(REQUEST_URL, {
+				method: 'GET',
+				headers: { 
+					'Content-Type': 'application/json',
+					'QB-Token':token
+				},
+			})
+			.then((response) => response.json())
+			.then((responseData) => {
+				console.log(responseData)
+				this.setState({
+					userprofile: responseData.user,
+				});
+			}).catch((e) => {
+				console.log(e)
+			})
+		})
     }
-
     
 
 	animateChatBoxUser() {
@@ -155,8 +182,6 @@ class Chat extends Component {
 					newArray.push(this.state.messages[i])
 				}
 
-				console.log('============+++++')
-				console.log(newArray)
 				this.setState({
 					messages:newArray
 				});
@@ -184,6 +209,8 @@ class Chat extends Component {
 				<ChatBoxDoctor
 					key={index}
 					messageBody={item.message}
+					latitude = {item.latitude}
+					longitude = {item.longitude}
 					navigation = {this.props.navigation}
 					messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
 						hour: '2-digit',
@@ -263,7 +290,7 @@ class Chat extends Component {
 		console.log('chat group user profile link')
 		console.log(params)
 		return(
-			<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('CreateGroupChat')}>
+			<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('Profile', {UserInfo: this.state.userprofile})}>
 				<Image source = {{
 					uri: Constant.BLOB_URL + params.Dialog.blob_id + '/download.json',
 					method:'GET',
@@ -276,7 +303,6 @@ class Chat extends Component {
 					style = {styles.menuIcon} />
 			</TouchableOpacity>
 		)
-
 	}
 
 	render() {

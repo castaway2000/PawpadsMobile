@@ -39,7 +39,9 @@ class Settings extends Component {
             }
         })
         AsyncStorage.getItem(Constant.SETTINGS_RANGE).then((value) => {
-            this.setState({ searchRange: value })
+            if(value){
+                this.setState({ searchRange: value })
+            }
         })
         AsyncStorage.getItem(Constant.SETTINGS_GPS_ACCURACY).then((value) => {
             if(value == 'High'){
@@ -134,6 +136,7 @@ class Settings extends Component {
         this.props.navigation.goBack()
     }
     render() {
+        console.log('search distance ->  ' + this.state.searchRange)
         return (
             <View style={styles.container}>
                 <View style = {styles.tabView}>
@@ -170,7 +173,7 @@ class Settings extends Component {
                                 <TextInput
                                     style = {styles.inputText}
                                     onChangeText = {(text) => this.setState({searchRange:text})}
-                                    value = {this.state.searchRange.toString()}
+                                    value = {this.state.searchRange}
                                     placeholderTextColor = {Constant.APP_COLOR}
                                     keyboardType = 'numeric'
                                     underlineColorAndroid = 'transparent'

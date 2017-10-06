@@ -9,10 +9,10 @@ function search(state = initialState, action) {
                 ...state,
                 searchResult: action.value
             };
-        case 'Search_ClearText':
+        case 'Search_ClearResult':
             return {
                 ...state,
-                searchResult: ''
+                searchResult: [],
             }
         default:
             return state

@@ -17,6 +17,8 @@ import {
     LOGIN_USER,
 } from '../../actions/types'
 
+let nextInput;
+
 // create a component
 class Login extends Component {
     static navigationOptions = {
@@ -71,7 +73,6 @@ class Login extends Component {
         }).catch((e) => {
             console.log(e)
         })   
-
     }
     
     _onLogin = () => {
@@ -96,7 +97,7 @@ class Login extends Component {
         fetch(REQUEST_URL, {
             method: 'POST',
             headers: { 
-                'Content-Type': 'application/json',
+                'Content-Type': 'multipart/form-data',
                 'QB-Token': this.state.qb_token
             },
             body:formdata
@@ -109,10 +110,13 @@ class Login extends Component {
                 console.log(id)
                 console.log(responseData)
 
-                
                 AsyncStorage.setItem(Constant.QB_USERID, id.toString());
                 AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
                 AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
+                if(responseData.user.blob_id){
+                    AsyncStorage.setItem(Constant.USER_BLOBID, responseData.user.blob_id.toString());
+                }
+                
 
                 const { navigate } = this.props.navigation
                 navigate ('Drawer')
@@ -153,7 +157,14 @@ class Login extends Component {
     setPassword(text){
         this.setState({ password: text })
     }
-
+    getNextInput(data) {
+		nextInput = data;
+	}
+   	changeFocus() {
+		if (nextInput !== undefined) {
+			nextInput.focus();
+		}
+	}
     render() {
         return (
             <View style = {styles.container}>
@@ -178,10 +189,12 @@ class Login extends Component {
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.name}
                                 onChangeText = {(text) => this.setUserName(text)}
+                                onSubmitEditing={this.changeFocus.bind(this)}
                             />
                         </View>
                         <View style = {styles.passwordView}>
                             <TextInput
+                                ref={this.getNextInput.bind(this)}
                                 style = {styles.passwordInput}
                                 returnKeyType = 'done'
                                 placeholder = {this.state.ispassword == true ? 'Password': 'Passowrd is required'}
@@ -191,6 +204,7 @@ class Login extends Component {
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.password}
                                 onChangeText = {(text) => this.setPassword(text)}
+                                onSubmitEditing={this._onLogin}
                             />
                             <TouchableOpacity style = {styles.forgotView} onPress = {this._onForgot}>
                                 <Text>?</Text>

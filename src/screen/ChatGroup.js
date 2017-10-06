@@ -1,6 +1,4 @@
-/**
- * Created by mponomarets on 7/5/17.
- */
+
 import React, {Component} from 'react';
 import {
 	View,
@@ -31,7 +29,6 @@ import {Actions} from 'react-native-router-flux';
 import {getChatMessage, sendMessage} from '../actions';
 import {colors} from '../actions/const';
 import {ChatMessageBox, ChatBoxUser, ChatBoxDoctor} from './common';
-import InvertibleScrollView from 'react-native-invertible-scroll-view';
 
 
 var messages = []
@@ -68,7 +65,7 @@ class ChatGroup extends Component {
 		var {params} = this.props.navigation.state
         messages = []
         AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
-            var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=15'
+            var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=50'
             fetch(REQUEST_URL, {
                 method: 'GET',
                 headers: { 
@@ -79,6 +76,7 @@ class ChatGroup extends Component {
             .then((response) => response.json())
             .then((responseData) => {
                 if(responseData.limit > 0){
+					console.log('Get Group Chat message -->')
                     console.log(responseData)
                     responseData.items.map((item, index) => {
                         messages.push(item)
@@ -178,6 +176,8 @@ class ChatGroup extends Component {
 				<ChatBoxDoctor
 					key={index}
 					messageBody={item.message}
+					latitude = {item.latitude}
+					longitude = {item.longitude}
 					navigation = {this.props.navigation}
 					messageSenderPhoto={item.sender_id}
 					messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
@@ -204,7 +204,7 @@ class ChatGroup extends Component {
 
 	renderChatMessage() {
 		if (this.state.loading) {
-			return <ActivityIndicator style={{margin: 200}} color={colors.primaryOrange} size={'large'}/>;
+			return <ActivityIndicator style={{margin: 200}} color={'black'} size={'large'}/>;
 		}
 		else {
 			var newArray = []

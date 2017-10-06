@@ -23,7 +23,7 @@ import Constant from '../../common/Constant'
 const datas = [
 	{
 		name: "Friends",
-		route: "",
+		route: "Friends",
         icon: require('../../assets/img/two-men.png'),
 	},
     {
@@ -47,17 +47,21 @@ class SideBar extends Component {
     constructor(props) {
 		super(props);
 		this.state = {
-			shadowOffsetWidth: 1,
-			shadowRadius: 4,
-            name:''
+            name:'',
+            blob_id:'',
 		};
 	}
     componentWillMount() {
         this.loadUserData()     
     }
     loadUserData(){
-        AsyncStorage.getItem(Constant.USER_FULL_NAME).then((value) => {
-            this.setState({ name: value })
+        AsyncStorage.getItem(Constant.USER_FULL_NAME).then((value1) => {
+            AsyncStorage.getItem(Constant.USER_BLOBID).then((value2) => {
+                this.setState({ 
+                    name: value1,
+                    blob_id: value2,
+                })
+            })
         })
     }
 
@@ -72,8 +76,17 @@ class SideBar extends Component {
                     <Content>
                         <View style = {styles.drawer}>
                             <Image source = {require('../../assets/img/app_bar_bg.png')} style = {styles.drawerCover} /> 
-                            <TouchableOpacity onPress = {() => this.props.navigation.navigate('UserProfile')}>
-                                <Image defaultSource = {require('../../assets/img/user_placeholder.png')} style = {styles.userPhoto} />
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('UserProfile')}>
+                                <Image source = {{
+                                    uri: Constant.BLOB_URL + this.state.blob_id + '/download.json',
+                                    method:'GET',
+                                    headers: { 
+                                            'Content-Type': 'application/json',
+                                            'QB-Token': this.state.token
+                                        },
+                                    }}
+                                    defaultSource = {require('../../assets/img/user_placeholder.png')}
+                                    style = {styles.userPhoto} />
                             </TouchableOpacity>
                             <Text style = {styles.name}>{this.state.name}</Text>
                             <TouchableOpacity style = {styles.editBtn} onPress = {this._onEdit}>

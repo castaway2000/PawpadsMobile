@@ -14,11 +14,21 @@ class ChatBoxDoctor extends Component {
 	constructor(props){
         super(props)
         this.state = {
-            refresh:false,
+            refresh: false,
+			distancerefresh: false,
 			blob_id:'',
 			userprofile: [],
+			distance_unit: 'km',
+			distance: Number,
         }
     }
+	componentWillMount() {
+		// AsyncStorage.getItem(Constant.SETTINGS_DISTANCE_UNIT).then((value) => {
+        //     if(value){
+        //         this.setState({ distance_unit: value })
+        //     }
+        // })
+	}
 	downloadLastUser(last_message_userid){
 		AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
 			var REQUEST_URL = Constant.USERS_URL +  last_message_userid +'.json'
@@ -47,7 +57,6 @@ class ChatBoxDoctor extends Component {
     }
 
 	showUserProfiel  = () => {
-		// this.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})
 		this.props.navigation.navigate('Profile', {UserInfo: this.state.userprofile})
 	}
 
@@ -73,16 +82,67 @@ class ChatBoxDoctor extends Component {
 		}
 		
 	}
+	showUserName(){
+		return(
+			<Text style={styles.messageTime}>
+				{this.state.userprofile.full_name?
+					this.state.userprofile.full_name:
+					this.state.userprofile.login}
+			</Text>
+		)
+	}
+	degreesToRadians(degrees){
+		return degrees * Math.PI/180
+	}
+	distanceInKmBetweenEarthCoordinates(lat1, lon1, lat2, lon2){
+		var earthRadiusKm = 6371
+		var dLat = this.degreesToRadians(lat2 - lat1)
+		var dLon = this.degreesToRadians(lon2 - lon1)
+		lat1 = this.degreesToRadians(lat1)
+		lat2 = this.degreesToRadians(lat2)
+
+		var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2)
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+		return earthRadiusKm * c
+	}
+	showUserDistance(){
+		{this.state.distancerefresh == false?
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					var distance = this.distanceInKmBetweenEarthCoordinates(Math.round(this.props.latitude), Math.round(position.coords.latitude), Math.round(this.props.longitude), Math.round(position.coords.longitude))
+					this.setState({ 
+						distance: distance.toFixed(2),
+						distancerefresh: true,
+					})
+				},
+				// (error) => this.setState({error: error.message}),
+				{enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
+			):
+			null
+		}
+		
+		return(
+			<Text style={[styles.messageTime, styles.messageDistance]}>{this.state.distance} km</Text>
+		)
+	}
+	showNull(){
+
+	}
 	render() {
 		const {doctorMessageContainer, messagesContainer, messageTime, messageText, messagePhoto} = styles;
 		return (
-			<View style={messagesContainer}>
-				{this.state.refresh == false? this.downloadLastUser(this.props.messageSenderPhoto) : null}
-				{this.showUserphoto()}
-				
-				<View style={doctorMessageContainer}>
-					<Text style={messageText}>{this.props.messageBody}</Text>
-					<Text style={messageTime}>{this.props.messageLocalTimestamp}</Text>
+			<View style = {messagesContainer}>
+				<Text style={messageTime}>{this.props.messageLocalTimestamp}</Text>
+				<View style = {{flexDirection:'row', alignItems:'center', marginTop:3}}>
+					{this.state.refresh == false? this.downloadLastUser(this.props.messageSenderPhoto) : null}
+					{this.showUserphoto()}
+					<View style={doctorMessageContainer}>
+						<Text style={messageText}>{this.props.messageBody}</Text>
+					</View>
+				</View>
+				<View style = {{flexDirection:'row', marginTop:3}}>
+					{ this.showUserName()}
+					{ this.showUserDistance()}
 				</View>
 			</View>
 		);
@@ -91,10 +151,11 @@ class ChatBoxDoctor extends Component {
 
 const styles = {
 	messagesContainer: {
-		flexDirection: 'row',
-		margin: 10,
-		justifyContent: 'flex-start',
-		alignItems: 'center'
+		marginLeft: 10,
+		marginTop: 5,
+		marginBottom: 5,
+		alignItems: 'flex-start',
+		justifyContent: 'center'
 	},
 	doctorMessageContainer: {
 		borderWidth: 1,
@@ -107,14 +168,14 @@ const styles = {
 		alignItems: 'flex-start',
 		paddingHorizontal: 10,
 		flexDirection: 'column',
-		borderRadius: 15,
+		borderRadius: 10,
 		borderBottomLeftRadius: 0,
 		backgroundColor: 'rgba(242, 242, 242, 1)'
 	},
 	messageTime: {
-		fontSize: 10,
+		fontSize: 12,
 		paddingTop: 5,
-		color: 'rgba(193, 197, 201, 1)'
+		color: 'rgba(190, 190, 190, 1)'
 	},
 	messageText: {
 		color: '#000'
@@ -123,8 +184,15 @@ const styles = {
 		width: 40,
 		height: 40,
 		borderRadius: 20
+	},
+	messageDistance: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		width: Constant.WIDTH_SCREEN,
+		textAlign: 'center',
+		backgroundColor: 'transparent'
 	}
-
 };
 
 export {ChatBoxDoctor};

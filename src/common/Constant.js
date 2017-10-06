@@ -14,6 +14,7 @@ module.exports = {
 
     SESSION_URL : 'https://api.quickblox.com/session.json',
     LOGIN_URL : 'https://api.quickblox.com/login.json',
+    REGISTER_URL : 'https://api.quickblox.com/users.json',
     RETRIEVE_DIALOGS_URL: 'https://api.quickblox.com/chat/Dialog.json',
     BLOB_URL: 'https://api.quickblox.com/blobs/',
     USERS_URL: 'https://api.quickblox.com/users/',
@@ -28,6 +29,7 @@ module.exports = {
     USER_LOGIN: 'user_login',
     USER_FULL_NAME: 'user_full_name',
     USER_EMAIL: 'user_email',
+    USER_BLOBID: 'user_blob_id',
 
     SETTINGS_DISTANCE_UNIT: 'settings_distance_unit',
     SETTINGS_RANGE: 'settings_range',

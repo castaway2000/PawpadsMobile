@@ -14,9 +14,7 @@ import { bindActionCreators } from 'redux'
 import { NavigationActions } from 'react-navigation'
 import Constant from '../../common/Constant'
 
-var wordList = [
-    'Albania', 'Argentina','Brazil','Beligium','Cananda','China','Denmark','Egypt','France','Germany','Greece','Italy','Japan','Nethelands','Norway','Spain','Sweden','Ukraine','United State','Uruguay',
-]
+var searchList = []
 var filteredData = []
 
 // define your styles
@@ -60,23 +58,25 @@ class SearchBox extends Component {
         }
         // this.set = this.set.bind(this);
     }
-    componentWillMount() {
+    componentDidMount() {
         filteredData = []
+        searchList = []        
     }
 
     set(text){
+        searchList = [] 
+
         this.setState({
             searchText: text,
         });
-        filteredData = this.filterNotes(text, wordList)
+        filteredData = this.filterNotes(text, this.props.users)
 
-        var { SearchResult } = this.props;
-        SearchResult(filteredData);
+        this.props.SearchResult(filteredData)
     }
-    filterNotes(text, wordList){
+    filterNotes(text, searchList){
         var query = text.toLowerCase();
-        return wordList.filter(function(el){
-            return el.toLowerCase().indexOf(query) > -1
+        return searchList.filter(function(el){
+            return el.name.toLowerCase().indexOf(query) > -1
         })
     }
 
@@ -108,7 +108,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    SearchResult: (filteredData) => dispatch({type: 'Search_Result', value: filteredData})
+    SearchResult: filteredData => dispatch({type: 'Search_Result', value: filteredData})
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchBox)
