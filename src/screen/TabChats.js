@@ -18,6 +18,7 @@ import {
 	variables,
 } from 'native-base'
 import Constant from '../common/Constant'
+import { connect } from 'react-redux'
 import {sendRequest} from '../actions/http';
 
 const datas = []
@@ -46,7 +47,7 @@ class TabChats extends Component {
     }
     loadData(){
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
-            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?type[in]=2,3' + '&limit=100' + '&skip=' + currentPage*10
+            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?type[in]=2,3' + '&limit=50' + '&skip=' + currentPage*10
             console.log(REQUEST_URL)
             fetch(REQUEST_URL, {
                 method: 'GET',
@@ -104,8 +105,6 @@ class TabChats extends Component {
         })
         .then((response) => response.json())
         .then((responseData) => {
-            console.log('====')
-            console.log(responseData)
 
             for(var i = 0;i < this.state.dialogs.length; i++){
                 if(this.state.dialogs[i].name == responseData.user.login || this.state.dialogs[i].name == responseData.user.full_name){
@@ -115,6 +114,9 @@ class TabChats extends Component {
             this.setState({
                 refresh: true
             });
+            
+            this.props.ChatsUsers(this.state.dialogs)
+
         }).catch((e) => {
             console.log(e)
         })
@@ -239,4 +241,13 @@ const styles = StyleSheet.create({
 });
 
 //make this component available to the app
-export default TabChats;
+const mapStateToProps = state => ({
+
+});
+
+const mapDispatchToProps = dispatch => ({
+    ChatsUsers: users => dispatch({type: 'Chats_Result', value: users})
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(TabChats)
+

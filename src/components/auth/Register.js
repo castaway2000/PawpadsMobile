@@ -160,8 +160,6 @@ class Register extends Component {
         })
         .then((response) => response.json())
         .then((responseData) => {
-            console.log('====>>>>>>')
-            console.log(responseData)
             if(responseData.errors){
                 alert(responseData.errors.email[0])
             }else{

@@ -16,7 +16,7 @@ import Constant from '../common/Constant'
 import { connect } from 'react-redux'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import SearchBox from './common/SearchBox'
-import CheckBox from 'react-native-icon-checkbox';
+// import CheckBox from 'react-native-icon-checkbox';
 
 var isAlert = false
 var isName = false
@@ -49,7 +49,7 @@ class CreateGroupChat extends Component {
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
             this.setState({ userID: value })
         })
-        this.loadData()     
+        this.loadData()
     }
     loadData(){
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
@@ -89,7 +89,7 @@ class CreateGroupChat extends Component {
         this.props.navigation.goBack()
     }
     _onRefresh() {
-        this.loadData() 
+        this.loadData()
         this.setState({refreshing: true});
         setTimeout(() => {
             this.loadData() 
@@ -97,7 +97,7 @@ class CreateGroupChat extends Component {
                 refreshing: false
             })
         }, 2000)
-    }
+    } 
     handleSelectedKilometers = (checked) => {
         this.setState({
             isKilometerSelected: true,
@@ -165,7 +165,10 @@ class CreateGroupChat extends Component {
                     return(
                       <TouchableOpacity style = {styles.tabChannelListCell} key = {index} onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})}>
                         {this.state.refresh == false? this.downloadLastUser(data.occupants_ids) : null}
-                        <CheckBox
+                        <TouchableOpacity onPress = {()=>this.handleSelectUser(index)}>
+                            <Image source = {data.ischecked? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
+                        </TouchableOpacity>
+                        {/*<CheckBox
                             key = {index}
                             size={25}
                             checked={data.ischecked}
@@ -173,7 +176,7 @@ class CreateGroupChat extends Component {
                             uncheckedIconName="radio-button-unchecked"
                             checkedIconName="radio-button-checked"
                             iconStyle = {{color: Constant.APP_COLOR}}
-                        />
+                        />*/}
                         <Image source = {{
                             uri: Constant.BLOB_URL + data.blob_id + '/download.json',
                             method:'GET',
@@ -272,7 +275,7 @@ const styles = StyleSheet.create({
         position:'absolute',
         right: 15
     },
-     bodyView: {
+    bodyView: {
         flex: 1,
         width: Constant.WIDTH_SCREEN,
         backgroundColor: 'white',
@@ -301,6 +304,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
+        marginLeft: 10
     },
     loadingView: {
         flex: 1,
@@ -314,7 +318,11 @@ const styles = StyleSheet.create({
         padding: 10, 
         paddingLeft: 20,
         alignItems:'center',
-    }
+    },
+    checkBox: {
+        width: 18,
+        height: 18,
+    },
 });
 
 //make this component available to the app

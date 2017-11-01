@@ -13,7 +13,29 @@ function search(state = initialState, action) {
             return {
                 ...state,
                 searchResult: [],
-            }
+            };
+        case 'Chats_Result':
+            return {
+                ...state,
+                chatsUsers: action.value
+            };
+        case 'Chats_Search_Result':
+            return {
+                ...state,
+                chatsSearchUsers: action.value
+            };
+        case 'Channels_Result':
+            return {
+                ...state,
+                channelsUsers: action.value
+            };
+        case 'Channels_Search_Result':
+            return {
+                ...state,
+                channelsSearchUsers: action.value
+            };
+
+
         default:
             return state
     }

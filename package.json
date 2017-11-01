@@ -1,43 +1,41 @@
 {
-  "name": "PawPads",
-  "version": "0.1.0",
+  "name": "Pawpads",
+  "version": "0.0.1",
   "private": true,
-  "devDependencies": {
-    "react-native-scripts": "1.1.0",
-    "jest-expo": "~19.0.0",
-    "react-test-renderer": "16.0.0-alpha.12"
-  },
-  "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
   "scripts": {
-    "start": "react-native-scripts start",
-    "eject": "react-native-scripts eject",
-    "android": "react-native-scripts android",
-    "ios": "react-native-scripts ios",
-    "test": "node node_modules/jest/bin/jest.js --watch"
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "native-base": "^2.3.3",
+    "react": "16.0.0-beta.5",
+    "react-native": "0.49.3",
+    "react-native-crypto": "^2.1.1",
+    "react-native-icon-checkbox": "^1.2.0",
+    "react-native-image-picker": "^0.26.7",
+    "react-native-keyboard-aware-scroll-view": "^0.3.0",
+    "react-native-maps": "^0.17.0",
+    "react-native-popup-dialog": "^0.9.36",
+    "react-native-pull": "^2.0.2",
+    "react-native-router-flux": "^4.0.0-beta.22",
+    "react-native-vector-icons": "^4.4.2",
+    "react-navigation": "^1.0.0-beta.13",
+    "react-redux": "^5.0.6",
+    "redux": "^3.7.2"
+  },
+  "devDependencies": {
+    "babel-jest": "21.2.0",
+    "babel-preset-react-native": "4.0.0",
+    "jest": "21.2.1",
+    "react-test-renderer": "16.0.0-beta.5"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "react-native"
   },
   "rnpm": {
     "assets": [
-      "./src/assets/fonts/"
+      "./assets/fonts/"
     ]
-  },
-  "dependencies": {
-    "@expo/vector-icons": "^5.1.0",
-    "crypto-js": "^3.1.9-1",
-    "expo": "^19.0.0",
-    "native-base": "^2.3.1",
-    "react": "16.0.0-alpha.12",
-    "react-native": "^0.46.1",
-    "react-native-checkbox": "^1.1.0",
-    "react-native-icon-checkbox": "^1.2.0",
-    "react-native-keyboard-aware-scroll-view": "^0.3.0",
-    "react-native-maps": "^0.16.3",
-    "react-native-popup-dialog": "^0.9.35",
-    "react-native-pull": "^2.0.2",
-    "react-native-router-flux": "^4.0.0-beta.17",
-    "react-navigation": "^1.0.0-beta.11",
-    "react-redux": "^5.0.6"
   }
 }

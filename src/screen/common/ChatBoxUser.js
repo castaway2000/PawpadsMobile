@@ -2,16 +2,42 @@
 import React, {Component} from 'react';
 import {
 	Text,
-	View
+	View,
+	Image,
+	AsyncStorage,
+	TouchableOpacity,
 } from 'react-native';
+import Constant from '../../common/Constant'
 
 class ChatBoxUser extends Component {
+
+	showMessageBody(){
+		if(this.props.messageImage.length > 0){
+			return(
+				<Image source = {{
+						uri: Constant.BLOB_URL + this.props.messageImage[0].id + '/download.json',
+						method:'GET',
+						headers: { 
+								'Content-Type': 'application/json',
+								'QB-Token': this.props.token
+							},
+						}}
+						style = {styles.messageImg} 
+				/>
+			)
+		}
+		else{
+			return(
+				<Text style={styles.messageText}>{this.props.messageBody}</Text>
+			)
+		}
+	}
 	render() {
 		const {userMessageContainer, messagesContainer, messageTime, messageText} = styles;
 		return (
 			<View style={messagesContainer}>
 				<View style={userMessageContainer}>
-					<Text style={messageText}>{this.props.messageBody}</Text>
+					{this.showMessageBody()}
 					<Text style={messageTime}>{this.props.messageLocalTimestamp}</Text>
 				</View>
 			</View>
@@ -50,6 +76,11 @@ const styles = {
 	},
 	messageText: {
 		color: '#fff'
+	},
+	messageImg: {
+		width: 220,
+		height: 220,
+		resizeMode: 'contain',
 	}
 };
 

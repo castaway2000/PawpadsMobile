@@ -16,6 +16,7 @@ import Chat from './screen/Chat'
 import ChatGroup from './screen/ChatGroup'
 import ChatGroupEdit from './screen/ChatGroupEdit'
 import CreateGroupChat from './screen/CreateGroupChat'
+import Search from './screen/Search'
 
 const AppNavigators = StackNavigator(
     {
@@ -39,13 +40,13 @@ const LoginStack = StackNavigator(
         ChatGroup: { screen: ChatGroup },
         ChatGroupEdit: { screen: ChatGroupEdit },
         CreateGroupChat: { screen: CreateGroupChat },
+        Search: { screen: Search },
     },
     {
         initialRouteName: 'Login',
         headerMode: 'none'
-    }
+    },
 )
-
 
 
 export default () => 

@@ -20,6 +20,7 @@ module.exports = {
     USERS_URL: 'https://api.quickblox.com/users/',
     GROUPCHAT_MESSAGE_URL: 'https://api.quickblox.com/chat/Message.json',
     NEARBY_FIND_USER_URL : 'https://api.quickblox.com/geodata/find.json',
+    CREATE_FILE_URL : 'https://api.quickblox.com/blobs.json',
 
     QB_USERID: 'qb_userid',
     QB_OWNER_ID: 'qb_owner_id',

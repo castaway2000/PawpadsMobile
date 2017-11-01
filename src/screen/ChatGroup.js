@@ -29,10 +29,13 @@ import {Actions} from 'react-native-router-flux';
 import {getChatMessage, sendMessage} from '../actions';
 import {colors} from '../actions/const';
 import {ChatMessageBox, ChatBoxUser, ChatBoxDoctor} from './common';
-
+import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
+var ImagePicker = require("react-native-image-picker");
 
 var messages = []
 var currentUserid = ''
+var isCamera = false;
+var isGallery = false;
 
 class ChatGroup extends Component {
 	constructor(props) {
@@ -41,6 +44,8 @@ class ChatGroup extends Component {
 			messages: this.props.chatMessages,
 			loading: true,
 			protected: this.props.profile,
+			token: '',
+			blob_id: '',
 		};
 	}
 
@@ -65,7 +70,7 @@ class ChatGroup extends Component {
 		var {params} = this.props.navigation.state
         messages = []
         AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
-            var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=50'
+            var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=15'
             fetch(REQUEST_URL, {
                 method: 'GET',
                 headers: { 
@@ -83,7 +88,8 @@ class ChatGroup extends Component {
                     })
                     this.setState({
 						messages: messages,
-                        loading: false
+                        loading: false,
+						token: value
                     })
                 }else{
                     this.setState({ loading: false })
@@ -94,7 +100,6 @@ class ChatGroup extends Component {
         })
     }
 
-    
 
 	animateChatBoxUser() {
 		this.animatedValue.setValue(0);
@@ -112,57 +117,56 @@ class ChatGroup extends Component {
 		var newArray = []
 		var {params} = this.props.navigation.state
 		Keyboard.dismiss();
-	
-		AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
-			let formdata = new FormData()
-			formdata.append('chat_dialog_id', params.Dialog._id)
-			formdata.append('message', text)
-            var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL
-            fetch(REQUEST_URL, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'QB-Token': value
-                },
-				body: formdata
-            })
-            .then((response) => response.json())
-            .then((responseData) => {
-				
-				newArray.push({
-					_id: responseData._id,
-					attachments: responseData.attachments,
-					chat_dialog_id: responseData.chat_dialog_id,
-					created_at: responseData.created_at,
-					date_sent: responseData.date_sent,
-					delivered_ids: responseData.delivered_ids,
-					message: responseData.message,
-					read_ids: responseData.read_ids,
-					recipient_id: responseData.recipient_id,
-					sender_id: responseData.sender_id,
-					updated_at: responseData.updated_at,
-   					read: responseData.read,
-				});
+		
+		//Send message only with Text
+		let formdata = new FormData()
+		formdata.append('chat_dialog_id', params.Dialog._id)
+		formdata.append('message', text)
+		var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL
+		fetch(REQUEST_URL, {
+			method: 'POST',
+			headers: { 
+				'Content-Type': 'application/json',
+				'QB-Token': this.state.token
+			},
+			body: formdata
+		})
+		.then((response) => response.json())
+		.then((responseData) => {
+			
+			newArray.push({
+				_id: responseData._id,
+				attachments: responseData.attachments,
+				chat_dialog_id: responseData.chat_dialog_id,
+				created_at: responseData.created_at,
+				date_sent: responseData.date_sent,
+				delivered_ids: responseData.delivered_ids,
+				message: responseData.message,
+				read_ids: responseData.read_ids,
+				recipient_id: responseData.recipient_id,
+				sender_id: responseData.sender_id,
+				updated_at: responseData.updated_at,
+				read: responseData.read,
+			});
 
-				for(var i = 0; i<this.state.messages.length; i++) {
-					newArray.push(this.state.messages[i])
-				}
+			for(var i = 0; i<this.state.messages.length; i++) {
+				newArray.push(this.state.messages[i])
+			}
 
-				console.log(newArray)
-				this.setState({
-					message:newArray
-				});
+			console.log(newArray)
+			this.setState({
+				messages:newArray
+			});
 
-				var {dispatch} = this.props
-				dispatch({
-					type: CHANGE_MESSAGE_LIST,
-					payload: newArray,
-				})
+			var {dispatch} = this.props
+			dispatch({
+				type: CHANGE_MESSAGE_LIST,
+				payload: newArray,
+			})
 
-            }).catch((e) => {
-                console.log(e)
-            })   
-        })
+		}).catch((e) => {
+			console.log(e)
+		})   
 	}
 
 	componentWillUnmount() {
@@ -172,33 +176,72 @@ class ChatGroup extends Component {
 	renderListMessages(item, index) {
 		var {params} = this.props.navigation.state
 		if (item.sender_id != currentUserid) {
-			return (
-				<ChatBoxDoctor
-					key={index}
-					messageBody={item.message}
-					latitude = {item.latitude}
-					longitude = {item.longitude}
-					navigation = {this.props.navigation}
-					messageSenderPhoto={item.sender_id}
-					messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
-						hour: '2-digit',
-						minute: '2-digit',
-						month: 'short',
-						day: 'numeric',
-					})}/>
-			);
+			if(item.STICKER){
+				return (
+					<ChatBoxDoctor
+						key={index}
+						messageBody={item.message}
+						messageImage={item.attachments}
+						messageSticker = {item.STICKER}
+						latitude = {item.latitude}
+						longitude = {item.longitude}
+						navigation = {this.props.navigation}
+						messageSenderPhoto={item.sender_id}
+						messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
+							hour: '2-digit',
+							minute: '2-digit',
+							month: 'short',
+							day: 'numeric',
+						})}/>
+				);
+			}else{
+				return (
+					<ChatBoxDoctor
+						key={index}
+						messageBody={item.message}
+						messageImage={item.attachments}
+						latitude = {item.latitude}
+						longitude = {item.longitude}
+						navigation = {this.props.navigation}
+						messageSenderPhoto={item.sender_id}
+						messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
+							hour: '2-digit',
+							minute: '2-digit',
+							month: 'short',
+							day: 'numeric',
+						})}/>
+				);
+			}
+			
 		}
 		else {
-			return (
-				<ChatBoxUser
-					key={index}
-					messageBody={item.message}
-					//messageSender={item.sender_name}
-					messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
-						hour: '2-digit',
-						minute: '2-digit'
-					})}/>
-			);
+			if(item.STICKER){
+				return (
+					<ChatBoxUser
+						key={index}
+						messageBody={item.message}
+						messageSticker = {item.STICKER}
+						messageImage={item.attachments}
+						token = {this.state.token}
+						messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
+							hour: '2-digit',
+							minute: '2-digit'
+						})}/>
+				);
+			}else{
+				return (
+					<ChatBoxUser
+						key={index}
+						messageBody={item.message}
+						messageImage={item.attachments}
+						token = {this.state.token}
+						messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
+							hour: '2-digit',
+							minute: '2-digit'
+						})}/>
+				);
+			}
+			
 		}
 	}
 
@@ -239,25 +282,28 @@ class ChatGroup extends Component {
 			return (
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessage(text)}/>
+					<ChatMessageBox sendMessage={(text) => this.sendMessage(text)} onPressFile = {this._onClickedFile}/>
 				</KeyboardAvoidingView>
 			);
 		} else {
 			return (
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessage(text)}/>
+					<ChatMessageBox sendMessage={(text) => this.sendMessage(text)} onPressFile = {this._onClickedFile}/>
 				</KeyboardAvoidingView>
 			);
 		}
+	}
 
+	_onClickedFile = () => {
+		this.popupDialog.show()
 	}
 
 	chatEdit(){
 		var {params} = this.props.navigation.state
 		if(params.GroupChatting){
 			return(
-				<TouchableOpacity style = {styles.backButton} onPress = {() => this.props.navigation.navigate('ChatGroupEdit')}>
+				<TouchableOpacity style = {styles.backButton} onPress = {() => this.props.navigation.navigate('ChatGroupEdit', {Dialog: params.Dialog})}>
 					<Image source = {require('../assets/img/edit_white.png')} style = {{width: 18, height: 18, resizeMode:'contain'}}/>
 				</TouchableOpacity>
 			);
@@ -279,6 +325,178 @@ class ChatGroup extends Component {
 		}
 	}
 
+	onCamera = () => {
+		isCamera = true
+		isGallery = false
+        this.popupDialog.dismiss()
+		this.getAttachmentID()
+    }
+    onGallery = () => {
+		isCamera = false
+		isGallery = true
+        this.popupDialog.dismiss()
+		this.getAttachmentID()
+    }
+    onCancel = () => {
+        this.popupDialog.dismiss()
+    }
+	getAttachmentID(){
+		var today = new Date()
+		console.log('Today ==>')
+		console.log(today)
+		var yyyy = today.getFullYear().toString()
+		var MM = (today.getMonth()+1).toString()
+		var dd = today.getDate().toString()
+		var hh = today.getHours()
+		var mm = today.getMinutes()
+		var ss = today.getSeconds()
+		var timestamp = yyyy + MM + dd + '_' + hh + mm + ss
+
+		var REQUEST_URL = Constant.CREATE_FILE_URL + '?blob[content_type]=image/jpeg&blob[name]=' + timestamp + '.png'
+		console.log(REQUEST_URL)
+		fetch(REQUEST_URL, {
+			method: 'POST',
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'QB-Token': this.state.token
+			},
+		})
+		.then((response) => response.json())
+		.then((responseData) => {
+			console.log('--<')
+			console.log(responseData)
+			this.setState({ blob_id:responseData.blob.id })
+			this.showPicker()
+		}).catch((e) => {
+			console.log(e)
+		})
+	}
+	showPicker() {
+		const options = {
+			quality: 1.0,
+			maxWidth: 200,
+			maxHeight: 200,
+			storageOptions: {
+			skipBackup: true,
+			cameraRoll: true,
+			waitUntilSaved: true
+			}
+		}
+		if(isCamera){
+			ImagePicker.launchCamera(options, (response)  => {
+				console.log('Response = ', response);
+
+				// console.log('Response Data = ', response.data);
+
+				if (response.didCancel) {
+					console.log('User cancelled image picker');
+				}
+				else if (response.error) {
+					console.log('ImagePicker Error: ', response.error);
+				}
+				else if (response.customButton) {
+					console.log('User tapped custom button: ', response.customButton);
+				}
+				else {
+					var source = ''
+					console.log("ProfileScreen.js Platform: ", Platform);
+					if (Platform.OS === 'ios') {
+						source = {uri: response.uri.replace('file://', ''), isStatic: true};
+					} else {
+						source = {uri: response.uri, isStatic: true};
+					}
+					console.log(source)
+				}
+			});
+		}else{
+			ImagePicker.launchImageLibrary(options, (response)  => {
+				console.log('Response = ', response);
+
+				// console.log('Response Data = ', response.data);
+
+				if (response.didCancel) {
+					console.log('User cancelled image picker');
+				}
+				else if (response.error) {
+					console.log('ImagePicker Error: ', response.error);
+				}
+				else if (response.customButton) {
+					console.log('User tapped custom button: ', response.customButton);
+				}
+				else {
+					var source = ''
+					// console.log("ProfileScreen.js Platform: ", Platform);
+					// if (Platform.OS === 'ios') {
+						 source = response.uri.replace('file://', '');
+						// source = response.uri
+					// } else {
+					// 	source = {uri: response.uri, isStatic: true};
+					// }
+					console.log(source)
+					this.sendPhotoMessage(source)
+				}
+			});
+		}
+  	}
+
+	sendPhotoMessage(source){
+		var {params} = this.props.navigation.state
+
+		var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + "?chat_dialog_id=" + params.Dialog._id + "&attachments[0][id]=" + this.state.blob_id + "&attachments[0][type]=image&attachments[0][url]=" + source;
+		console.log(REQUEST_URL)
+		fetch(REQUEST_URL, {
+			method: 'POST',
+			headers: { 
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'QB-Token': this.state.token
+			},
+			// body: {
+			// 	"chat_dialog_id": "5986d65fa0eb4779778a4b51",
+			// 	"attachments[0][id]": this.state.blob_id,
+			// 	"attachments[0][type]": "image",
+			// 	"attachments[0][url]": source
+
+			// }
+		})
+		.then((response) => response.json())
+		.then((responseData) => {
+			console.log('+++++++')
+			console.log(responseData)
+			// newArray.push({
+			// 	_id: responseData._id,
+			// 	attachments: responseData.attachments,
+			// 	chat_dialog_id: responseData.chat_dialog_id,
+			// 	created_at: responseData.created_at,
+			// 	date_sent: responseData.date_sent,
+			// 	delivered_ids: responseData.delivered_ids,
+			// 	message: responseData.message,
+			// 	read_ids: responseData.read_ids,
+			// 	recipient_id: responseData.recipient_id,
+			// 	sender_id: responseData.sender_id,
+			// 	updated_at: responseData.updated_at,
+			// 	read: responseData.read,
+			// });
+
+			// for(var i = 0; i<this.state.messages.length; i++) {
+			// 	newArray.push(this.state.messages[i])
+			// }
+
+			// console.log(newArray)
+			// this.setState({
+			// 	messages:newArray
+			// });
+
+			var {dispatch} = this.props
+			dispatch({
+				type: CHANGE_MESSAGE_LIST,
+				payload: newArray,
+			})
+
+		}).catch((e) => {
+			console.log(e)
+		})   
+	}
+
 	render() {
 		var {params} = this.props.navigation.state 
 		return (
@@ -296,6 +514,28 @@ class ChatGroup extends Component {
                 <View style = {styles.bodyView}>
                     {this.renderChat()}
                 </View>
+
+				<PopupDialog
+                    ref={(popupDialog) => { this.popupDialog = popupDialog; }}
+                    //dialogStyle = {styles.dialogView}
+                    overlayBackgroundColor = {'black'}
+                    overlayOpacity = {0.9}
+                    height = {200}
+                    width = {280}
+                >
+                    <View style = {{backgroundColor:'white', padding: 15, borderRadius: 10}}>
+                        <Text style = {{textAlign:'left', margin: 10, fontSize: 20, fontWeight: 'bold'}}>Select file</Text>
+                        <TouchableOpacity onPress = {this.onCamera}>
+                            <Text style = {{textAlign:'left', fontSize: 17, marginTop: 10, marginLeft: 10}}>Take from camera</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress = {this.onGallery}>
+                            <Text style = {{textAlign:'left', fontSize: 17, marginTop: 20, marginLeft: 10}}>Choose from gallery</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress = {this.onCancel}>
+                            <Text style = {{textAlign:'left', fontSize: 17, marginTop: 20, marginLeft: 10}}>Cancel</Text>
+                        </TouchableOpacity>
+                    </View>
+                </PopupDialog>
 			</View>
 		);
 	}

@@ -11,6 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import reactNativeKeyboardAwareScrollView from 'react-native-keyboard-aware-scroll-view';
 
+
 class ChatMessageBox extends Component {
 	constructor (props) {
 		super(props);
@@ -99,6 +100,10 @@ class ChatMessageBox extends Component {
 		}
 	}
 
+	// _sendFile = () => {
+	// 	this.props.onPressFile
+	// }
+
 	render () {
 		const {container, buttonContainer,graphicIcon} = styles;
 		const {heightIOS} = this.state;
@@ -111,7 +116,7 @@ class ChatMessageBox extends Component {
 					</TouchableOpacity>
 				</View>
 				<View style = {{flexDirection:'row'}}>
-					<TouchableOpacity onPress={() => this.onButtonPress(this.state.text)}>
+					<TouchableOpacity onPress= {this.props.onPressFile}>
 						<Image source = {require('../../assets/img/paper_clip.png')} style = {graphicIcon}/>
 					</TouchableOpacity>
 					<TouchableOpacity onPress={() => this.onButtonPress(this.state.text)}>

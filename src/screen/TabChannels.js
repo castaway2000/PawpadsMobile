@@ -56,14 +56,10 @@ class TabChannels extends Component {
         this.loadData()     
     }
 
-    componentWillReceiveProps(nextProps) {
-        
-    }
-
     loadData(){
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             token = token
-            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?limit=100' + '&type[in]=1,2' + '&skip=' + currentPage*10 
+            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?limit=50' + '&type[in]=1,2' + '&skip=' + currentPage*10 
             fetch(REQUEST_URL, {
                 method: 'GET',
                 headers: { 
@@ -86,7 +82,6 @@ class TabChannels extends Component {
                 }else{
                     this.setState({ loading: false })
                 }
-                
             }).catch((e) => {
                 console.log(e)
             })   
@@ -112,6 +107,10 @@ class TabChannels extends Component {
             this.setState({
                 refresh: true
             });
+
+            this.props.ChannelsUsers(this.state.dialogs)
+
+
         }).catch((e) => {
             console.log(e)
         })
@@ -214,9 +213,9 @@ class TabChannels extends Component {
                 <Content bounces={false} contentContainerStyle={{ flex: 1, backgroundColor: 'white', alignItems:'center' }}>
                     <PullView 
                         style = {{flex: 1, width:Constant.WIDTH_SCREEN}} 
-                        //onPullRelease = {this.onPullRelease}
-                        //topIndicatorRender = {this.topIndicatorRender}
-                        //onRefresh={this._onRefresh.bind(this)}
+                        onPullRelease = {this.onPullRelease}
+                        topIndicatorRender = {this.topIndicatorRender}
+                        onRefresh={this._onRefresh.bind(this)}
                         >
                         {/*<ScrollView
                             refreshControl={
@@ -288,11 +287,13 @@ const styles = StyleSheet.create({
     }
 });
 
-// const mapStateToProps = ({chat}) => {
-// 	const {loading, chatMessages, error, userId, doctorId, profile} = chat;
-// 	return {loading, chatMessages, error, userId, doctorId, profile};
-// };
+const mapStateToProps = state => ({
 
-// export default connect(mapStateToProps)(TabChannels);
-//make this component available to the app
-export default TabChannels;
+});
+
+const mapDispatchToProps = dispatch => ({
+    ChannelsUsers: users => dispatch({type: 'Channels_Result', value: users})
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(TabChannels)
+

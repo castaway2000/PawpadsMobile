@@ -50,13 +50,12 @@ const styles = StyleSheet.create({
 });
 
 class SearchBox extends Component {
-
+ 
     constructor(props){
         super(props)
         this.state = {
             searchText:'',
         }
-        // this.set = this.set.bind(this);
     }
     componentDidMount() {
         filteredData = []
@@ -73,6 +72,7 @@ class SearchBox extends Component {
 
         this.props.SearchResult(filteredData)
     }
+    
     filterNotes(text, searchList){
         var query = text.toLowerCase();
         return searchList.filter(function(el){
@@ -94,14 +94,11 @@ class SearchBox extends Component {
                     onChangeText = {(text) => this.set(text)}
                     onSubmitEditing = {(event) => Keyboard.dismiss()}
                 />
-                <Image source = {require('../../assets/img/mic_grey.png')} style = {styles.micImg}/>
                 
             </View>
         )
     }
-}
-
-
+} 
 
 const mapStateToProps = state => ({
 

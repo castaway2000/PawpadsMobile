@@ -205,32 +205,72 @@ class Chat extends Component {
 	renderListMessages(item, index) {
 		var {params} = this.props.navigation.state
 		if (item.sender_id != currentUserid) {
-			return (
-				<ChatBoxDoctor
-					key={index}
-					messageBody={item.message}
-					latitude = {item.latitude}
-					longitude = {item.longitude}
-					navigation = {this.props.navigation}
-					messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
-						hour: '2-digit',
-						minute: '2-digit',
-						month: 'short',
-						day: 'numeric',
-					})}/>
-			);
+			if(item.STICKER){
+				return (
+					<ChatBoxDoctor
+						key={index}
+						messageBody={item.message}
+						messageImage={item.attachments}
+						messageSticker = {item.STICKER}
+						latitude = {item.latitude}
+						longitude = {item.longitude}
+						navigation = {this.props.navigation}
+						messageSenderPhoto={item.sender_id}
+						messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
+							hour: '2-digit',
+							minute: '2-digit',
+							month: 'short',
+							day: 'numeric',
+						})}/>
+				);
+			}else{
+				return (
+					<ChatBoxDoctor
+						key={index}
+						messageBody={item.message}
+						messageImage={item.attachments}
+						latitude = {item.latitude}
+						longitude = {item.longitude}
+						navigation = {this.props.navigation}
+						messageSenderPhoto={item.sender_id}
+						messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
+							hour: '2-digit',
+							minute: '2-digit',
+							month: 'short',
+							day: 'numeric',
+						})}/>
+				);
+			}
+			
 		}
 		else {
-			return (
-				<ChatBoxUser
-					key={index}
-					messageBody={item.message}
-					//messageSender={item.sender_name}
-					messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
-						hour: '2-digit',
-						minute: '2-digit',
-					})}/>
-			);
+			if(item.STICKER){
+				return (
+					<ChatBoxUser
+						key={index}
+						messageBody={item.message}
+						messageSticker = {item.STICKER}
+						messageImage={item.attachments}
+						token = {this.state.token}
+						messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
+							hour: '2-digit',
+							minute: '2-digit'
+						})}/>
+				);
+			}else{
+				return (
+					<ChatBoxUser
+						key={index}
+						messageBody={item.message}
+						messageImage={item.attachments}
+						token = {this.state.token}
+						messageLocalTimestamp={(new Date(item.created_at)).toLocaleString([], {
+							hour: '2-digit',
+							minute: '2-digit'
+						})}/>
+				);
+			}
+			
 		}
 	}
 

@@ -5,7 +5,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { connect } from 'react-redux';
 import { loginUser, passwordChanged } from '../../actions';
 import Constant from '../../common/Constant'
-import { Font } from 'expo'
 var CryptoJS = require("crypto-js")
 import hmacSHA1 from 'crypto-js/hmac-sha1'
 import {formatDate} from '../../actions/const';
@@ -107,8 +106,6 @@ class Login extends Component {
             this.setState({ loading: false })
             if(responseData.user){
                 var id = responseData.user.id
-                console.log(id)
-                console.log(responseData)
 
                 AsyncStorage.setItem(Constant.QB_USERID, id.toString());
                 AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
@@ -117,7 +114,6 @@ class Login extends Component {
                     AsyncStorage.setItem(Constant.USER_BLOBID, responseData.user.blob_id.toString());
                 }
                 
-
                 const { navigate } = this.props.navigation
                 navigate ('Drawer')
             }
@@ -271,10 +267,10 @@ const styles = StyleSheet.create({
         marginTop: Constant.HEIGHT_SCREEN*0.3
     },
     logotitle: {
-        fontSize: 20,
+        fontSize: 30,
         color: 'white',
         backgroundColor: 'transparent',
-        // fontFamily: 'Roboto'
+        // fontFamily: 'Bellota_BoldItalic'
     },
     nameView: {
         width: Constant.WIDTH_SCREEN - 100,

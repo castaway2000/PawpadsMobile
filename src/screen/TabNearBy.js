@@ -18,6 +18,7 @@ import {
 	variables,
 } from 'native-base'
 import Constant from '../common/Constant'
+import { connect } from 'react-redux'
 
 var datas = []
 var distance_unit = ''
@@ -90,7 +91,10 @@ class TabNearBy extends Component {
                             nearByUsers: responseData.items,
                             token: value,
                             loading: false 
-                        })                    
+                        })
+
+                        this.props.NearByUsers(responseData.items)
+
                     }).catch((e) => {
                         console.log(e)
                     })   
@@ -161,7 +165,6 @@ class TabNearBy extends Component {
             }
             
         }
-        
     }
 
     render() {
@@ -217,5 +220,13 @@ const styles = StyleSheet.create({
     }
 });
 
-//make this component available to the app
-export default TabNearBy;
+
+const mapStateToProps = state => ({
+
+});
+
+const mapDispatchToProps = dispatch => ({
+    NearByUsers: users => dispatch({type: 'Nearby_Result', value: users})
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(TabNearBy)

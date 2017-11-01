@@ -6,6 +6,7 @@ import {
 	Image,
 	AsyncStorage,
 	TouchableOpacity,
+	Navigator
 } from 'react-native';
 import {colors} from '../../actions/const';
 import Constant from '../../common/Constant'
@@ -22,13 +23,7 @@ class ChatBoxDoctor extends Component {
 			distance: Number,
         }
     }
-	componentWillMount() {
-		// AsyncStorage.getItem(Constant.SETTINGS_DISTANCE_UNIT).then((value) => {
-        //     if(value){
-        //         this.setState({ distance_unit: value })
-        //     }
-        // })
-	}
+
 	downloadLastUser(last_message_userid){
 		AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
 			var REQUEST_URL = Constant.USERS_URL +  last_message_userid +'.json'
@@ -41,8 +36,6 @@ class ChatBoxDoctor extends Component {
 			})
 			.then((response) => response.json())
 			.then((responseData) => {
-				console.log('->->->->->->->->')
-				console.log(responseData)
 				this.setState({
 					userprofile: responseData.user,
 					blob_id: responseData.user.blob_id,
@@ -110,13 +103,14 @@ class ChatBoxDoctor extends Component {
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
 					var distance = this.distanceInKmBetweenEarthCoordinates(Math.round(this.props.latitude), Math.round(position.coords.latitude), Math.round(this.props.longitude), Math.round(position.coords.longitude))
+					console.log(distance)
 					this.setState({ 
 						distance: distance.toFixed(2),
 						distancerefresh: true,
 					})
 				},
-				// (error) => this.setState({error: error.message}),
-				{enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
+				(error) => this.setState({error: error.message}),
+            	{enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
 			):
 			null
 		}
@@ -125,20 +119,58 @@ class ChatBoxDoctor extends Component {
 			<Text style={[styles.messageTime, styles.messageDistance]}>{this.state.distance} km</Text>
 		)
 	}
-	showNull(){
 
+	showMessageBody(){
+		if(this.props.messageImage.length > 0){
+			return(
+				<View style={styles.doctorMessageImageContainer}>
+					<Image source = {{
+							uri: Constant.BLOB_URL + this.props.messageImage[0].id + '/download.json',
+							method:'GET',
+							headers: { 
+									'Content-Type': 'application/json',
+									'QB-Token': this.state.token
+								},
+							}}
+							style = {styles.messageImg} 
+					/>
+				</View>
+			)
+		}else if (this.props.messageSticker) {
+			return(
+				<View style={styles.doctorMessageImageContainer}>
+					<Image source = {{
+							uri: this.props.messageSticker,
+							method:'GET',
+							headers: { 
+									'Content-Type': 'application/json',
+									'QB-Token': this.state.token
+								},
+							}}
+							style = {styles.messageImg} 
+					/>
+				</View>
+			)
+		}
+		else{
+			return(
+				<View style={styles.doctorMessageContainer}>
+					<Text style={styles.messageText}>{this.props.messageBody}</Text>
+				</View>
+			)
+		}
+		
 	}
 	render() {
 		const {doctorMessageContainer, messagesContainer, messageTime, messageText, messagePhoto} = styles;
 		return (
 			<View style = {messagesContainer}>
 				<Text style={messageTime}>{this.props.messageLocalTimestamp}</Text>
-				<View style = {{flexDirection:'row', alignItems:'center', marginTop:3}}>
+				<View style = {{flexDirection:'row', alignItems:'flex-end', marginTop:3}}>
 					{this.state.refresh == false? this.downloadLastUser(this.props.messageSenderPhoto) : null}
 					{this.showUserphoto()}
-					<View style={doctorMessageContainer}>
-						<Text style={messageText}>{this.props.messageBody}</Text>
-					</View>
+					{this.showMessageBody()}
+					
 				</View>
 				<View style = {{flexDirection:'row', marginTop:3}}>
 					{ this.showUserName()}
@@ -172,6 +204,15 @@ const styles = {
 		borderBottomLeftRadius: 0,
 		backgroundColor: 'rgba(242, 242, 242, 1)'
 	},
+	doctorMessageImageContainer: {
+		marginLeft: 10,
+		paddingVertical: 5,
+		minWidth: 100,
+		maxWidth: 260,
+		justifyContent: 'flex-start',
+		alignItems: 'flex-start',
+		paddingHorizontal: 10,
+	},
 	messageTime: {
 		fontSize: 12,
 		paddingTop: 5,
@@ -181,9 +222,9 @@ const styles = {
 		color: '#000'
 	},
 	messagePhoto: {
-		width: 40,
-		height: 40,
-		borderRadius: 20
+		width: 30,
+		height: 30,
+		borderRadius: 15
 	},
 	messageDistance: {
 		position: 'absolute',
@@ -192,6 +233,11 @@ const styles = {
 		width: Constant.WIDTH_SCREEN,
 		textAlign: 'center',
 		backgroundColor: 'transparent'
+	},
+	messageImg: {
+		width: 220,
+		height: 220,
+		resizeMode: 'contain',
 	}
 };
 

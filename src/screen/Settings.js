@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight, AsyncStorage } from 'react-native';
 import Constant from '../common/Constant'
-import CheckBox from 'react-native-icon-checkbox';
+// import CheckBox from 'react-native-icon-checkbox';
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
 import {Button} from 'native-base';
 import {colors} from '../actions/const';
@@ -136,7 +136,6 @@ class Settings extends Component {
         this.props.navigation.goBack()
     }
     render() {
-        console.log('search distance ->  ' + this.state.searchRange)
         return (
             <View style={styles.container}>
                 <View style = {styles.tabView}>
@@ -149,24 +148,15 @@ class Settings extends Component {
                     <ScrollView style = {styles.mscrollView}>
                         <View style = {{padding: 20}}>
                             <Text style = {styles.settingTxt}>Distance Units</Text>
-                            <CheckBox
-                                label="Kilometrs"
-                                size={25}
-                                checked={this.state.isKilometerSelected}
-                                onPress={this.handleSelectedKilometers}
-                                uncheckedIconName="radio-button-unchecked"
-                                checkedIconName="radio-button-checked"
-                                iconStyle = {{color: Constant.APP_COLOR}}
-                            />
-                            <CheckBox
-                                label="Miles"
-                                size={25}
-                                checked={this.state.isMilesSelected}
-                                onPress={this.handleSelectedMiles}
-                                uncheckedIconName="radio-button-unchecked"
-                                checkedIconName="radio-button-checked"
-                                iconStyle = {{color: Constant.APP_COLOR}}
-                            />
+                            <TouchableOpacity style = {{flexDirection: 'row', width: 200, height: 40, alignItems: 'center'}} onPress = {this.handleSelectedKilometers}>
+                                <Image source = {this.state.isKilometerSelected? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
+                                <Text style = {styles.settingsItem}>Kilometrs</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style = {{flexDirection: 'row', width: 200, height: 40, alignItems: 'center'}} onPress = {this.handleSelectedMiles}>
+                                <Image source = {this.state.isMilesSelected? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
+                                <Text style = {styles.settingsItem}>Miles</Text>
+                            </TouchableOpacity>
+
                             <Text style = {[styles.settingTxt, {marginTop: 10}]}>Range</Text>
                             <View style = {styles.cellView}>
                                 <View style = {styles.lineTop}/>
@@ -181,47 +171,30 @@ class Settings extends Component {
                                 <Image source = {require('../assets/img/pencil_icon.png')} style = {styles.icon}/>
                                 <View style = {styles.lineBottom}/>
                             </View>
+
                             <Text style = {[styles.settingTxt, {marginTop: 10}]}>GPS Accurancy</Text>
-                            <CheckBox
-                                label="High"
-                                size={25}
-                                checked={this.state.isHighSelected}
-                                onPress={this.handleSelectedHigh}
-                                uncheckedIconName="radio-button-unchecked"
-                                checkedIconName="radio-button-checked"
-                                iconStyle = {{color: Constant.APP_COLOR}}
-                            />
-                            <CheckBox
-                                label="Medium"
-                                size={25}
-                                checked={this.state.isMediumSelected}
-                                onPress={this.handleSelectedMedium}
-                                uncheckedIconName="radio-button-unchecked"
-                                checkedIconName="radio-button-checked"
-                                iconStyle = {{color: Constant.APP_COLOR}}
-                            />
-                            <CheckBox
-                                label="Low"
-                                size={25}
-                                checked={this.state.isLowSelected}
-                                onPress={this.handleSelectedLow}
-                                uncheckedIconName="radio-button-unchecked"
-                                checkedIconName="radio-button-checked"
-                                iconStyle = {{color: Constant.APP_COLOR}}
-                            />
+                            <TouchableOpacity style = {{flexDirection: 'row', width: 200, height: 40, alignItems: 'center'}} onPress = {this.handleSelectedHigh}>
+                                <Image source = {this.state.isHighSelected? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
+                                <Text style = {styles.settingsItem}>High</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style = {{flexDirection: 'row', width: 200, height: 40, alignItems: 'center'}} onPress = {this.isMediumSelected}>
+                                <Image source = {this.state.isMediumSelected? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
+                                <Text style = {styles.settingsItem}>Medium</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style = {{flexDirection: 'row', width: 200, height: 40, alignItems: 'center'}} onPress = {this.handleSelectedLow}>
+                                <Image source = {this.state.isLowSelected? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
+                                <Text style = {styles.settingsItem}>Low</Text>
+                            </TouchableOpacity>
+                            
                             <Text style = {[styles.settingTxt, {marginTop: 10}]}>Notification Settings</Text>
-                            <CheckBox
-                                label="Toggle push notifications"
-                                checked={this.state.isTogglepushSelected}
-                                onPress={this.handleSelectedPush}
-                                iconStyle = {{color: Constant.APP_COLOR}}
-                            />
-                            <CheckBox
-                                label="Toggle Messaging Popups"
-                                checked={this.state.isToggleMessagingSelected}
-                                onPress={this.handleSelectedMessaging}
-                                iconStyle = {{color: Constant.APP_COLOR}}
-                            />
+                            <TouchableOpacity style = {{flexDirection: 'row', width: 280, height: 40, alignItems: 'center'}} onPress = {this.handleSelectedPush}>
+                                <Image source = {this.state.isTogglepushSelected? require('../assets/img/fill-check-box.png'): require('../assets/img/blank-check-box.png')}  style = {styles.checkBox}/>
+                                <Text style = {styles.settingsItem}>Toggle push notifications</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style = {{flexDirection: 'row', width: 280, height: 40, alignItems: 'center'}} onPress = {this.handleSelectedMessaging}>
+                                <Image source = {this.state.isToggleMessagingSelected? require('../assets/img/fill-check-box.png'): require('../assets/img/blank-check-box.png')}  style = {styles.checkBox}/>
+                                <Text style = {styles.settingsItem}>Toggle Messaging Popups</Text>
+                            </TouchableOpacity>
 
                             <View style = {{alignItems:'center', marginTop: 20}}>
                                 <Text style = {[styles.settingTxt, {marginTop: 10}]}>Account Settings</Text>
@@ -360,6 +333,15 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         flex: 1,
         color: Constant.APP_COLOR,
+    },
+    checkBox: {
+        width: 18,
+        height: 18,
+    },
+    settingsItem: {
+        color:'black',
+        fontSize: 15,
+        marginLeft: 10
     }
 });
 

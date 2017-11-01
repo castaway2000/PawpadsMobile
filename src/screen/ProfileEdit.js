@@ -45,8 +45,6 @@ class ProfileEdit extends Component {
                 })
                 .then((response) => response.json())
                 .then((responseData) => {
-                    console.log('Edit User Profile -->')
-                    console.log(responseData)
                     if(responseData.user.custom_data){
                         var json = JSON.parse(responseData.user.custom_data)
                         this.setState({ 
@@ -122,8 +120,6 @@ class ProfileEdit extends Component {
         })
         .then((response) => response.json())
         .then((responseData) => {
-            console.log('Upload User Profile -->')
-            console.log(responseData)
             if(responseData.errors){
                 alert(responseData.errors.email[0])
             }else{
