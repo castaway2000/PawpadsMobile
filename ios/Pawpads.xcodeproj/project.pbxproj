@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -59,6 +58,7 @@
 		F3557B5008104C9FA2B802E9 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 13E6908453D24F36B6388209 /* SimpleLineIcons.ttf */; };
 		F8BEB4CF752A4FCA886C813B /* Bellota_BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9C64C471F1DF4AAABA5A6FA4 /* Bellota_BoldItalic.otf */; };
 		FC810DC822C6474B8BCE4673 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 28C63E58C1B04F3A940F1F45 /* libRNVectorIcons.a */; };
+		5BC673CAB7564B24AF9BA04E /* libRCTFBSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3568CA8A145046299477480E /* libRCTFBSDK.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -378,6 +378,8 @@
 		EF1FE7A53B3B49F29E152C8D /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		F25BD4CFBBCB45AEA4260A88 /* Proxima_Nova_Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Proxima_Nova_Regular.otf; path = ../assets/fonts/Proxima_Nova_Regular.otf; sourceTree = "<group>"; };
 		F276C5388359449AA5D16D1A /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/native-base/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
+		ECC94DE041B546F2ADA703D4 /* RCTFBSDK.xcodeproj */ = {isa = PBXFileReference; name = "RCTFBSDK.xcodeproj"; path = "../node_modules/react-native-fbsdk/ios/RCTFBSDK.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		3568CA8A145046299477480E /* libRCTFBSDK.a */ = {isa = PBXFileReference; name = "libRCTFBSDK.a"; path = "libRCTFBSDK.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -401,6 +403,7 @@
 				90550A6EC26D44269E5E92A5 /* libRNImagePicker.a in Frameworks */,
 				080AAD5C184D4B15A280BA28 /* libAirMaps.a in Frameworks */,
 				FC810DC822C6474B8BCE4673 /* libRNVectorIcons.a in Frameworks */,
+				5BC673CAB7564B24AF9BA04E /* libRCTFBSDK.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -629,6 +632,7 @@
 				7ECE9F305C6949FEA8F9D292 /* RNImagePicker.xcodeproj */,
 				00F56F3555B345069ECAAB3C /* AirMaps.xcodeproj */,
 				0FA9928852A74A8FAE004F47 /* RNVectorIcons.xcodeproj */,
+				ECC94DE041B546F2ADA703D4 /* RCTFBSDK.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1147,6 +1151,7 @@
 					"$(SRCROOT)/../node_modules/react-native-image-picker/ios",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
+					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
 				);
 				INFOPLIST_FILE = Pawpads/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1160,6 +1165,10 @@
 				PROVISIONING_PROFILE = "8d05eb3f-57b5-43b4-b4db-03f825e53d4b";
 				PROVISIONING_PROFILE_SPECIFIER = Pawpads_Pro;
 				VERSIONING_SYSTEM = "apple-generic";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Pawpads\"",
+				);
 			};
 			name = Debug;
 		};
@@ -1176,6 +1185,7 @@
 					"$(SRCROOT)/../node_modules/react-native-image-picker/ios",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
+					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
 				);
 				INFOPLIST_FILE = Pawpads/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1189,6 +1199,10 @@
 				PROVISIONING_PROFILE = "8d05eb3f-57b5-43b4-b4db-03f825e53d4b";
 				PROVISIONING_PROFILE_SPECIFIER = Pawpads_Pro;
 				VERSIONING_SYSTEM = "apple-generic";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Pawpads\"",
+				);
 			};
 			name = Release;
 		};

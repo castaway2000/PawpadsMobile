@@ -54,7 +54,6 @@ class CreateGroupChat extends Component {
     loadData(){
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?type[in]=2,3' + '&limit=10' + '&skip=' + currentPage*10
-            console.log(REQUEST_URL)
             fetch(REQUEST_URL, {
                 method: 'GET',
                 headers: { 
@@ -65,7 +64,6 @@ class CreateGroupChat extends Component {
             .then((response) => response.json())
             .then((responseData) => {
                 if(responseData.limit > 0){
-                    console.log(responseData)
                     datas.push(responseData.items)
                     console.log(datas)
                     currentPage ++
@@ -120,8 +118,6 @@ class CreateGroupChat extends Component {
         })
         .then((response) => response.json())
         .then((responseData) => {
-            console.log(responseData)
-
             for(var i = 0;i < this.state.dialogs.length; i++){
                 if(this.state.dialogs[i].name == responseData.user.login || this.state.dialogs[i].name == responseData.user.full_name){
                     this.state.dialogs[i]['blob_id'] = responseData.user.blob_id.toString();

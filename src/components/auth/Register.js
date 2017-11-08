@@ -56,7 +56,6 @@ class Register extends Component {
         })
         .then((response) => response.json())
         .then((responseData) => {
-            console.log(responseData)
             var token = responseData.session.token
             this.setState({
                 qb_token: token

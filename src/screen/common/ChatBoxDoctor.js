@@ -103,7 +103,6 @@ class ChatBoxDoctor extends Component {
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
 					var distance = this.distanceInKmBetweenEarthCoordinates(Math.round(this.props.latitude), Math.round(position.coords.latitude), Math.round(this.props.longitude), Math.round(position.coords.longitude))
-					console.log(distance)
 					this.setState({ 
 						distance: distance.toFixed(2),
 						distancerefresh: true,

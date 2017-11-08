@@ -47,7 +47,6 @@ export const passwordChanged = (text) => {
 };
 
 export const loginUser = ({email, password}) => {
-    console.log(email)
 	return (dispatch) => {
 		dispatch({type: LOGIN_USER});
 		let url = HOST + 'api/v2/mobile/login';

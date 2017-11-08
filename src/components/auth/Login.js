@@ -63,7 +63,6 @@ class Login extends Component {
         })
         .then((response) => response.json())
         .then((responseData) => {
-            console.log(responseData)
             var token = responseData.session.token
             AsyncStorage.setItem(Constant.QB_TOKEN, token);
             this.setState({

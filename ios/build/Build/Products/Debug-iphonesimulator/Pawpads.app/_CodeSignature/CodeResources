@@ -38,11 +38,11 @@
 		</data>
 		<key>Assets.car</key>
 		<data>
-		wCFo67FyMbEuAvJnkWt+OsFavoE=
+		oHWoVGhxrJba0tUQWPA3pKz3U3k=
 		</data>
 		<key>Base.lproj/LaunchScreen.nib</key>
 		<data>
-		GzRI704CX1LlmJN0ejCP/V7eL3s=
+		sJYl20rz0Xd3heqBXLw9ySFSW0Q=
 		</data>
 		<key>Bellota_BoldItalic.otf</key>
 		<data>
@@ -70,7 +70,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		ogPC7hp2mYSqvv/8U5t8gMhnVXM=
+		Q0cPcm5ZaPC0PRQ4hfget2dI2xc=
 		</data>
 		<key>Ionicons.ttf</key>
 		<data>
@@ -86,7 +86,7 @@
 		</data>
 		<key>Octicons.ttf</key>
 		<data>
-		43wPh5FmspBv+00q8kJl9AIbRBc=
+		XF4wYBlFFw56fAqk3ggmUtwnNQI=
 		</data>
 		<key>PkgInfo</key>
 		<data>
@@ -223,22 +223,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			wCFo67FyMbEuAvJnkWt+OsFavoE=
+			oHWoVGhxrJba0tUQWPA3pKz3U3k=
 			</data>
 			<key>hash2</key>
 			<data>
-			zVousXBMZtJVwpNVKhzMTsQ7wk59MpznSdM9lmxnTk4=
+			pmLFUAXfqW4CQoShXjtm+RauTrp3C/V2JzD/GiE0yOM=
 			</data>
 		</dict>
 		<key>Base.lproj/LaunchScreen.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			GzRI704CX1LlmJN0ejCP/V7eL3s=
+			sJYl20rz0Xd3heqBXLw9ySFSW0Q=
 			</data>
 			<key>hash2</key>
 			<data>
-			tSbVjZYwh7pN/xHZ31XEQutq9tZC1qiNsMPxtL4SbWI=
+			kRF9AwFaJr8s36Doa2MiAzdRkZ438RhuVTtWFUQsZ2U=
 			</data>
 		</dict>
 		<key>Bellota_BoldItalic.otf</key>
@@ -344,11 +344,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			43wPh5FmspBv+00q8kJl9AIbRBc=
+			XF4wYBlFFw56fAqk3ggmUtwnNQI=
 			</data>
 			<key>hash2</key>
 			<data>
-			IDC914RgQrcm7e1pDO4UjqugvZKBAae3xLoaLztAPMg=
+			sw1aNDI0CqTWoFwAl/BoysSnzVrJqfoRSzi3y6/KJCM=
 			</data>
 		</dict>
 		<key>Proxima_Nova_Bold.otf</key>

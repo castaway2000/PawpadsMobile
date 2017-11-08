@@ -43,6 +43,7 @@ class TabChannels extends Component {
         this.topIndicatorRender = this.topIndicatorRender.bind(this);
     }
     onPullRelease(resolve){
+        console.log('*')
         this.setState({refreshing: true});
         setTimeout(() => {
            this.loadData() 
@@ -59,7 +60,7 @@ class TabChannels extends Component {
     loadData(){
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             token = token
-            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?limit=50' + '&type[in]=1,2' + '&skip=' + currentPage*10 
+            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?limit=100' + '&type[in]=1,2' + '&skip=' + currentPage*10 
             fetch(REQUEST_URL, {
                 method: 'GET',
                 headers: { 
@@ -70,7 +71,6 @@ class TabChannels extends Component {
             .then((response) => response.json())
             .then((responseData) => {
                 if(responseData.limit > 0){
-                    console.log(responseData)
                     datas.push(responseData.items)
                     console.log(datas)
                     currentPage ++
@@ -137,8 +137,6 @@ class TabChannels extends Component {
 			);
         }
         else{
-            console.log(this.state.token)
-            console.log(this.state.dialogs)
             return(
                 this.state.dialogs.map((data, index) => {
                     return(
@@ -174,8 +172,7 @@ class TabChannels extends Component {
                       </TouchableOpacity>
                     )    
                 })
-            )
-           
+            )  
         }
         
     }
@@ -215,6 +212,7 @@ class TabChannels extends Component {
                         style = {{flex: 1, width:Constant.WIDTH_SCREEN}} 
                         onPullRelease = {this.onPullRelease}
                         topIndicatorRender = {this.topIndicatorRender}
+                        
                         onRefresh={this._onRefresh.bind(this)}
                         >
                         {/*<ScrollView

@@ -57,8 +57,6 @@ class ChatGroup extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		console.log('will receive props')
-		console.log(nextProps.chatMessages)
 		if (nextProps !== this.props || nextProps.chatMessages.length !== this.props.chatMessages.length) {
 			this.setState({
 				messages: nextProps.chatMessages,
@@ -81,8 +79,6 @@ class ChatGroup extends Component {
             .then((response) => response.json())
             .then((responseData) => {
                 if(responseData.limit > 0){
-					console.log('Get Group Chat message -->')
-                    console.log(responseData)
                     responseData.items.map((item, index) => {
                         messages.push(item)
                     })
@@ -153,7 +149,6 @@ class ChatGroup extends Component {
 				newArray.push(this.state.messages[i])
 			}
 
-			console.log(newArray)
 			this.setState({
 				messages:newArray
 			});
@@ -342,8 +337,6 @@ class ChatGroup extends Component {
     }
 	getAttachmentID(){
 		var today = new Date()
-		console.log('Today ==>')
-		console.log(today)
 		var yyyy = today.getFullYear().toString()
 		var MM = (today.getMonth()+1).toString()
 		var dd = today.getDate().toString()
@@ -353,7 +346,6 @@ class ChatGroup extends Component {
 		var timestamp = yyyy + MM + dd + '_' + hh + mm + ss
 
 		var REQUEST_URL = Constant.CREATE_FILE_URL + '?blob[content_type]=image/jpeg&blob[name]=' + timestamp + '.png'
-		console.log(REQUEST_URL)
 		fetch(REQUEST_URL, {
 			method: 'POST',
 			headers: { 
@@ -363,8 +355,6 @@ class ChatGroup extends Component {
 		})
 		.then((response) => response.json())
 		.then((responseData) => {
-			console.log('--<')
-			console.log(responseData)
 			this.setState({ blob_id:responseData.blob.id })
 			this.showPicker()
 		}).catch((e) => {
@@ -385,8 +375,6 @@ class ChatGroup extends Component {
 		if(isCamera){
 			ImagePicker.launchCamera(options, (response)  => {
 				console.log('Response = ', response);
-
-				// console.log('Response Data = ', response.data);
 
 				if (response.didCancel) {
 					console.log('User cancelled image picker');
@@ -450,41 +438,10 @@ class ChatGroup extends Component {
 				'Content-Type': 'application/x-www-form-urlencoded',
 				'QB-Token': this.state.token
 			},
-			// body: {
-			// 	"chat_dialog_id": "5986d65fa0eb4779778a4b51",
-			// 	"attachments[0][id]": this.state.blob_id,
-			// 	"attachments[0][type]": "image",
-			// 	"attachments[0][url]": source
-
-			// }
 		})
 		.then((response) => response.json())
 		.then((responseData) => {
-			console.log('+++++++')
 			console.log(responseData)
-			// newArray.push({
-			// 	_id: responseData._id,
-			// 	attachments: responseData.attachments,
-			// 	chat_dialog_id: responseData.chat_dialog_id,
-			// 	created_at: responseData.created_at,
-			// 	date_sent: responseData.date_sent,
-			// 	delivered_ids: responseData.delivered_ids,
-			// 	message: responseData.message,
-			// 	read_ids: responseData.read_ids,
-			// 	recipient_id: responseData.recipient_id,
-			// 	sender_id: responseData.sender_id,
-			// 	updated_at: responseData.updated_at,
-			// 	read: responseData.read,
-			// });
-
-			// for(var i = 0; i<this.state.messages.length; i++) {
-			// 	newArray.push(this.state.messages[i])
-			// }
-
-			// console.log(newArray)
-			// this.setState({
-			// 	messages:newArray
-			// });
 
 			var {dispatch} = this.props
 			dispatch({

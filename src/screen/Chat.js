@@ -56,8 +56,6 @@ class Chat extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		console.log('will receive props')
-		console.log(nextProps.chatMessages)
 		if (nextProps !== this.props || nextProps.chatMessages.length !== this.props.chatMessages.length) {
 			this.setState({
 				messages: nextProps.chatMessages,
@@ -70,7 +68,6 @@ class Chat extends Component {
         messages = []
         AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
             var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=50'
-			console.log(REQUEST_URL)
             fetch(REQUEST_URL, {
                 method: 'GET',
                 headers: { 
@@ -81,7 +78,6 @@ class Chat extends Component {
             .then((response) => response.json())
             .then((responseData) => {
                 if(responseData.limit > 0){
-                    console.log(responseData)
                     responseData.items.map((item, index) => {
                         messages.push(item)
                     })
@@ -119,7 +115,6 @@ class Chat extends Component {
 			})
 			.then((response) => response.json())
 			.then((responseData) => {
-				console.log(responseData)
 				this.setState({
 					userprofile: responseData.user,
 				});
@@ -327,8 +322,6 @@ class Chat extends Component {
 
 	createGroup(){
 		var {params} = this.props.navigation.state
-		console.log('chat group user profile link')
-		console.log(params)
 		return(
 			<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('Profile', {UserInfo: this.state.userprofile})}>
 				<Image source = {{
