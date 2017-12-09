@@ -71,7 +71,6 @@ export const loginUser = ({email, password}) => {
 				}
 			});
 	};
-
 };
 
 const loginUserSuccess = (dispatch, email, token) => {
@@ -157,4 +156,3 @@ export const logOutUser = () => {
 	);
 
 };
-

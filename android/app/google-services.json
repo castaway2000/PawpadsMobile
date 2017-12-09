@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "801182429951",
+    "firebase_url": "https://pawpads-59185.firebaseio.com",
+    "project_id": "pawpads-59185",
+    "storage_bucket": "pawpads-59185.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801182429951:android:3237ec101a08a61c",
+        "android_client_info": {
+          "package_name": "com.pawpads"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "801182429951-nr4f2sranl9cl4kskqu1i6ac1h0op5j7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3T2i39UcqYlwoEoi4jZDtPckoJCQMl08"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

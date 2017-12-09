@@ -9,7 +9,6 @@ var isName = false
 var isEmail = false
 var isPassword = false
 var isConfirm = false
-
 var isEmail = false
 
 // create a component
@@ -21,9 +20,11 @@ class Passwordrecovery extends Component {
             isEmail: false
         }
     }
+
     _onback = () => {
         this.props.navigation.goBack()
     }
+
     _onRecover = () => {
         isEmail = false
         if(this.state.email.length == 0){
@@ -37,7 +38,7 @@ class Passwordrecovery extends Component {
             backgroundColor = 'blue'
         />
         return (
-            
+
             <View style={styles.container}>
                 <View style = {styles.statusbar}/>
                 <View style = {styles.tabView}>
@@ -61,7 +62,7 @@ class Passwordrecovery extends Component {
                                 onChangeText = {(text) => {this.setState({ email: text })}}
                             />
                         </View>
-          
+
                         <TouchableOpacity style = {styles.recoveryButton} onPress = {this._onRecover}>
                             <Text style = {styles.recover}>Recover</Text>
                         </TouchableOpacity>
@@ -71,6 +72,7 @@ class Passwordrecovery extends Component {
         );
     }
 }
+
 
 // define your styles
 const styles = StyleSheet.create({
@@ -134,9 +136,9 @@ const styles = StyleSheet.create({
         textAlign:'left',
         fontSize: 14,
         color: 'black',
-        
+
     },
-    
+
     recoveryButton:{
         width: Constant.WIDTH_SCREEN - 100,
         height: 45,

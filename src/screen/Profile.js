@@ -38,7 +38,7 @@ class Profile extends Component {
             <Image source = {{
                 uri: Constant.BLOB_URL + params.UserInfo.blob_id + '/download.json',
                 method:'GET',
-                headers: { 
+                headers: {
                         'Content-Type': 'application/json',
                         'QB-Token': this.state.token
                     },
@@ -54,13 +54,13 @@ class Profile extends Component {
             <Image source = {{
                 uri: Constant.BLOB_URL + params.UserInfo.blob_id + '/download.json',
                 method:'GET',
-                headers: { 
+                headers: {
                         'Content-Type': 'application/json',
                         'QB-Token': this.state.token
                     },
                 }}
                 defaultSource = {require('../assets/img/user_placeholder.png')}
-                style = {styles.userphoto} 
+                style = {styles.userphoto}
             />
         )
     }
@@ -74,7 +74,7 @@ class Profile extends Component {
                         json.about :
                         null
                      }
-                </Text> 
+                </Text>
         )
     }
     showUserAge(){
@@ -83,15 +83,15 @@ class Profile extends Component {
         if(json){
             var today = new Date()
             if(json.age > 0){
-                var currentage = today.getFullYear() - json.age           
+                var currentage = today.getFullYear() - json.age
                 return(
                     <View style = {{flexDirection:'row', alignItems:'center', marginTop: 20}}>
                         <Image source ={require('../assets/img/male_icon.png')} style = {{width: 17, height: 23}}/>
                         <Text style = {{color: 'gray'}}> Age :<Text> {currentage}</Text></Text>
                     </View>
                 )
-            } 
-        }   
+            }
+        }
     }
     showUserHobby(){
         var {params} = this.props.navigation.state
@@ -102,7 +102,7 @@ class Profile extends Component {
                     json.hobby :
                     null
                     }
-            </Text> 
+            </Text>
         )
     }
     showAlertUserName(){
@@ -112,8 +112,8 @@ class Profile extends Component {
                 { params.UserInfo.full_name?
                     params.UserInfo.full_name :
                     params.UserInfo.login
-                } 
-            </Text> 
+                }
+            </Text>
         )
     }
     showUserName(){
@@ -123,20 +123,17 @@ class Profile extends Component {
                     { params.UserInfo.full_name?
                         params.UserInfo.full_name :
                         params.UserInfo.login
-                    } 
-                </Text> 
+                    }
+                </Text>
         )
     }
     onCreateDialog = () =>{
         var {params} = this.props.navigation.state
-        let formdata = new FormData()
-        formdata.append('type', '3')
-        formdata.append('name', params.UserInfo.full_name)
-        formdata.append('occupants_ids', params.UserInfo.id + ',' + this.state.userid)
+        let formdata = {'type':'3', 'name': params.UserInfo.full_name, 'occupants_ids': params.UserInfo.id + ',' + this.state.userid}
         var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL
         fetch(REQUEST_URL, {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'QB-Token': this.state.token
             },
@@ -146,7 +143,7 @@ class Profile extends Component {
         .then((responseData) => {
             params.UserInfo['_id'] = responseData._id
             this.props.navigation.navigate('Chat', {GroupName: params.UserInfo.login, GroupChatting: false, Dialog: params.UserInfo, Token: this.state.token})
-            
+
         }).catch((e) => {
             console.log(e)
         })
@@ -154,7 +151,7 @@ class Profile extends Component {
     render() {
         var {params} = this.props.navigation.state
         return (
-            
+
                 <View style={styles.container}>
                     <View style = {styles.statusbar}/>
                     <ScrollView style = {{backgroundColor: 'white'}}>
@@ -174,7 +171,7 @@ class Profile extends Component {
                                 { this.showUserHobby() }
                                 { this.showUserAge() }
                                 { this.showUserAbout() }
-                                
+
                                 <View style = {styles.buttonView}>
                                     {/*<TouchableOpacity style = {styles.removeBtn}>
                                         <Text style = {{color: Constant.APP_COLOR}}>Remove from friends</Text>
@@ -190,7 +187,7 @@ class Profile extends Component {
                         <TouchableOpacity onPress={() => { this.popupDialog.show(); }}>
                             <Image source = {require('../assets/img/add_to_friend.png')} style = {styles.addphoto}/>
                         </TouchableOpacity>
-                        { this.showUserPhoto() }    
+                        { this.showUserPhoto() }
                         <TouchableOpacity onPress = {this.onCreateDialog} >
                             <Image source = {require('../assets/img/chat_button_new.png')} style = {styles.addphoto}/>
                         </TouchableOpacity>
@@ -218,8 +215,8 @@ class Profile extends Component {
                     </TouchableHighlight>
                 </PopupDialog>
                 </View>
-                
-            
+
+
         );
     }
 }
@@ -279,13 +276,13 @@ const styles = StyleSheet.create({
         paddingTop: 50
     },
     userphoto: {
-        width: 100, 
-        height: 100, 
-        borderRadius: 50, 
+        width: 100,
+        height: 100,
+        borderRadius: 50,
     },
     addphoto: {
-        width: 50, 
-        height: 50, 
+        width: 50,
+        height: 50,
         borderRadius: 25,
     },
     editView: {
@@ -339,7 +336,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderBottomWidth: 1,
         borderColor: '#f4f4f4',
-        marginTop: 20        
+        marginTop: 20
     },
     buttonView: {
         marginTop: 60
@@ -348,18 +345,18 @@ const styles = StyleSheet.create({
         width: Constant.WIDTH_SCREEN*0.75,
         backgroundColor: 'transparent',
         justifyContent:'center',
-        alignItems:'center', 
+        alignItems:'center',
     },
     cancelBtn: {
-        backgroundColor: '#fb5e33', 
-        width: Constant.WIDTH_SCREEN*0.75, 
-        height: 40, 
-        alignItems:'center', 
+        backgroundColor: '#fb5e33',
+        width: Constant.WIDTH_SCREEN*0.75,
+        height: 40,
+        alignItems:'center',
         justifyContent:'center'
     },
     requestButton: {
-        textAlign:'center', 
-        color:'white', 
+        textAlign:'center',
+        color:'white',
         fontWeight:'bold'
     }
 });

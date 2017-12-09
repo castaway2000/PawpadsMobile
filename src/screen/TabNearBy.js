@@ -52,14 +52,14 @@ class TabNearBy extends Component {
             if(value){
                this.setState({ search_range: value })
             }
-            
+
         })
         AsyncStorage.getItem(Constant.SETTINGS_GPS_ACCURACY).then((value) => {
             if(value){
                 this.setState({ gps_accuracy: value })
             }
         })
-        this.loadData()     
+        this.loadData()
     }
 
     loadData(){
@@ -78,25 +78,25 @@ class TabNearBy extends Component {
                     }
                     fetch(REQUEST_URL, {
                         method: 'GET',
-                        headers: { 
+                        headers: {
                             'Content-Type': 'application/json',
                             'QB-Token': value
                         },
                     })
                     .then((response) => response.json())
                     .then((responseData) => {
-                        console.log(responseData.items)    
-                        this.setState({ 
+                        console.log(responseData.items)
+                        this.setState({
                             nearByUsers: responseData.items,
                             token: value,
-                            loading: false 
+                            loading: false
                         })
 
                         this.props.NearByUsers(responseData.items)
 
                     }).catch((e) => {
                         console.log(e)
-                    })   
+                    })
                 })
             },
             (error) => this.setState({error: error.message}),
@@ -129,23 +129,23 @@ class TabNearBy extends Component {
                                 onRefresh={this._onRefresh.bind(this)}
                             />
                         }
-                        style = {styles.mList} 
+                        style = {styles.mList}
                         dataArray={this.state.nearByUsers}
                         renderRow={data =>
                             <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data.geo_datum.user.user})} style = {{height:70}}>
                                 <Image source = {{
                                         uri: Constant.BLOB_URL + data.geo_datum.user.user.blob_id + '/download.json',
                                         method:'GET',
-                                        headers: { 
+                                        headers: {
                                                 'Content-Type': 'application/json',
                                                 'QB-Token': this.state.token
                                             },
                                         }}
                                         defaultSource = {require('../assets/img/user_placeholder.png')}
-                                        style = {styles.menuIcon} 
+                                        style = {styles.menuIcon}
                                 />
                                 {data.geo_datum.user.user.full_name?
-                                    <Text style = {styles.menuItem}>{data.geo_datum.user.user.full_name}</Text> : 
+                                    <Text style = {styles.menuItem}>{data.geo_datum.user.user.full_name}</Text> :
                                     <Text style = {styles.menuItem}>{data.geo_datum.user.user.login}</Text> }
                                 {this.state.distance_unit == 'km' ?
                                     <Text style = {styles.distance}>{parseInt(data.geo_datum.distance)} {this.state.distance_unit}</Text> :
@@ -162,7 +162,7 @@ class TabNearBy extends Component {
                     </View>
                 )
             }
-            
+
         }
     }
 
@@ -172,7 +172,7 @@ class TabNearBy extends Component {
                 <Content bounces={false} style={{ flex: 1, backgroundColor: 'white'}}>
 
                     { this.renderNearBy() }
-                    
+
                 </Content>
             </Container>
         );
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     },
     mList: {
         height: Constant.HEIGHT_SCREEN - 140,
-        paddingBottom: 30, 
+        paddingBottom: 30,
         backgroundColor:'white'
     },
     menuItem:{

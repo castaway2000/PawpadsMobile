@@ -9,7 +9,7 @@ import TabNearBy from './TabNearBy'
 
 // create a component
 class Dashboard extends Component {
-    static navigationOptions = { 
+    static navigationOptions = {
         title:'',
         header: null
     };
@@ -37,7 +37,7 @@ class Dashboard extends Component {
             this.props.navigation.navigate('Search', {TabName: 'CHANNELS'})
         }
     }
-    
+
     _onNearby = () => {
         this.setState({
             isNearby: true,
@@ -173,9 +173,9 @@ const styles = StyleSheet.create({
         left: 0,
     },
     tabItem: {
-        height: 50, 
-        width: Constant.WIDTH_SCREEN/3, 
-        justifyContent:'center', 
+        height: 50,
+        width: Constant.WIDTH_SCREEN/3,
+        justifyContent:'center',
         alignItems:'center'
     }
 

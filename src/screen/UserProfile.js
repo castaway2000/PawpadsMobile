@@ -35,7 +35,7 @@ class UserProfile extends Component {
                 var REQUEST_URL = Constant.USERS_URL + userid + '.json'
                 fetch(REQUEST_URL, {
                     method: 'GET',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/json',
                         'QB-Token': token
                     },
@@ -44,17 +44,17 @@ class UserProfile extends Component {
                 .then((responseData) => {
                     console.log(responseData)
                     if(responseData.user.custom_data){
-                        this.setState({ 
+                        this.setState({
                             username: responseData.user.login,
                             userinfo: responseData.user.custom_data,
                             token: token,
                             loading: false,
-                        }) 
+                        })
                         if(responseData.user.blob_id){
                             this.setState({ blob_id: responseData.user.blob_id})
                         }
                     }else{
-                        this.setState({ 
+                        this.setState({
                             username: responseData.user.login,
                             token: token,
                             loading: false,
@@ -63,10 +63,10 @@ class UserProfile extends Component {
                             this.setState({ blob_id: responseData.user.blob_id})
                         }
                     }
-                     
+
                 }).catch((e) => {
                     console.log(e)
-                })   
+                })
             })
         })
     }
@@ -78,13 +78,13 @@ class UserProfile extends Component {
             <Image source = {{
                 uri: Constant.BLOB_URL + this.state.blob_id + '/download.json',
                 method:'GET',
-                headers: { 
+                headers: {
                         'Content-Type': 'application/json',
                         'QB-Token': this.state.token
                     },
                 }}
                 defaultSource = {require('../assets/img/user_placeholder.png')}
-                style = {styles.userphoto} 
+                style = {styles.userphoto}
             />
         )
     }
@@ -94,7 +94,7 @@ class UserProfile extends Component {
             return(
                 <Text style = {styles.job}>
                     {json.about}
-                </Text> 
+                </Text>
             )
         }else{
             return null
@@ -123,7 +123,7 @@ class UserProfile extends Component {
             return(
                 <Text style = {styles.job}>
                     {json.hobby}
-                </Text> 
+                </Text>
             )
         }else{
             return null
@@ -136,15 +136,15 @@ class UserProfile extends Component {
                 { params.UserInfo.full_name?
                     params.UserInfo.full_name :
                     params.UserInfo.login
-                } 
-            </Text> 
+                }
+            </Text>
         )
     }
     showUserName(){
         return(
             <Text style = {styles.name}>
                 {this.state.username}
-            </Text> 
+            </Text>
         )
     }
     onCreateDialog = () =>{
@@ -156,7 +156,7 @@ class UserProfile extends Component {
         var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL
         fetch(REQUEST_URL, {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'QB-Token': this.state.token
             },
@@ -166,12 +166,12 @@ class UserProfile extends Component {
         .then((responseData) => {
             params.UserInfo['_id'] = responseData._id
             this.props.navigation.navigate('Chat', {GroupName: params.UserInfo.login, GroupChatting: false, Dialog: params.UserInfo, Token: this.state.token})
-            
+
         }).catch((e) => {
             console.log(e)
         })
     }
-    
+
     loadingView(){
         if(this.state.loading){
             return (
@@ -203,7 +203,7 @@ class UserProfile extends Component {
                                 { this.showUserHobby() }
                                 { this.showUserAge() }
                                 { this.showUserAbout() }
-                                
+
                                 <View style = {styles.buttonView}>
                                     {/*<TouchableOpacity style = {styles.removeBtn}>
                                         <Text style = {{color: Constant.APP_COLOR}}>Remove from friends</Text>
@@ -216,7 +216,7 @@ class UserProfile extends Component {
                     </View>
 
                     <View style = {styles.editView}>
-                        { this.showUserPhoto() }    
+                        { this.showUserPhoto() }
                     </View>
                     {this.loadingView()}
                 </View>
@@ -274,13 +274,13 @@ const styles = StyleSheet.create({
         paddingTop: 50
     },
     userphoto: {
-        width: 100, 
-        height: 100, 
-        borderRadius: 50, 
+        width: 100,
+        height: 100,
+        borderRadius: 50,
     },
     addphoto: {
-        width: 50, 
-        height: 50, 
+        width: 50,
+        height: 50,
         borderRadius: 25,
     },
     editView: {
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderBottomWidth: 1,
         borderColor: '#f4f4f4',
-        marginTop: 20        
+        marginTop: 20
     },
     buttonView: {
         marginTop: 60
@@ -344,18 +344,18 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         justifyContent:'center',
         alignItems:'center',
-        
+
     },
     cancelBtn: {
-        backgroundColor: '#fb5e33', 
-        width: Constant.WIDTH_SCREEN*0.75, 
-        height: 40, 
-        alignItems:'center', 
+        backgroundColor: '#fb5e33',
+        width: Constant.WIDTH_SCREEN*0.75,
+        height: 40,
+        alignItems:'center',
         justifyContent:'center'
     },
     requestButton: {
-        textAlign:'center', 
-        color:'white', 
+        textAlign:'center',
+        color:'white',
         fontWeight:'bold'
     },
     loadingView: {

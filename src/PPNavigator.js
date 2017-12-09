@@ -1,8 +1,8 @@
 //import libraries
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux'
-import { 
-    addNavigationHelpers, 
+import {
+    addNavigationHelpers,
     StackNavigator } from 'react-navigation'
 var { Router, Scene } = require('react-native-router-flux');
 import { Root } from 'native-base'
@@ -17,6 +17,7 @@ import ChatGroup from './screen/ChatGroup'
 import ChatGroupEdit from './screen/ChatGroupEdit'
 import CreateGroupChat from './screen/CreateGroupChat'
 import Search from './screen/Search'
+import DataMigration from './screen/DataMigration'
 
 const AppNavigators = StackNavigator(
     {
@@ -30,8 +31,9 @@ const AppNavigators = StackNavigator(
 );
 
 const LoginStack = StackNavigator(
-    {   
+    {
         Login: { screen: Login },
+        DataMigration: { screen: DataMigration},
         Register: { screen: Register},
         Passwordrecovery: { screen: Passwordrecovery },
         Drawer: { screen: Drawer },
@@ -49,8 +51,7 @@ const LoginStack = StackNavigator(
 )
 
 
-export default () => 
+export default () =>
     <Root>
         <LoginStack />
     </Root>
- 

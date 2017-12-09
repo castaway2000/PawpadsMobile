@@ -12,6 +12,11 @@ module.exports = {
     QB_AUTH_SECRET : "sszVLheuYags2ZQ",
     QB_ACCOUNT_KEY : "S6mqpsBsKxfbSqZxGY4X",
 
+    FIREBASE_PASS_SECRET : "S6mqpsBsKxfbSqZxGY4X",
+
+    TWITTER_COMSUMER_KEY: 'd0OQD2OeO77QLYMPROTteJRMi',
+    TWITTER_CONSUMER_SECRET: '8ZdXAvVlHzJWjGwZSeQm9MaLtJ1Ra9kx6eg5nqCLFh3NBfMzkf',
+
     SESSION_URL : 'https://api.quickblox.com/session.json',
     LOGIN_URL : 'https://api.quickblox.com/login.json',
     REGISTER_URL : 'https://api.quickblox.com/users.json',
@@ -21,6 +26,7 @@ module.exports = {
     GROUPCHAT_MESSAGE_URL: 'https://api.quickblox.com/chat/Message.json',
     NEARBY_FIND_USER_URL : 'https://api.quickblox.com/geodata/find.json',
     CREATE_FILE_URL : 'https://api.quickblox.com/blobs.json',
+    GET_USER_LOCATION : 'https://api.quickblox.com/geodata/find.json', //?user.id=20852310
 
     QB_USERID: 'qb_userid',
     QB_OWNER_ID: 'qb_owner_id',
