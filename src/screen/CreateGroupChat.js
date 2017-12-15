@@ -56,7 +56,7 @@ class CreateGroupChat extends Component {
             var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?type[in]=2,3' + '&limit=10' + '&skip=' + currentPage*10
             fetch(REQUEST_URL, {
                 method: 'GET',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'QB-Token': token
                 },
@@ -67,18 +67,18 @@ class CreateGroupChat extends Component {
                     datas.push(responseData.items)
                     console.log(datas)
                     currentPage ++
-                    this.setState({ 
+                    this.setState({
                         dialogs: JSON.parse(JSON.stringify(datas[0])),
                         token: token,
-                        loading: false 
+                        loading: false
                     })
                 }else{
                     this.setState({ loading: false })
                 }
-                
+
             }).catch((e) => {
                 console.log(e)
-            })   
+            })
         })
     }
     _onback = () => {
@@ -90,12 +90,12 @@ class CreateGroupChat extends Component {
         this.loadData()
         this.setState({refreshing: true});
         setTimeout(() => {
-            this.loadData() 
+            this.loadData()
             this.setState({
                 refreshing: false
             })
         }, 2000)
-    } 
+    }
     handleSelectedKilometers = (checked) => {
         this.setState({
             isKilometerSelected: true,
@@ -111,7 +111,7 @@ class CreateGroupChat extends Component {
         var REQUEST_URL = Constant.USERS_URL + last_message_userid +'.json'
         fetch(REQUEST_URL, {
             method: 'GET',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'QB-Token': this.state.token
             },
@@ -176,21 +176,22 @@ class CreateGroupChat extends Component {
                         <Image source = {{
                             uri: Constant.BLOB_URL + data.blob_id + '/download.json',
                             method:'GET',
-                            headers: { 
+                            headers: {
                                     'Content-Type': 'application/json',
                                     'QB-Token': this.state.token
                                 },
                             }}
                             defaultSource = {require('../assets/img/user_placeholder.png')}
-                            style = {styles.menuIcon} 
+                            style = {styles.menuIcon}
                         />
                         <Text style = {styles.customerName}>{data.name}</Text>
                       </TouchableOpacity>
-                    )    
+                    )
                 })
             )
-        }   
+        }
     }
+    
     render() {
         var { filteredData } = this.props;
         <StatusBar
@@ -225,7 +226,7 @@ class CreateGroupChat extends Component {
                             {filteredData.length == 0 ? this.renderCreateChats(this.state.dialogs): this.renderCreateChats(filteredData)}
                         </ScrollView>
                     </Content>
-                    
+
                 </View>
             </View>
         );
@@ -287,7 +288,7 @@ const styles = StyleSheet.create({
         // flex:1,
         height: 500,
         width: Constant.WIDTH_SCREEN,
-        paddingBottom: 30, 
+        paddingBottom: 30,
         backgroundColor:'white'
     },
     customerName:{
@@ -308,10 +309,10 @@ const styles = StyleSheet.create({
         top: 200
     },
     tabChannelListCell: {
-        width: Constant.WIDTH_SCREEN, 
-        height: 70, 
-        flexDirection:'row', 
-        padding: 10, 
+        width: Constant.WIDTH_SCREEN,
+        height: 70,
+        flexDirection:'row',
+        padding: 10,
         paddingLeft: 20,
         alignItems:'center',
     },

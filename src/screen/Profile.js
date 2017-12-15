@@ -29,9 +29,11 @@ class Profile extends Component {
             this.setState({ userid: value })
         })
     }
+
     _onback = () => {
         this.props.navigation.goBack()
     }
+
     showAlertUserPhoto(){
         var {params} = this.props.navigation.state
         return(
@@ -48,6 +50,7 @@ class Profile extends Component {
             />
         )
     }
+
     showUserPhoto() {
         var {params} = this.props.navigation.state
         return(
@@ -64,6 +67,7 @@ class Profile extends Component {
             />
         )
     }
+
     showUserAbout(){
         var {params} = this.props.navigation.state
         var json = JSON.parse(params.UserInfo.custom_data)
@@ -77,6 +81,7 @@ class Profile extends Component {
                 </Text>
         )
     }
+
     showUserAge(){
         var {params} = this.props.navigation.state
         var json = JSON.parse(params.UserInfo.custom_data)
@@ -93,6 +98,7 @@ class Profile extends Component {
             }
         }
     }
+
     showUserHobby(){
         var {params} = this.props.navigation.state
         var json = JSON.parse(params.UserInfo.custom_data)
@@ -105,6 +111,7 @@ class Profile extends Component {
             </Text>
         )
     }
+
     showAlertUserName(){
         var {params} = this.props.navigation.state
         return(
@@ -116,6 +123,7 @@ class Profile extends Component {
             </Text>
         )
     }
+
     showUserName(){
         var {params} = this.props.navigation.state
         return(
@@ -127,6 +135,7 @@ class Profile extends Component {
                 </Text>
         )
     }
+
     onCreateDialog = () =>{
         var {params} = this.props.navigation.state
         let formdata = {'type':'3', 'name': params.UserInfo.full_name, 'occupants_ids': params.UserInfo.id + ',' + this.state.userid}

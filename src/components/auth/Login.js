@@ -40,25 +40,29 @@ class Login extends Component {
     constructor(props){
         super(props)
         this.state = {
-            name: '',
-            password: '',
+            name: 'cris', //cris 1BITJAY_1875640410  howsonanna
+            password: '12345678',
             qb_token: '',
             loading: this.props.loading,
             isname: true,
-            ispassword: true
+            ispassword: true,
+            qb_token_user : "",
         }
     }
 
     componentWillMount() {
-      tmp = this
+        tmp = this
+
+        this.getQB_Token()
+    }
+
+    getQB_Token() {
+
         var time = parseInt(Date.now()/1000)
         var signatureParams = 'application_id='+ Constant.QB_APPID + '&auth_key=' + Constant.QB_AUTH_KEY + '&nonce=' + time + '&timestamp=' + time
         var signature = ''
         signature = hmacSHA1(signatureParams, Constant.QB_AUTH_SECRET).toString()
-        this.getQB_Token(time, signature)
-    }
 
-    getQB_Token(time, signature) {
         let formdata = new FormData()
         formdata.append('application_id', Constant.QB_APPID)
         formdata.append('auth_key', Constant.QB_AUTH_KEY)
@@ -78,9 +82,156 @@ class Login extends Component {
         .then((responseData) => {
             var token = responseData.session.token
             AsyncStorage.setItem(Constant.QB_TOKEN, token);
+            console.log("token is:",token);
             this.setState({
                 qb_token: token
             })
+
+        }).catch((e) => {
+            console.log(e)
+        })
+    }
+
+    getQB_Token_User(username,password,isDataMigrated) {
+
+      console.log("Getting user session token.");
+
+        var time = parseInt(Date.now()/1000)
+        var signatureParams = 'application_id='+ Constant.QB_APPID + '&auth_key=' + Constant.QB_AUTH_KEY + '&nonce=' + time + '&timestamp=' + time + '&user[login]=' + this.state.name + '&user[password]=' + this.state.password
+        var signature = ''
+        signature = hmacSHA1(signatureParams, Constant.QB_AUTH_SECRET).toString()
+
+        var params = {
+          "application_id":Constant.QB_APPID,
+          "auth_key":Constant.QB_AUTH_KEY,
+          "timestamp":time,
+          "nonce":time,
+          "signature":signature,
+          "user": {"login": this.state.name, "password": this.state.password}
+        }
+        console.log("user params is:",params);
+
+        var REQUEST_URL = Constant.SESSION_URL
+        fetch(REQUEST_URL, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(params)
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+          console.log("user session token responce:",responseData);
+          var token = responseData.session.token
+          AsyncStorage.setItem(Constant.QB_USER_TOKEN, token);
+          this.setState({
+              qb_token: token
+          })
+
+          //Go to home
+          this._checkDataMigration(isDataMigrated)
+
+        }).catch((e) => {
+            console.log(e)
+        })
+    }
+
+    getQB_Token_User_Facebook(isDataMigrated,fbtoken) {
+
+      //provider facebook
+      //keys[token] fb token
+      console.log("Getting user facebook session token.");
+
+        var time = parseInt(Date.now()/1000)
+
+        //application_id=22&auth_key=wJHd4cQSxpQGWx5&keys[token]=AM46dxjhisdffgry26282352fdusdfusdfgsdf&nonce=33432&provider=facebook&timestamp=1326966962
+        var signatureParams = 'application_id='+ Constant.QB_APPID + '&auth_key=' + Constant.QB_AUTH_KEY + '&keys[token]=' + fbtoken + '&nonce=' + time + '&provider=' + 'facebook' + '&timestamp=' + time
+        var signature = ''
+        signature = hmacSHA1(signatureParams, Constant.QB_AUTH_SECRET).toString()
+
+        var params = {
+          "application_id":Constant.QB_APPID,
+          "auth_key":Constant.QB_AUTH_KEY,
+          "timestamp":time,
+          "nonce":time,
+          "signature":signature,
+          "provider": "facebook",
+          "keys": {"token": fbtoken}
+        }
+        console.log("user params is:",params);
+
+        var REQUEST_URL = Constant.SESSION_URL
+        fetch(REQUEST_URL, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(params)
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+          console.log("user session token responce:",responseData);
+          var token = responseData.session.token
+          AsyncStorage.setItem(Constant.QB_USER_TOKEN, token);
+          this.setState({
+              qb_token_user: token
+          })
+
+          //Go to home
+          this._checkDataMigration(isDataMigrated)
+
+        }).catch((e) => {
+            console.log(e)
+        })
+    }
+
+    getQB_Token_User_Twitter(isDataMigrated,twtoken,twsecret) {
+
+      //provider facebook
+      //keys[token] fb token
+      console.log("Getting user twitter session token.");
+
+        var time = parseInt(Date.now()/1000)
+        var signatureParams = 'application_id='+ Constant.QB_APPID + '&auth_key=' + Constant.QB_AUTH_KEY + '&keys[token]=' + twtoken + '&keys[secret]=' + twsecret + '&nonce=' + time + '&provider=' + 'twitter' + '&timestamp=' + time
+        var signature = ''
+        signature = hmacSHA1(signatureParams, Constant.QB_AUTH_SECRET).toString()
+
+        var params = {
+          "application_id":Constant.QB_APPID,
+          "auth_key":Constant.QB_AUTH_KEY,
+          "timestamp":time,
+          "nonce":time,
+          "signature":signature,
+          "provider": "twitter",
+          "keys": {"token": twtoken, "secret": twsecret}
+        }
+        
+
+        console.log("user params is:",params);
+
+        var REQUEST_URL = Constant.SESSION_URL
+        fetch(REQUEST_URL, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(params)
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+          console.log("user session token responce:",responseData);
+          var token = responseData.session.token
+          AsyncStorage.setItem(Constant.QB_USER_TOKEN, token);
+          this.setState({
+              qb_token_user: token
+          })
+
+          //Go to home
+          this._checkDataMigration(isDataMigrated)
+
         }).catch((e) => {
             console.log(e)
         })
@@ -157,6 +308,7 @@ class Login extends Component {
 
                         //save pref
                         AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
+                        AsyncStorage.setItem(Constant.USER_PASSWORD, this.state.password);
                         AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
 
                         if (email) {
@@ -167,8 +319,7 @@ class Login extends Component {
                             AsyncStorage.setItem(Constant.USER_BLOBID, blob_id.toString());
                         }
 
-                        //Go to home
-                        this._checkDataMigration(isDataMigrated)
+                        this.getQB_Token_User(this.state.name, this.state.password,isDataMigrated)
 
                       } else {
                         console.log("User entered wrong password");
@@ -246,7 +397,7 @@ class Login extends Component {
                       }
 
                       //Go to home
-                      this._checkDataMigration(isDataMigrated)
+                      this.getQB_Token_User_Twitter(isDataMigrated,authToken,authTokenSecret)
 
                     } else {
                         console.log("Twitter: User Not found on Firebase. Registering on firebase...")
@@ -364,7 +515,7 @@ class Login extends Component {
                              }
 
                              //Go to home
-                             tmp._checkDataMigration(isDataMigrated)
+                             tmp.getQB_Token_User_Facebook(isDataMigrated,accessToken)
 
                            } else {
                                console.log("Facebook: User Not found on Firebase. Registering on firebase...")

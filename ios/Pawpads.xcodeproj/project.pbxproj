@@ -58,6 +58,7 @@
 		84BFB8952D7042B4BF5EDDCE /* rubicon-icon-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6D135D747B74431C8476454B /* rubicon-icon-font.ttf */; };
 		888DEEA3CA6C4374ACF4217E /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C6BF95414CFF4140A41CA012 /* Zocial.ttf */; };
 		9344A90C69F847738DF7DBF0 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C48B6910A6B64076A9F677E5 /* MaterialCommunityIcons.ttf */; };
+		A11AB11DED2A4F0998F1255B /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 57EA39044E784A85AB81EA51 /* libRNFetchBlob.a */; };
 		A3F1332B887048C9BD204DC4 /* Proxima_Nova_Regular_Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = B8815E4B0BA44727B99D7484 /* Proxima_Nova_Regular_Italic.otf */; };
 		ABD15607A31B42CB8F3043A6 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F276C5388359449AA5D16D1A /* Octicons.ttf */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
@@ -222,6 +223,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNFirebase;
+		};
+		35F7F6E91FE254F2002D0568 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A417E889EF1248E6B0103E01 /* RNFetchBlob.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A15C300E1CD25C330074CB35;
+			remoteInfo = RNFetchBlob;
 		};
 		3DAD3E831DF850E9000B6D8A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -403,6 +411,7 @@
 		51EBFAC7A8854A819B266D4A /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/native-base/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		551D040F2194F35BD4C59967 /* libPods-Pawpads.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Pawpads.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		56A0B229144D4477AF64C7F1 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
+		57EA39044E784A85AB81EA51 /* libRNFetchBlob.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFetchBlob.a; sourceTree = "<group>"; };
 		5CFB8020DC024166B62077FB /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		618F344883194B47A3812261 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/native-base/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
@@ -414,6 +423,7 @@
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		9C64C471F1DF4AAABA5A6FA4 /* Bellota_BoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Bellota_BoldItalic.otf; path = ../assets/fonts/Bellota_BoldItalic.otf; sourceTree = "<group>"; };
 		9CF55409041D481D8BC7DAA8 /* Proxima_Nova_Regular_Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Proxima_Nova_Regular_Italic.otf; path = ../assets/fonts/Proxima_Nova_Regular_Italic.otf; sourceTree = "<group>"; };
+		A417E889EF1248E6B0103E01 /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFetchBlob.xcodeproj; path = "../node_modules/react-native-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		AE42726F582ECC52CFCD7A09 /* Pods-Pawpads.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pawpads.release.xcconfig"; path = "Pods/Target Support Files/Pods-Pawpads/Pods-Pawpads.release.xcconfig"; sourceTree = "<group>"; };
 		B8815E4B0BA44727B99D7484 /* Proxima_Nova_Regular_Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Proxima_Nova_Regular_Italic.otf; path = ../src/assets/fonts/Proxima_Nova_Regular_Italic.otf; sourceTree = "<group>"; };
@@ -462,6 +472,7 @@
 				65BDE9AA05EE48D9B83BAEAD /* libyoga.a in Frameworks */,
 				E5F0056D89E84DE2856526D0 /* libcxxreact.a in Frameworks */,
 				50EC5802E93948CFBD5D5401 /* libjschelpers.a in Frameworks */,
+				A11AB11DED2A4F0998F1255B /* libRNFetchBlob.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -588,6 +599,7 @@
 				3F0B0B18D95A4F81B7315FB3 /* libyoga.a */,
 				38F95B7A27964434942C5B59 /* libcxxreact.a */,
 				F30AA1A3D2B94FFEB51EF925 /* libjschelpers.a */,
+				57EA39044E784A85AB81EA51 /* libRNFetchBlob.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -652,6 +664,14 @@
 			isa = PBXGroup;
 			children = (
 				35D4F3571FD162B200E10C97 /* libRNFirebase.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		35F7F6E61FE254F2002D0568 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				35F7F6EA1FE254F2002D0568 /* libRNFetchBlob.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -735,6 +755,7 @@
 				E71DE328F16C46D2945448EA /* RNFirebase.xcodeproj */,
 				2DCB6E070BF94ABAA8DE1796 /* RCTFBSDK.xcodeproj */,
 				2E6FCA79C8B44517B5B333BD /* RNTwitterSignIn.xcodeproj */,
+				A417E889EF1248E6B0103E01 /* RNFetchBlob.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -896,6 +917,10 @@
 				{
 					ProductGroup = 146834001AC3E56700842450 /* Products */;
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
+				},
+				{
+					ProductGroup = 35F7F6E61FE254F2002D0568 /* Products */;
+					ProjectRef = A417E889EF1248E6B0103E01 /* RNFetchBlob.xcodeproj */;
 				},
 				{
 					ProductGroup = 35D4F3301FD162B200E10C97 /* Products */;
@@ -1067,6 +1092,13 @@
 			fileType = archive.ar;
 			path = libRNFirebase.a;
 			remoteRef = 35D4F3561FD162B200E10C97 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		35F7F6EA1FE254F2002D0568 /* libRNFetchBlob.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNFetchBlob.a;
+			remoteRef = 35F7F6E91FE254F2002D0568 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		3DAD3E841DF850E9000B6D8A /* libRCTImage-tvOS.a */ = {
@@ -1361,12 +1393,14 @@
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
 					"$(SRCROOT)/../node_modules/react-native-twitter-signin/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
 				);
 				INFOPLIST_FILE = Pawpads/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/Pawpads\"",
 					"\"$(SRCROOT)/Pawpads\"",
 					"\"$(SRCROOT)/Pawpads\"",
 					"\"$(SRCROOT)/Pawpads\"",
@@ -1413,12 +1447,14 @@
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
 					"$(SRCROOT)/../node_modules/react-native-twitter-signin/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
 				);
 				INFOPLIST_FILE = Pawpads/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/Pawpads\"",
 					"\"$(SRCROOT)/Pawpads\"",
 					"\"$(SRCROOT)/Pawpads\"",
 					"\"$(SRCROOT)/Pawpads\"",

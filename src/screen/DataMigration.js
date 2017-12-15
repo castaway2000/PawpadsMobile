@@ -4,8 +4,10 @@ import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, 
 import Constant from '../common/Constant'
 import hmacSHA1 from 'crypto-js/hmac-sha1'
 import RNFirebase from 'react-native-firebase';
+import RNFetchBlob from 'react-native-fetch-blob'
 
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
 
 // create a component
 class DataMigration extends Component {
@@ -14,51 +16,131 @@ class DataMigration extends Component {
         this.state = {
           qb_token: '',
           userid:'',
+          qb_token_user:'',
+          password:'',
+          tableId:'',
+          loadedImages:0,
+          userDialogSkipped:0,
+          userChatSkipped:0,
         };
     }
+
     componentWillMount() {
+
       AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
         console.log("user id is:",value);
           this.setState({userid: value })
+
+          AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
+            console.log("token is:",value);
+              this.setState({qb_token: value })
+
+              AsyncStorage.getItem(Constant.QB_USER_TOKEN).then((value) => {
+                console.log("user token is:",value);
+                  this.setState({qb_token_user: value })
+
+                  AsyncStorage.getItem(Constant.USER_PASSWORD).then((value) => {
+                    console.log("user password is:",value);
+                      this.setState({password: value })
+
+                      //this._getLocationDataQuickblox()
+                      this._getUserDialog()
+                  })
+              })
+          })
       })
-      var time = parseInt(Date.now()/1000)
-      var signatureParams = 'application_id='+ Constant.QB_APPID + '&auth_key=' + Constant.QB_AUTH_KEY + '&nonce=' + time + '&timestamp=' + time
-      var signature = ''
-      signature = hmacSHA1(signatureParams, Constant.QB_AUTH_SECRET).toString()
-      this.getQB_Token(time, signature)
     }
 
-    getQB_Token(time, signature){
-        let formdata = new FormData()
-        formdata.append('application_id', Constant.QB_APPID)
-        formdata.append('auth_key', Constant.QB_AUTH_KEY)
-        formdata.append('timestamp', time)
-        formdata.append('nonce', time)
-        formdata.append('signature', signature)
+    /**
+     * Chat Dialog
+     */
+    _getUserDialog = () => {
 
-        var REQUEST_URL = Constant.SESSION_URL
+        console.log("Quickblox: Getting... Dialog data");
+
+        var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + "?skip=" + this.state.userDialogSkipped*100
+
         fetch(REQUEST_URL, {
-            method: 'POST',
+            method: 'GET',
             headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            body:formdata
+                'Content-Type': 'application/json',
+                'QB-Token': this.state.qb_token_user
+            }
         })
         .then((response) => response.json())
         .then((responseData) => {
-          console.log("token responce:",responseData);
 
-            var token = responseData.session.token
-            this.setState({
-                qb_token: token
-            })
-            this._loginWithQuickblox()
+          if (responseData["items"].length > 0) {
+            console.log("Quickblox: Responce:",this.state.userDialogSkipped,responseData);
+            this.state.userDialogSkipped = this.state.userDialogSkipped + 1
+
+            for (var index = 0; index < responseData["items"].length; index++) {
+              this._saveUserDialogtoFirebase(responseData,index)
+              this._getUserChats(responseData["items"][index]["_id"])
+            }
+            this._getUserDialog()
+          } else {
+            console.log("No data found.");
+          }
         }).catch((e) => {
             console.log(e)
         })
     }
 
-    _loginWithQuickblox = () => {
+    _saveUserDialogtoFirebase = (responseData,index) => {
+
+      var updates = {};
+      var newKey = firebase.database().ref().child('dialog').push().key;
+      updates = responseData["items"][index]
+      firebase.database().ref().child('/dialog/' + responseData["items"][index]["_id"]).set(updates)
+    }
+
+    /**
+     * Chats
+     */
+    _getUserChats = (chatDialogId) => {
+
+        console.log("Quickblox: Getting... Chat data");
+
+        var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + "?chat_dialog_id=" + chatDialogId + "&skip=" + this.state.userChatSkipped*100
+
+        fetch(REQUEST_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'QB-Token': this.state.qb_token_user
+            }
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+
+          if (responseData["items"].length > 0) {
+            console.log("Quickblox: Responce:",this.state.userChatSkipped,responseData);
+            this.state.userChatSkipped = this.state.userChatSkipped + 1
+
+            for (var index = 0; index < responseData["items"].length; index++) {
+              this._saveUserChattoFirebase(responseData,index)
+            }
+            this._getUserChats(chatDialogId)
+          }
+        }).catch((e) => {
+            console.log(e)
+        })
+    }
+
+    _saveUserChattoFirebase = (responseData,index) => {
+
+      var updates = {};
+      var newKey = firebase.database().ref().child('chats').push().key;
+      updates = responseData["items"][index]
+      firebase.database().ref().child('/chats/' + responseData["items"][index]["_id"]).set(updates)
+    }
+
+    /**
+     * LOCATION DATA
+     */
+
+    _getLocationDataQuickblox = () => {
 
         console.log("Quickblox: Getting... Location data");
 
@@ -68,7 +150,7 @@ class DataMigration extends Component {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'QB-Token': this.state.qb_token
+                'QB-Token': this.state.qb_token_user
             }
         })
         .then((response) => response.json())
@@ -84,15 +166,39 @@ class DataMigration extends Component {
 
                 console.log("Quickblox: latitude:",geodata["latitude"]);
                 console.log("Quickblox: longitude:",geodata["longitude"]);
+                console.log("Quickblox: longitude:",geodata["user_id"]);
 
-                var rootRef = firebase.database().ref(`/users`);
-                let user = {};
-                user[tableId + "/location"] = {
-                                            "latitude":geodata["latitude"],
-                                            "longitude":geodata["longitude"]
-                                            }
-                rootRef.update(user);
+                firebase.database()
+                    .ref(`/users`)
+                    .orderByChild("id")
+                    .equalTo(geodata["user_id"].toString())
+                    .once("value")
+                    .then(snapshot => {
+                      this.setState({ loading: false })
+                        if (snapshot.val()) {
 
+                          let response = snapshot.val()
+                          var keys = Object.keys(response);
+                          var tableId =  keys[keys.length-1]
+
+                          var rootRef = firebase.database().ref(`/users`);
+                          let user = {};
+                          user[tableId + "/location"] = {
+                            "latitude":geodata["latitude"],
+                            "longitude":geodata["longitude"]
+                          }
+
+                          rootRef.update(user);
+
+                          this.setState({tableId: tableId })
+
+                          this._getUserBlobs();
+
+                        } else {
+                            console.log("User Not found on Firebase. Incorrect user id.")
+                            alert("Please enter correct username")
+                        }
+                    })
               } else {
 
               }
@@ -102,6 +208,97 @@ class DataMigration extends Component {
         }).catch((e) => {
             console.log(e)
         })
+    }
+
+    _getUserBlobs = () => {
+        console.log("Quickblox: Getting User Blobs....");
+        var REQUEST_URL = Constant.CREATE_FILE_URL
+
+        fetch(REQUEST_URL, {
+            method: 'GET',
+            headers: {
+                'QB-Token': this.state.qb_token_user
+            }
+        })
+        .then((response) => response.json())
+        .then( (responseData) => {
+          console.log("Quickblox User blobs Responce:",responseData);
+
+          this.setState({totalImagesCount: responseData["items"].length})
+
+          for (var index in responseData["items"]) {
+            //Store to firebase
+
+            var updates = {};
+            var newKey = firebase.database().ref().child('users').child('content').push().key;
+            updates['/users/' + this.state.tableId + '/content/' + newKey] = responseData["items"][index]["blob"]
+            firebase.database().ref().update(updates)
+
+            //Download Images
+            this._downloadImages(responseData, index);
+          }
+
+        }).catch((e) => {
+            console.log(e)
+        })
+    }
+
+    _downloadImages = (responseData,index) => {
+
+      let imageurl = Constant.BLOB_URL + responseData["items"][index]["blob"]["uid"] + ".json";
+      let imagename = responseData["items"][index]["blob"]["name"]
+
+      console.log("imagename is:",imagename);
+
+      // send http request in a new thread (using native code)
+      RNFetchBlob
+      .config({
+        fileCache : true,
+      })
+      .fetch('GET', imageurl, {
+        'QB-Token' : this.state.qb_token,
+      })
+
+      // when response status code is 200
+      .then((res) => {
+        console.log('The file saved to ', res.path())
+
+        //Upload Image to firebase
+        firebase.storage().ref("content/" + this.state.tableId + "/" + imagename).putFile(res.path())
+        .on('state_changed', (snapshot) => {
+          // console.log("SNAPSHOT = ");
+          // console.log(snapshot);
+        }, (err) => {
+          console.log("Error " + err);
+
+          ///
+          this.setState({loadedImages: this.state.loadedImages + 1 })
+          if (this.state.loadedImages == responseData["items"].length) {
+              console.log("All Images Uploaded.",this.state.loadedImages ,responseData["items"].length);
+          }
+
+        }, (uploadedAsset) => {
+
+          ///
+          this.setState({loadedImages: this.state.loadedImages + 1 })
+          if (this.state.loadedImages == responseData["items"].length) {
+              console.log("All Images Uploaded.",this.state.loadedImages ,responseData["items"].length);
+          }
+        });
+      })
+
+      // Status code is not 200
+      .catch((errorMessage, statusCode) => {
+        console.log("errorMessage = ",index,errorMessage);
+
+        ///
+        this.setState({loadedImages: this.state.loadedImages + 1 })
+        if (this.state.loadedImages == responseData["items"].length) {
+            console.log("All Images Uploaded.",this.state.loadedImages ,responseData["items"].length);
+        }
+
+        // error handling
+      })
     }
 
     render() {

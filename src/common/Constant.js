@@ -32,8 +32,10 @@ module.exports = {
     QB_OWNER_ID: 'qb_owner_id',
     QB_USERNAME: 'qb_username',
     QB_TOKEN:  'qb_token',
+    QB_USER_TOKEN:  'qb_user_token',
 
     USER_LOGIN: 'user_login',
+    USER_PASSWORD: 'user_pass',
     USER_FULL_NAME: 'user_full_name',
     USER_EMAIL: 'user_email',
     USER_BLOBID: 'user_blob_id',
