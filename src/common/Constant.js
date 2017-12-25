@@ -27,6 +27,8 @@ module.exports = {
     NEARBY_FIND_USER_URL : 'https://api.quickblox.com/geodata/find.json',
     CREATE_FILE_URL : 'https://api.quickblox.com/blobs.json',
     GET_USER_LOCATION : 'https://api.quickblox.com/geodata/find.json', //?user.id=20852310
+    GET_BLOCKLIST : 'https://api.quickblox.com/data/BlockList.json',
+    GET_FRIENDSLIST : 'https://api.quickblox.com/data/FriendsList.json',
 
     QB_USERID: 'qb_userid',
     QB_OWNER_ID: 'qb_owner_id',

@@ -1414,7 +1414,7 @@
 					"-lc++",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.saber.Pawpads;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saber.Pawpadsdev;
 				PRODUCT_NAME = Pawpads;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1468,7 +1468,7 @@
 					"-lc++",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.saber.Pawpads;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saber.Pawpadsdev;
 				PRODUCT_NAME = Pawpads;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";

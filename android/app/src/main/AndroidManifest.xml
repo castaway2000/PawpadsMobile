@@ -18,6 +18,7 @@
       android:label="Pawpads-Dev"
       android:icon="@mipmap/ic_launcher"
       android:theme="@style/AppTheme">
+
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

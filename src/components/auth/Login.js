@@ -207,7 +207,7 @@ class Login extends Component {
           "provider": "twitter",
           "keys": {"token": twtoken, "secret": twsecret}
         }
-        
+
 
         console.log("user params is:",params);
 
@@ -332,7 +332,10 @@ class Login extends Component {
                     }
                 } else {
                     console.log("User Not found on Firebase.")
-                    alert("Please enter correct username")
+                    console.log("Adding Trying to loginwith Quickblox....")
+
+                    this._loginWithQuickblox(null)
+
                 }
             })
     }
@@ -604,6 +607,7 @@ class Login extends Component {
           console.log(responseData);
             this.setState({ loading: false })
             if(responseData.user) {
+
                 var id = responseData.user.id
 
                 //update password on firebase
