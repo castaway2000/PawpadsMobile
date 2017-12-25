@@ -208,7 +208,6 @@ class Login extends Component {
           "keys": {"token": twtoken, "secret": twsecret}
         }
 
-
         console.log("user params is:",params);
 
         var REQUEST_URL = Constant.SESSION_URL
@@ -244,7 +243,7 @@ class Login extends Component {
             if (this.state.password.length < 1) {
                 this.setState({ ispassword: false })
             } else {
-                this.firebaseLogin()
+                this.firebaseLoginNormal()
                 Keyboard.dismiss();
             }
         }
@@ -263,7 +262,7 @@ class Login extends Component {
     }
 
    //Login with firebase
-    firebaseLogin = () => {
+    firebaseLoginNormal = () => {
       console.log("Login with firebase started.");
       this.setState({ loading: true })
         firebase.database()
@@ -295,52 +294,46 @@ class Login extends Component {
                     let password = response[tableId]["password"]
                     let isDataMigrated = response[tableId]["isDataMigrated"]
 
-                    //Get user password
-                    if (typeof password != "undefined") {
-                      console.log("User password found on firebase. Password is:" ,password);
-                      this.setState({ loading: false })
+                    console.log("User password found on firebase. Password is:" ,password);
+                    this.setState({ loading: false })
 
-                      //Decrypt password
-                      var plaintextpassword  = CryptoJS.AES.decrypt(password.toString(), Constant.FIREBASE_PASS_SECRET).toString(CryptoJS.enc.Utf8);
+                    //Decrypt password
+                    var plaintextpassword  = CryptoJS.AES.decrypt(password.toString(), Constant.FIREBASE_PASS_SECRET).toString(CryptoJS.enc.Utf8);
 
-                      if (plaintextpassword == this.state.password) {
-                        console.log("User entered correct password");
+                    if (plaintextpassword == this.state.password) {
+                      console.log("User entered correct password");
 
-                        //save pref
-                        AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
-                        AsyncStorage.setItem(Constant.USER_PASSWORD, this.state.password);
-                        AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                      //save pref
+                      AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
+                      AsyncStorage.setItem(Constant.USER_PASSWORD, this.state.password);
+                      AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
 
-                        if (email) {
-                          AsyncStorage.setItem(Constant.USER_EMAIL, email);
-                        }
-
-                        if (blob_id) {
-                            AsyncStorage.setItem(Constant.USER_BLOBID, blob_id.toString());
-                        }
-
-                        this.getQB_Token_User(this.state.name, this.state.password,isDataMigrated)
-
-                      } else {
-                        console.log("User entered wrong password");
-                        alert("Please enter correct password.")
+                      if (email) {
+                        AsyncStorage.setItem(Constant.USER_EMAIL, email);
                       }
-                    } else {
-                      console.log("User is registred on firebase but password not found.");
 
-                      this._loginWithQuickblox(tableId)
+                      if (blob_id) {
+                        AsyncStorage.setItem(Constant.USER_BLOBID, blob_id.toString());
+                      }
+
+                      this.getQB_Token_User(this.state.name, this.state.password,isDataMigrated)
+
+                    } else {
+                      console.log("User entered wrong password");
+                      alert("Please enter correct password.")
                     }
-                } else {
+                  } else {
                     console.log("User Not found on Firebase.")
                     console.log("Adding Trying to loginwith Quickblox....")
 
-                    this._loginWithQuickblox(null)
+                    this._loginWithQuickbloxNormal()
 
                 }
             })
     }
 
-    handelTwitterLogin = () => {
+    //Login with twitter
+    firebaseLoginTwitter = () => {
       console.log("Twitter: Login with firebase started.");
       this.setState({ loading: true })
 
@@ -403,40 +396,8 @@ class Login extends Component {
                       this.getQB_Token_User_Twitter(isDataMigrated,authToken,authTokenSecret)
 
                     } else {
-                        console.log("Twitter: User Not found on Firebase. Registering on firebase...")
-
-                        //Get current date
-                        let dt = new Date();
-                        let dateString =  dt.toISOString();
-
-                        var updates = {};
-                        var newKey = firebase.database().ref().child('users').push().key;
-                        var qbID = newKey
-                        var isDataMigrated = "true"
-
-                        var user =  { "blob_id": 0,
-                                        "created_at":dateString,
-                                        "full_name":"",
-                                        "id":newKey,
-                                        "last_request_at":dateString,
-                                        "login":login,
-                                        "owner_id":0,
-                                        "twitter_id":twitterId,
-                                        "updated_at":dateString,
-                                        "isDataMigrated":isDataMigrated
-                                      }
-
-                        updates['/users/' + newKey] = user;
-                        firebase.database().ref().update(updates)
-
-                        //save pref
-                        AsyncStorage.setItem(Constant.QB_USERID, qbID);
-                        AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
-
-                        console.log("Twitter: Registred on firebase.")
-
-                        //Go to home
-                        this._checkDataMigration(isDataMigrated)
+                      //Check quickblox for twitter data
+                      this._loginWithQuickbloxTwitter(authToken,authTokenSecret,loginData)
                     }
                 })
           }
@@ -447,7 +408,8 @@ class Login extends Component {
         });
       }
 
-    handleFacebookLogin = () => {
+    //Login with facebook
+    firebaseLoginFacebook = () => {
       console.log("Facebook: Login with firebase started.");
       LoginManager.logInWithReadPermissions(['public_profile', 'email', 'user_friends']).then(
 
@@ -521,40 +483,7 @@ class Login extends Component {
                              tmp.getQB_Token_User_Facebook(isDataMigrated,accessToken)
 
                            } else {
-                               console.log("Facebook: User Not found on Firebase. Registering on firebase...")
-
-                               //Get current date
-                               let dt = new Date();
-                               let dateString =  dt.toISOString();
-
-                               var updates = {};
-                               var newKey = firebase.database().ref().child('users').push().key;
-                               var qbID = newKey
-                               var isDataMigrated = "true"
-
-                               var user =  {  "blob_id": 0,
-                                               "created_at":dateString,
-                                               "full_name":"",
-                                               "id":newKey,
-                                               "last_request_at":dateString,
-                                               "login":login,
-                                               "owner_id":0,
-                                               "twitter_id":facebookID,
-                                               "updated_at":dateString,
-                                               "isDataMigrated":isDataMigrated,
-                                             }
-
-                               updates['/users/' + newKey] = user;
-                               firebase.database().ref().update(updates)
-
-                               //save pref
-                               AsyncStorage.setItem(Constant.QB_USERID, qbID);
-                               AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
-
-                               console.log("Facebook: Registred on firebase.")
-
-                               //Go to home
-                               tmp._checkDataMigration(isDataMigrated)
+                             tmp._loginWithQuickbloxFacebook(accessToken,result)
                            }
                        })
                      }
@@ -584,9 +513,9 @@ class Login extends Component {
        )
      }
 
-    _loginWithQuickblox = (tableId) => {
+    _loginWithQuickbloxNormal = () => {
 
-        console.log("Validating password from Quickblox...");
+        console.log("Validating user from Quickblox...");
 
         let formdata = new FormData()
         formdata.append('login', this.state.name)
@@ -608,43 +537,225 @@ class Login extends Component {
             this.setState({ loading: false })
             if(responseData.user) {
 
-                var id = responseData.user.id
+              console.log("Adding user to firebase");
 
-                //update password on firebase
-                let dt = new Date();
-                let dateString =  dt.toISOString()
+              //Encrypt password
+              var ciphertext = CryptoJS.AES.encrypt(this.state.password, Constant.FIREBASE_PASS_SECRET).toString();
 
-                console.log("Adding password to firebase");
+              //Add user to firebase
+              var updates = {};
+              var newKey = firebase.database().ref().child('users').push().key;
+              responseData.user.password = ciphertext
+              updates['/users/' + newKey] = responseData.user;
+              firebase.database().ref().update(updates)
 
-                //Encrypt password
-                var ciphertext = CryptoJS.AES.encrypt(this.state.password, Constant.FIREBASE_PASS_SECRET).toString();
+              //Save to local storage
+              AsyncStorage.setItem(Constant.QB_USERID, responseData.user.id.toString());
+              AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
+              AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
+              if(responseData.user.blob_id){
+                  AsyncStorage.setItem(Constant.USER_BLOBID, responseData.user.blob_id.toString());
+              }
 
-                var rootRef = firebase.database().ref(`/users`);
-                let user = {};
-                user[tableId + "/password"] = ciphertext
-                rootRef.update(user);
-                user[tableId + "/updated_at"] = dateString
-                rootRef.update(user);
+              var isDataMigrated = "false"
 
-                AsyncStorage.setItem(Constant.QB_USERID, id.toString());
-                AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
-                AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
-                if(responseData.user.blob_id){
-                    AsyncStorage.setItem(Constant.USER_BLOBID, responseData.user.blob_id.toString());
-                }
-
-                var isDataMigrated = "false"
-
-                //Go to home
-                this._checkDataMigration(isDataMigrated)
+              //Go to home
+              this.getQB_Token_User(this.state.name,this.state.password,isDataMigrated)
 
             } else {
               console.log("Username Not found on Quickblox.")
-                alert(responseData.errors)
+              alert("Please enter correct username or password.")
             }
         }).catch((e) => {
             console.log(e)
         })
+    }
+
+    _loginWithQuickbloxFacebook = (token,result) => {
+      console.log("Validating Facebook user from Quickblox...");
+
+      var REQUEST_URL = Constant.LOGIN_URL
+
+      let formdata = new FormData()
+            formdata.append('provider', "facebook")
+            formdata.append('keys[token]', token)
+
+
+
+            fetch(REQUEST_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'QB-Token': this.state.qb_token
+                },
+                body:formdata
+            })
+            .then((response) => response.json())
+            .then((responseData) => {
+              console.log(responseData);
+                this.setState({ loading: false })
+                if(responseData.user) {
+
+                  console.log("Adding user to firebase");
+
+                  //Encrypt password
+                  var ciphertext = CryptoJS.AES.encrypt(this.state.password, Constant.FIREBASE_PASS_SECRET).toString();
+
+                  //Add user to firebase
+                  var updates = {};
+                  var newKey = firebase.database().ref().child('users').push().key;
+                  responseData.user.password = ciphertext
+                  updates['/users/' + newKey] = responseData.user;
+                  firebase.database().ref().update(updates)
+
+                  //Save to local storage
+                  AsyncStorage.setItem(Constant.QB_USERID, responseData.user.id.toString());
+                  AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
+                  AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
+                  if(responseData.user.blob_id){
+                      AsyncStorage.setItem(Constant.USER_BLOBID, responseData.user.blob_id.toString());
+                  }
+
+                  var isDataMigrated = "false"
+
+                  this.getQB_Token_User_Facebook(isDataMigrated,token)
+
+                } else {
+                  console.log("Facebook: User Not found on Firebase. Registering on firebase...")
+
+                  //Get current date
+                  let dt = new Date();
+                  let dateString =  dt.toISOString();
+
+                  var updates = {};
+                  var newKey = firebase.database().ref().child('users').push().key;
+                  var qbID = newKey
+                  var isDataMigrated = "true"
+                  let facebookID = result["id"]
+                  let login = "facebook_" + facebookID
+
+                  var user =  {"blob_id": 0,
+                                  "created_at":dateString,
+                                  "full_name":"",
+                                  "id":newKey,
+                                  "last_request_at":dateString,
+                                  "login":login,
+                                  "owner_id":0,
+                                  "twitter_id":facebookID,
+                                  "updated_at":dateString,
+                                  "isDataMigrated":isDataMigrated,
+                                }
+
+                  updates['/users/' + newKey] = user;
+                  firebase.database().ref().update(updates)
+
+                  //save pref
+                  AsyncStorage.setItem(Constant.QB_USERID, qbID);
+                  AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+
+                  console.log("Facebook: Registred on firebase.")
+
+                  //Go to home
+                  tmp._checkDataMigration(isDataMigrated)
+                }
+            }).catch((e) => {
+                console.log(e)
+            })
+    }
+
+    _loginWithQuickbloxTwitter = (token, secret,loginData) => {
+
+      console.log("Validating Twitter user from Quickblox...");
+
+      let formdata = new FormData()
+      formdata.append('provider', "twitter")
+      formdata.append('keys[token]', token)
+      formdata.append('keys[secret]', secret)
+
+      var REQUEST_URL = Constant.LOGIN_URL
+
+      fetch(REQUEST_URL, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'multipart/form-data',
+              'QB-Token': this.state.qb_token
+          },
+          body:formdata
+      })
+      .then((response) => response.json())
+      .then((responseData) => {
+        console.log(responseData);
+          this.setState({ loading: false })
+          if(responseData.user) {
+
+            console.log("Adding user to firebase");
+
+            //Encrypt password
+            var ciphertext = CryptoJS.AES.encrypt(this.state.password, Constant.FIREBASE_PASS_SECRET).toString();
+
+            //Add user to firebase
+            var updates = {};
+            var newKey = firebase.database().ref().child('users').push().key;
+            responseData.user.password = ciphertext
+            updates['/users/' + newKey] = responseData.user;
+            firebase.database().ref().update(updates)
+
+            //Save to local storage
+            AsyncStorage.setItem(Constant.QB_USERID, responseData.user.id.toString());
+            AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
+            AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
+            if(responseData.user.blob_id){
+                AsyncStorage.setItem(Constant.USER_BLOBID, responseData.user.blob_id.toString());
+            }
+
+            var isDataMigrated = "false"
+
+            this.getQB_Token_User_Twitter(isDataMigrated,token,secret)
+
+          } else {
+
+            var isDataMigrated = "true"
+
+            //Get current date
+            let dt = new Date();
+            let dateString =  dt.toISOString();
+
+            var updates = {};
+            var newKey = firebase.database().ref().child('users').push().key;
+            var qbID = newKey
+            var isDataMigrated = "true"
+            let twitterId = loginData["userID"]
+            let login = loginData["userName"] + "_" + twitterId
+
+            var user =  {
+              "blob_id": 0,
+              "created_at":dateString,
+              "full_name":"",
+              "id":newKey,
+              "last_request_at":dateString,
+              "login":login,
+              "owner_id":0,
+              "twitter_id":twitterId,
+              "updated_at":dateString,
+              "isDataMigrated":isDataMigrated
+            }
+
+            updates['/users/' + newKey] = user;
+            firebase.database().ref().update(updates)
+
+            //save pref
+            AsyncStorage.setItem(Constant.QB_USERID, qbID);
+            AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+
+            console.log("Twitter: Registred on firebase.")
+
+            //Go to home
+            this._checkDataMigration(isDataMigrated)
+
+          }
+      }).catch((e) => {
+          console.log(e)
+      })
     }
 
     validateEmail = (email) => {
@@ -743,10 +854,10 @@ class Login extends Component {
                         <Text style = {styles.loginwith}>Login with</Text>
 
                         <View style = {styles.socialView}>
-                            <TouchableOpacity onPress={this.handleFacebookLogin}>
+                            <TouchableOpacity onPress={this.firebaseLoginFacebook}>
                                 <Image source = {require('../../assets/img/facebook.png')} style = {{width: 40, height: 40}}/>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={this.handelTwitterLogin}>
+                            <TouchableOpacity onPress={this.firebaseLoginTwitter}>
                                 <Image source = {require('../../assets/img/twitter.png')} style = {{width: 40, height: 40, marginLeft: 15}}/>
                             </TouchableOpacity>
                         </View>
