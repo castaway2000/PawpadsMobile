@@ -40,7 +40,7 @@ class Login extends Component {
     constructor(props){
         super(props)
         this.state = {
-            name: 'cris', //cris 1BITJAY_1875640410  howsonanna
+            name: 'cris', //cris 1BITJAY_1875640410  howsonanna stad
             password: '12345678',
             qb_token: '',
             loading: this.props.loading,
@@ -81,7 +81,11 @@ class Login extends Component {
         .then((response) => response.json())
         .then((responseData) => {
             var token = responseData.session.token
-            AsyncStorage.setItem(Constant.QB_TOKEN, token);
+
+            if (token) {
+              AsyncStorage.setItem(Constant.QB_TOKEN, token);
+            }
+
             console.log("token is:",token);
             this.setState({
                 qb_token: token
@@ -92,7 +96,7 @@ class Login extends Component {
         })
     }
 
-    getQB_Token_User(username,password,isDataMigrated) {
+    getQB_Token_User(username,password) {
 
       console.log("Getting user session token.");
 
@@ -124,20 +128,24 @@ class Login extends Component {
         .then((responseData) => {
           console.log("user session token responce:",responseData);
           var token = responseData.session.token
-          AsyncStorage.setItem(Constant.QB_USER_TOKEN, token);
+
+          if (token) {
+            AsyncStorage.setItem(Constant.QB_USER_TOKEN, token);
+          }
+
           this.setState({
               qb_token: token
           })
 
           //Go to home
-          this._checkDataMigration(isDataMigrated)
+          this._checkDataMigration("false")
 
         }).catch((e) => {
             console.log(e)
         })
     }
 
-    getQB_Token_User_Facebook(isDataMigrated,fbtoken) {
+    getQB_Token_User_Facebook(fbtoken) {
 
       //provider facebook
       //keys[token] fb token
@@ -174,20 +182,24 @@ class Login extends Component {
         .then((responseData) => {
           console.log("user session token responce:",responseData);
           var token = responseData.session.token
-          AsyncStorage.setItem(Constant.QB_USER_TOKEN, token);
+
+          if (token) {
+            AsyncStorage.setItem(Constant.QB_USER_TOKEN, token);
+          }
+
           this.setState({
               qb_token_user: token
           })
 
           //Go to home
-          this._checkDataMigration(isDataMigrated)
+          this._checkDataMigration("false")
 
         }).catch((e) => {
             console.log(e)
         })
     }
 
-    getQB_Token_User_Twitter(isDataMigrated,twtoken,twsecret) {
+    getQB_Token_User_Twitter(twtoken,twsecret) {
 
       //provider facebook
       //keys[token] fb token
@@ -207,7 +219,6 @@ class Login extends Component {
           "provider": "twitter",
           "keys": {"token": twtoken, "secret": twsecret}
         }
-
         console.log("user params is:",params);
 
         var REQUEST_URL = Constant.SESSION_URL
@@ -223,13 +234,17 @@ class Login extends Component {
         .then((responseData) => {
           console.log("user session token responce:",responseData);
           var token = responseData.session.token
-          AsyncStorage.setItem(Constant.QB_USER_TOKEN, token);
+
+          if (token) {
+            AsyncStorage.setItem(Constant.QB_USER_TOKEN, token);
+          }
+
           this.setState({
               qb_token_user: token
           })
 
           //Go to home
-          this._checkDataMigration(isDataMigrated)
+          this._checkDataMigration("false")
 
         }).catch((e) => {
             console.log(e)
@@ -304,9 +319,19 @@ class Login extends Component {
                       console.log("User entered correct password");
 
                       //save pref
-                      AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
-                      AsyncStorage.setItem(Constant.USER_PASSWORD, this.state.password);
-                      AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                      AsyncStorage.setItem(Constant.USER_TABEL_ID, tableId);
+
+                      if (qbID) {
+                        AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
+                      }
+
+                      if (this.state.password) {
+                        AsyncStorage.setItem(Constant.USER_PASSWORD, this.state.password);
+                      }
+
+                      if (login) {
+                        AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                      }
 
                       if (email) {
                         AsyncStorage.setItem(Constant.USER_EMAIL, email);
@@ -316,7 +341,11 @@ class Login extends Component {
                         AsyncStorage.setItem(Constant.USER_BLOBID, blob_id.toString());
                       }
 
-                      this.getQB_Token_User(this.state.name, this.state.password,isDataMigrated)
+                      if (isDataMigrated == "true") {
+                        this._checkDataMigration("true")
+                      } else {
+                        this.getQB_Token_User(this.state.name, this.state.password)
+                      }
 
                     } else {
                       console.log("User entered wrong password");
@@ -381,8 +410,15 @@ class Login extends Component {
                       let isDataMigrated = response[tableId]["isDataMigrated"]
 
                       //save pref
-                      AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
-                      AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                      AsyncStorage.setItem(Constant.USER_TABEL_ID, tableId);
+
+                      if (qbID) {
+                        AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
+                      }
+
+                      if (login) {
+                        AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                      }
 
                       if (email) {
                         AsyncStorage.setItem(Constant.USER_EMAIL, email);
@@ -393,7 +429,11 @@ class Login extends Component {
                       }
 
                       //Go to home
-                      this.getQB_Token_User_Twitter(isDataMigrated,authToken,authTokenSecret)
+                      if (isDataMigrated == "true") {
+                        this._checkDataMigration(isDataMigrated)
+                      } else {
+                        this.getQB_Token_User_Twitter(authToken,authTokenSecret)
+                      }
 
                     } else {
                       //Check quickblox for twitter data
@@ -468,8 +508,15 @@ class Login extends Component {
                              let isDataMigrated = response[tableId]["isDataMigrated"]
 
                              //save pref
-                             AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
-                             AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                             AsyncStorage.setItem(Constant.USER_TABEL_ID, tableId);
+
+                             if (qbID) {
+                               AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
+                             }
+
+                             if (login) {
+                               AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                             }
 
                              if (email) {
                                AsyncStorage.setItem(Constant.USER_EMAIL, email);
@@ -480,7 +527,11 @@ class Login extends Component {
                              }
 
                              //Go to home
-                             tmp.getQB_Token_User_Facebook(isDataMigrated,accessToken)
+                             if (isDataMigrated = "true") {
+                               tmp._checkDataMigration(isDataMigrated)
+                             } else {
+                               tmp.getQB_Token_User_Facebook(accessToken)
+                             }
 
                            } else {
                              tmp._loginWithQuickbloxFacebook(accessToken,result)
@@ -546,21 +597,33 @@ class Login extends Component {
               var updates = {};
               var newKey = firebase.database().ref().child('users').push().key;
               responseData.user.password = ciphertext
+              responseData.user["firid"] = newKey
               updates['/users/' + newKey] = responseData.user;
               firebase.database().ref().update(updates)
 
               //Save to local storage
-              AsyncStorage.setItem(Constant.QB_USERID, responseData.user.id.toString());
-              AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
-              AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
-              if(responseData.user.blob_id){
+              AsyncStorage.setItem(Constant.USER_TABEL_ID, newKey);
+
+              if (responseData.user.id) {
+                AsyncStorage.setItem(Constant.QB_USERID, responseData.user.id.toString());
+              }
+
+              if (responseData.user.login) {
+                AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
+              }
+
+              if (responseData.user.email) {
+                AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
+              }
+
+              if(responseData.user.blob_id) {
                   AsyncStorage.setItem(Constant.USER_BLOBID, responseData.user.blob_id.toString());
               }
 
               var isDataMigrated = "false"
 
               //Go to home
-              this.getQB_Token_User(this.state.name,this.state.password,isDataMigrated)
+              this.getQB_Token_User(this.state.name,this.state.password)
 
             } else {
               console.log("Username Not found on Quickblox.")
@@ -579,8 +642,6 @@ class Login extends Component {
       let formdata = new FormData()
             formdata.append('provider', "facebook")
             formdata.append('keys[token]', token)
-
-
 
             fetch(REQUEST_URL, {
                 method: 'POST',
@@ -605,20 +666,30 @@ class Login extends Component {
                   var updates = {};
                   var newKey = firebase.database().ref().child('users').push().key;
                   responseData.user.password = ciphertext
+                  responseData.user["firid"] = newKey
                   updates['/users/' + newKey] = responseData.user;
                   firebase.database().ref().update(updates)
 
                   //Save to local storage
-                  AsyncStorage.setItem(Constant.QB_USERID, responseData.user.id.toString());
-                  AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
-                  AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
+                  AsyncStorage.setItem(Constant.USER_TABEL_ID, newKey);
+
+                  if (responseData.user.id) {
+                    AsyncStorage.setItem(Constant.QB_USERID, responseData.user.id.toString());
+                  }
+
+                  if (responseData.user.login) {
+                    AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
+                  }
+
+                  if (responseData.user.email) {
+                    AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
+                  }
+
                   if(responseData.user.blob_id){
                       AsyncStorage.setItem(Constant.USER_BLOBID, responseData.user.blob_id.toString());
                   }
 
-                  var isDataMigrated = "false"
-
-                  this.getQB_Token_User_Facebook(isDataMigrated,token)
+                  this.getQB_Token_User_Facebook(token)
 
                 } else {
                   console.log("Facebook: User Not found on Firebase. Registering on firebase...")
@@ -644,14 +715,22 @@ class Login extends Component {
                                   "twitter_id":facebookID,
                                   "updated_at":dateString,
                                   "isDataMigrated":isDataMigrated,
+                                  "firid": newKey,
                                 }
 
                   updates['/users/' + newKey] = user;
                   firebase.database().ref().update(updates)
 
                   //save pref
-                  AsyncStorage.setItem(Constant.QB_USERID, qbID);
-                  AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                  AsyncStorage.setItem(Constant.USER_TABEL_ID, newKey);
+
+                  if (qbID) {
+                    AsyncStorage.setItem(Constant.QB_USERID, qbID);
+                  }
+
+                  if (login) {
+                    AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                  }
 
                   console.log("Facebook: Registred on firebase.")
 
@@ -697,20 +776,30 @@ class Login extends Component {
             var updates = {};
             var newKey = firebase.database().ref().child('users').push().key;
             responseData.user.password = ciphertext
+            responseData.user["firid"] = newKey
             updates['/users/' + newKey] = responseData.user;
             firebase.database().ref().update(updates)
 
             //Save to local storage
-            AsyncStorage.setItem(Constant.QB_USERID, responseData.user.id.toString());
-            AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
-            AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
+            AsyncStorage.setItem(Constant.USER_TABEL_ID, newKey);
+
+            if (responseData.user.id) {
+              AsyncStorage.setItem(Constant.QB_USERID, responseData.user.id.toString());
+            }
+
+            if (responseData.user.login) {
+              AsyncStorage.setItem(Constant.USER_FULL_NAME, responseData.user.login);
+            }
+
+            if (responseData.user.email) {
+              AsyncStorage.setItem(Constant.USER_EMAIL, responseData.user.email);
+            }
+
             if(responseData.user.blob_id){
                 AsyncStorage.setItem(Constant.USER_BLOBID, responseData.user.blob_id.toString());
             }
 
-            var isDataMigrated = "false"
-
-            this.getQB_Token_User_Twitter(isDataMigrated,token,secret)
+            this.getQB_Token_User_Twitter(token,secret)
 
           } else {
 
@@ -737,15 +826,23 @@ class Login extends Component {
               "owner_id":0,
               "twitter_id":twitterId,
               "updated_at":dateString,
-              "isDataMigrated":isDataMigrated
+              "isDataMigrated":isDataMigrated,
+              "firid": newKey,
             }
 
             updates['/users/' + newKey] = user;
             firebase.database().ref().update(updates)
 
             //save pref
-            AsyncStorage.setItem(Constant.QB_USERID, qbID);
-            AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+            AsyncStorage.setItem(Constant.USER_TABEL_ID, newKey);
+
+            if (qbID) {
+              AsyncStorage.setItem(Constant.QB_USERID, qbID);
+            }
+
+            if (login) {
+              AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+            }
 
             console.log("Twitter: Registred on firebase.")
 
@@ -811,10 +908,12 @@ class Login extends Component {
                         <View style = {styles.nameView}>
                             <TextInput
                                 style = {styles.nameInput}
+                                autoCapitalize= 'none'
+                                autoCorrect = {false}
+                                spellCheck = {false}
                                 returnKeyType = 'next'
                                 placeholder = {this.state.isname == true ? 'Login': 'Name is required'}
                                 placeholderTextColor = { this.state.isname == true ? 'black': 'red' }
-                                autoCorrect = {true}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.name}
                                 onChangeText = {(text) => this.setUserName(text)}
@@ -824,11 +923,13 @@ class Login extends Component {
                         <View style = {styles.passwordView}>
                             <TextInput
                                 ref={this.getNextInput.bind(this)}
+                                autoCapitalize= 'none'
+                                autoCorrect = {false}
+                                spellCheck = {false}
                                 style = {styles.passwordInput}
                                 returnKeyType = 'done'
                                 placeholder = {this.state.ispassword == true ? 'Password': 'Passowrd is required'}
                                 placeholderTextColor = { this.state.ispassword == true ? 'black': 'red' }
-                                autoCorrect = {true}
                                 secureTextEntry = {true}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.password}

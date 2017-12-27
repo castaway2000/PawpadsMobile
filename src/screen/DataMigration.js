@@ -8,6 +8,16 @@ import RNFetchBlob from 'react-native-fetch-blob'
 
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
+// Geofire
+import { initializeApp } from 'firebase'
+const geofire = require('geofire');
+
+const firebaseApp = initializeApp({
+  apiKey: Constant.FIREBASE_API_KEY,
+  authDomain: Constant.FIREBASE_AUTH_DOMAIN,
+  databaseURL: Constant.FIREBASE_DATABASE_URL,
+  storageBucket: Constant.FIREBASE_STORAGE_BUCKET
+},"App1")
 
 // create a component
 class DataMigration extends Component {
@@ -47,7 +57,14 @@ class DataMigration extends Component {
                     console.log("user password is:",value);
                       this.setState({password: value })
 
-                      this._getBlocklist()
+                      AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+                        console.log("user password is:",value);
+                          this.setState({tableId: value })
+
+                          this._getBlocklist()
+                          //this._queryuser()
+
+                        })
                   })
               })
           })
@@ -98,7 +115,6 @@ class DataMigration extends Component {
        var newKey = firebase.database().ref().child('blocklist').push().key;
        updates = responseData["items"][index]
        firebase.database().ref().child('/blocklist/' + responseData["items"][index]["_id"]).set(updates)
-
      }
 
      /**
@@ -173,13 +189,15 @@ class DataMigration extends Component {
               this._saveUserLocationtoFirebase(responseData)
             }
             this.setState({bodyText: "Migrating chats please wait...60%" })
-            //this._getUserDialog() //3.0
+            this._getUserDialog() //3.0
+
 
         }).catch((e) => {
             console.log(e)
             this.setState({bodyText: "Migrating chats please wait...60%" })
-            //this._getUserDialog() //3.0
+            this._getUserDialog() //3.0
         })}
+
       _saveUserLocationtoFirebase = (responseData) => {
             if (responseData.items) {
         let items = responseData["items"]
@@ -195,46 +213,25 @@ class DataMigration extends Component {
           console.log("Quickblox: longitude:",geodata["user_id"]);
           console.log("Quickblox: USER:",geodata["user"]["user"]);
 
-          firebase.database()
-              .ref(`/users`)
-              .orderByChild("id")
-              .equalTo(parseInt(this.state.userid))
-              .once("value")
-              .then(snapshot => {
+          firebase.database().ref('users/' + this.state.tableId).update({
+            "latitude":parseFloat(geodata["latitude"]),
+            "longitude":parseFloat(geodata["longitude"]),
+          });
 
-                  if (snapshot.val()) {
+          //Save to geofire
+          const geofireRef = new geofire(firebaseApp.database().ref('geofire/'))
+          geofireRef.set(this.state.tableId, [parseFloat(geodata["latitude"]), parseFloat(geodata["longitude"])]).then(function() {
+            console.log("Provided key has been added to GeoFire");
+          }, function(error) {
+            console.log("Error: " + error);
+          });
 
-                    let response = snapshot.val()
-                    var keys = Object.keys(response);
-                    var tableId =  keys[keys.length-1]
-
-                    //Update Location
-                    var rootRef = firebase.database().ref(`/users`);
-                    let userlocation = {};
-                    userlocation[tableId + "/location"] = {
-                      "latitude":geodata["latitude"],
-                      "longitude":geodata["longitude"],
-                    }
-                    rootRef.update(userlocation);
-
-                    //Update Custom data
-                    let customdata = {};
-                    customdata[tableId + "/custom_data"] = geodata["user"]["user"]["custom_data"]
-
-                    rootRef.update(customdata);
-
-                    this.setState({tableId: tableId })
-
-                    this._getUserBlobs();
-
-                  } else {
-                      console.log("User Not found on Firebase. Incorrect user id.")
-                  }
-              })
         } else {
 
         }
-      } else {}}
+      } else {
+
+      }}
 
       /**
       * Chat Dialog
@@ -243,7 +240,7 @@ class DataMigration extends Component {
 
         console.log("Quickblox: Getting... Dialog data");
 
-        var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + "?skip=" + this.state.userDialogSkipped*100
+        var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + "?skip=" + this.state.userDialogSkipped*100 + "&type[in]=2,3"
 
         fetch(REQUEST_URL, {
             method: 'GET',
@@ -429,27 +426,9 @@ class DataMigration extends Component {
 
           console.log("this.state.userid = ",this.state.userid);
 
-          firebase.database()
-              .ref(`/users`)
-              .orderByChild("id")
-              .equalTo(parseInt(this.state.userid))
-              .once("value")
-              .then(snapshot => {
+          firebase.database().ref('users/' + this.state.tableId).update({"isDataMigrated": "true"});
 
-                  if (snapshot.val()) {
-
-                    let response = snapshot.val()
-                    var keys = Object.keys(response);
-                    var tableId =  keys[keys.length-1]
-
-                    firebase.database().ref('users/' + tableId).update({"isDataMigrated": "true"});
-
-                    this.setState({bodyText: "Migration finished."})
-
-                  } else {
-                      console.log("User Not found on Firebase. Incorrect user id.")
-                  }
-              })
+          this.setState({bodyText: "Migration finished."})
         }
 
       render() {

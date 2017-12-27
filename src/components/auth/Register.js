@@ -203,7 +203,8 @@ class Register extends Component {
                                           "twitter_id":"",
                                           "updated_at":dateString,
                                           "password":ciphertext,
-                                          "email": this.state.email,}
+                                          "email": this.state.email,
+                                          "isDataMigrated":"true",}
 
                           updates['/users/' + newKey] = user;
                           firebase.database().ref().update(updates)
@@ -260,10 +261,12 @@ class Register extends Component {
                         <View style = {styles.nameView}>
                             <TextInput
                                 style = {styles.nameInput}
+                                autoCapitalize= 'none'
+                                autoCorrect = {false}
+                                spellCheck = {false}
                                 returnKeyType = 'next'
                                 placeholder = 'Name'
                                 placeholderTextColor = {this.state.isName == false? 'black': '#f94746'}
-                                autoCorrect = {true}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.name}
                                 onChangeText = {(text) => {this.setState({ name: text })}}
@@ -274,10 +277,13 @@ class Register extends Component {
                             <TextInput
                                 ref={this.getNextInput1.bind(this)}
                                 style = {styles.nameInput}
+                                autoCapitalize= 'none'
+                                autoCorrect = {false}
+                                spellCheck = {false}
                                 returnKeyType = 'next'
                                 placeholder = 'Email'
+                                keyboardType = 'email-address'
                                 placeholderTextColor = {this.state.isEmail == false? 'black': '#f94746'}
-                                autoCorrect = {true}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.email}
                                 onChangeText = {(text) => {this.setState({ email: text })}}
@@ -288,11 +294,13 @@ class Register extends Component {
                             <TextInput
                                 ref={this.getNextInput2.bind(this)}
                                 style = {styles.nameInput}
+                                autoCapitalize= 'none'
+                                autoCorrect = {false}
+                                spellCheck = {false}
                                 returnKeyType = 'next'
                                 placeholder = 'Password'
                                 placeholderTextColor = {this.state.isPassword == false? 'black': '#f94746'}
                                 secureTextEntry = {true}
-                                autoCorrect = {true}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.password}
                                 onChangeText = {(text) => {this.setState({ password: text })}}
@@ -303,11 +311,13 @@ class Register extends Component {
                             <TextInput
                                 ref={this.getNextInput3.bind(this)}
                                 style = {styles.nameInput}
+                                autoCapitalize= 'none'
+                                autoCorrect = {false}
+                                spellCheck = {false}
                                 returnKeyType = 'go'
                                 placeholder = 'Confirm password'
                                 placeholderTextColor = {this.state.isConfirm == false? 'black': '#f94746'}
                                 secureTextEntry = {true}
-                                autoCorrect = {true}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.confirm}
                                 onChangeText = {(text) => {this.setState({ confirm: text })}}

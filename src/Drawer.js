@@ -1,8 +1,8 @@
 //import libraries
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux'
-import { 
-    DrawerNavigator, 
+import {
+    DrawerNavigator,
     StackNavigator } from 'react-navigation'
 var { Router, Scene } = require('react-native-router-flux');
 
@@ -16,7 +16,7 @@ import UserProfile from './screen/UserProfile'
 import Login from './components/auth/Login'
 
 const Drawer = DrawerNavigator(
-    {   
+    {
         Dashboard: { screen: Dashboard },
         Friends: { screen: Friends },
         Settings: { screen: Settings },

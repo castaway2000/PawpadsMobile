@@ -64,7 +64,7 @@ class ChatGroup extends Component {
 			});
 		}
 	}
-    getChatMessage(){
+    getChatMessage() {
 		var {params} = this.props.navigation.state
         messages = []
         AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
