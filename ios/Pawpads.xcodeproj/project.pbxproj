@@ -36,9 +36,7 @@
 		35620A1E1FD94D130088941C /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35620A1B1FD94D130088941C /* FBSDKShareKit.framework */; };
 		35620A1F1FD94D130088941C /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35620A1C1FD94D130088941C /* FBSDKLoginKit.framework */; };
 		35620A201FD94D130088941C /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35620A1D1FD94D130088941C /* FBSDKCoreKit.framework */; };
-		35BD616E1FD97632002A9E8A /* TwitterKitResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 35BD61431FD97632002A9E8A /* TwitterKitResources.bundle */; };
 		35BD616F1FD97632002A9E8A /* TwitterCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35BD616B1FD97632002A9E8A /* TwitterCore.framework */; };
-		35BD61701FD97632002A9E8A /* TwitterShareExtensionUIResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 35BD616C1FD97632002A9E8A /* TwitterShareExtensionUIResources.bundle */; };
 		35BD61711FD97632002A9E8A /* TwitterKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35BD616D1FD97632002A9E8A /* TwitterKit.framework */; };
 		35BD61871FD97718002A9E8A /* libRNTwitterSignIn.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35BD611C1FD97100002A9E8A /* libRNTwitterSignIn.a */; };
 		35D7364D1FD952CE00B87455 /* libRNFirebase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D4F3571FD162B200E10C97 /* libRNFirebase.a */; };
@@ -1236,7 +1234,6 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
-				35BD616E1FD97632002A9E8A /* TwitterKitResources.bundle in Resources */,
 				D141C83E5F7249679EA06434 /* Entypo.ttf in Resources */,
 				683080E294134A75B512F479 /* EvilIcons.ttf in Resources */,
 				E7F3136191FE415FA96602C9 /* FontAwesome.ttf in Resources */,
@@ -1263,7 +1260,6 @@
 				058AF3F8047E4A6982BD2C30 /* Bellota_BoldItalic.otf in Resources */,
 				E8AA7D194BDA452BBE22FB80 /* Proxima_Nova_Bold.otf in Resources */,
 				A3F1332B887048C9BD204DC4 /* Proxima_Nova_Regular_Italic.otf in Resources */,
-				35BD61701FD97632002A9E8A /* TwitterShareExtensionUIResources.bundle in Resources */,
 				31AB82FE468E42E7BA1FC1F7 /* Proxima_Nova_Regular.otf in Resources */,
 				35421AB41FD82045005B4D1F /* GoogleService-Info.plist in Resources */,
 				6D60A536D226409DB4ADF484 /* Proxima_Nova_Semibold.otf in Resources */,
