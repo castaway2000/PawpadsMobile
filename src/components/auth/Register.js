@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, 
 import Constant from '../../common/Constant'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import hmacSHA1 from 'crypto-js/hmac-sha1'
+import RNFirebase from 'react-native-firebase';
 
 var isAlert = false
 var isName = false
@@ -14,6 +15,9 @@ let nextInput1;
 let nextInput2;
 let nextInput3;
 
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+var CryptoJS = require("crypto-js");
+
 // create a component
 class Register extends Component {
     constructor(props){
@@ -21,7 +25,7 @@ class Register extends Component {
         this.state = {
             name: '',
             email: '',
-            password: '',    
+            password: '',
             confirm: '',
             isAlert: false,
             isName: false,
@@ -38,6 +42,7 @@ class Register extends Component {
         signature = hmacSHA1(signatureParams, Constant.QB_AUTH_SECRET).toString()
         this.getQB_Token(time, signature)
     }
+
     getQB_Token(time, signature){
         let formdata = new FormData()
         formdata.append('application_id', Constant.QB_APPID)
@@ -49,20 +54,22 @@ class Register extends Component {
         var REQUEST_URL = Constant.SESSION_URL
         fetch(REQUEST_URL, {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
+            headers: {
+                'Content-Type': 'multipart/form-data',
             },
             body:formdata
         })
         .then((response) => response.json())
         .then((responseData) => {
+          console.log("token responce:",responseData);
+
             var token = responseData.session.token
             this.setState({
                 qb_token: token
             })
         }).catch((e) => {
             console.log(e)
-        })   
+        })
     }
 
     getNextInput1(data) {
@@ -90,7 +97,9 @@ class Register extends Component {
     _onback = () => {
         this.props.navigation.goBack()
     }
+
     _onSignup = () => {
+
         isAlert = false
         isName = false
         isEmail = false
@@ -123,17 +132,17 @@ class Register extends Component {
                 if(this.state.password == this.state.confirm){
                     // const { navigate } = this.props.navigation
                     // navigate ('Register')
-                    this.signup()
+                    this._signupWithFirebase()
                 }
                 else{
                     alert('Passwords do not match')
                 }
             }
         }
- 
+
         if(isAlert == true){
-            this.setState({ 
-                isAlert: isAlert, 
+            this.setState({
+                isAlert: isAlert,
                 isName: isName,
                 isEmail: isEmail,
                 isPassword: isPassword,
@@ -142,7 +151,71 @@ class Register extends Component {
         }
         Keyboard.dismiss();
     }
-    signup(){
+
+    _signupWithFirebase = () => {
+
+      var rootRef = firebase.database().ref().child('users').push().key;
+
+      //Check username regestred
+      firebase.database()
+          .ref(`/users`)
+          .orderByChild("login")
+          .equalTo(this.state.name)
+          .once("value")
+          .then(snapshot => {
+            this.setState({ loading: false })
+              if (snapshot.val()) {
+                alert("Username already registred.")
+              } else {
+                console.log("Username not registred.")
+
+                //Check email regestred
+                firebase.database()
+                    .ref(`/users`)
+                    .orderByChild("email")
+                    .equalTo(this.state.email)
+                    .once("value")
+                    .then(snapshot => {
+                      this.setState({ loading: false })
+                        if (snapshot.val()) {
+                          alert("Email already registred.")
+                        } else {
+                          console.log("Email not registred.");
+                          //Register on Firebase as new user
+
+                          //Get current date
+                          let dt = new Date();
+                          let dateString =  dt.toISOString();
+
+                          //Encrypt password
+                          var ciphertext = CryptoJS.AES.encrypt(this.state.password, Constant.FIREBASE_PASS_SECRET).toString();
+
+                          var updates = {};
+                          var newKey = firebase.database().ref().child('users').push().key;
+
+                          var user =  {"blob_id": 0,
+                                          "created_at":dateString,
+                                          "full_name":"",
+                                          "id":newKey,
+                                          "last_request_at":dateString,
+                                          "login":this.state.name,
+                                          "owner_id":0,
+                                          "twitter_id":"",
+                                          "updated_at":dateString,
+                                          "password":ciphertext,
+                                          "email": this.state.email,
+                                          "isDataMigrated":"true",}
+
+                          updates['/users/' + newKey] = user;
+                          firebase.database().ref().update(updates)
+                          this.props.navigation.goBack()
+                        }
+                    })
+              }
+          })
+    }
+
+    signup() {
         let formdata = new FormData()
         formdata.append('user[login]', this.state.name)
         formdata.append('user[password]', this.state.password)
@@ -151,7 +224,7 @@ class Register extends Component {
         var REQUEST_URL = Constant.REGISTER_URL
         fetch(REQUEST_URL, {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Content-Type': 'multipart/form-data',
                 'QB-Token': this.state.qb_token
             },
@@ -159,14 +232,15 @@ class Register extends Component {
         })
         .then((response) => response.json())
         .then((responseData) => {
+          console.log("register responce:",responseData);
             if(responseData.errors){
                 alert(responseData.errors.email[0])
-            }else{
+            } else {
                 this.props.navigation.goBack()
             }
         }).catch((e) => {
             console.log(e)
-        })   
+        })
     }
     validateEmail = (email) => {
         var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -187,10 +261,12 @@ class Register extends Component {
                         <View style = {styles.nameView}>
                             <TextInput
                                 style = {styles.nameInput}
+                                autoCapitalize= 'none'
+                                autoCorrect = {false}
+                                spellCheck = {false}
                                 returnKeyType = 'next'
                                 placeholder = 'Name'
                                 placeholderTextColor = {this.state.isName == false? 'black': '#f94746'}
-                                autoCorrect = {true}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.name}
                                 onChangeText = {(text) => {this.setState({ name: text })}}
@@ -201,10 +277,13 @@ class Register extends Component {
                             <TextInput
                                 ref={this.getNextInput1.bind(this)}
                                 style = {styles.nameInput}
+                                autoCapitalize= 'none'
+                                autoCorrect = {false}
+                                spellCheck = {false}
                                 returnKeyType = 'next'
                                 placeholder = 'Email'
+                                keyboardType = 'email-address'
                                 placeholderTextColor = {this.state.isEmail == false? 'black': '#f94746'}
-                                autoCorrect = {true}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.email}
                                 onChangeText = {(text) => {this.setState({ email: text })}}
@@ -215,11 +294,13 @@ class Register extends Component {
                             <TextInput
                                 ref={this.getNextInput2.bind(this)}
                                 style = {styles.nameInput}
+                                autoCapitalize= 'none'
+                                autoCorrect = {false}
+                                spellCheck = {false}
                                 returnKeyType = 'next'
                                 placeholder = 'Password'
                                 placeholderTextColor = {this.state.isPassword == false? 'black': '#f94746'}
                                 secureTextEntry = {true}
-                                autoCorrect = {true}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.password}
                                 onChangeText = {(text) => {this.setState({ password: text })}}
@@ -230,11 +311,13 @@ class Register extends Component {
                             <TextInput
                                 ref={this.getNextInput3.bind(this)}
                                 style = {styles.nameInput}
+                                autoCapitalize= 'none'
+                                autoCorrect = {false}
+                                spellCheck = {false}
                                 returnKeyType = 'go'
                                 placeholder = 'Confirm password'
                                 placeholderTextColor = {this.state.isConfirm == false? 'black': '#f94746'}
                                 secureTextEntry = {true}
-                                autoCorrect = {true}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.confirm}
                                 onChangeText = {(text) => {this.setState({ confirm: text })}}
@@ -246,8 +329,6 @@ class Register extends Component {
                             <Text style = {styles.alert}></Text>
                         }
 
-                        
-                        
                         <TouchableOpacity style = {styles.signupButton} onPress = {this._onSignup}>
                             <Image source = {require('../../assets/img/transparent_button.png')} style = {styles.signupButtonImg}/>
                             <Text style = {styles.signup}>Sign up</Text>

@@ -64,14 +64,14 @@ class ChatGroup extends Component {
 			});
 		}
 	}
-    getChatMessage(){
+    getChatMessage() {
 		var {params} = this.props.navigation.state
         messages = []
         AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
             var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=15'
             fetch(REQUEST_URL, {
                 method: 'GET',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'QB-Token': value
                 },
@@ -92,7 +92,7 @@ class ChatGroup extends Component {
                 }
             }).catch((e) => {
                 console.log(e)
-            })   
+            })
         })
     }
 
@@ -113,15 +113,13 @@ class ChatGroup extends Component {
 		var newArray = []
 		var {params} = this.props.navigation.state
 		Keyboard.dismiss();
-		
+
 		//Send message only with Text
-		let formdata = new FormData()
-		formdata.append('chat_dialog_id', params.Dialog._id)
-		formdata.append('message', text)
+		let formdata = {	'chat_dialog_id':params.Dialog._id,'message': text}
 		var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL
 		fetch(REQUEST_URL, {
 			method: 'POST',
-			headers: { 
+			headers: {
 				'Content-Type': 'application/json',
 				'QB-Token': this.state.token
 			},
@@ -129,7 +127,7 @@ class ChatGroup extends Component {
 		})
 		.then((response) => response.json())
 		.then((responseData) => {
-			
+
 			newArray.push({
 				_id: responseData._id,
 				attachments: responseData.attachments,
@@ -161,7 +159,7 @@ class ChatGroup extends Component {
 
 		}).catch((e) => {
 			console.log(e)
-		})   
+		})
 	}
 
 	componentWillUnmount() {
@@ -207,7 +205,7 @@ class ChatGroup extends Component {
 						})}/>
 				);
 			}
-			
+
 		}
 		else {
 			if(item.STICKER){
@@ -236,7 +234,7 @@ class ChatGroup extends Component {
 						})}/>
 				);
 			}
-			
+
 		}
 	}
 
@@ -267,7 +265,7 @@ class ChatGroup extends Component {
 				ref={scrollView => this.scrollView = scrollView}>
 
 				{this.renderChatMessage()}
-				
+
 			</ScrollView>
 		);
 	}
@@ -348,7 +346,7 @@ class ChatGroup extends Component {
 		var REQUEST_URL = Constant.CREATE_FILE_URL + '?blob[content_type]=image/jpeg&blob[name]=' + timestamp + '.png'
 		fetch(REQUEST_URL, {
 			method: 'POST',
-			headers: { 
+			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 				'QB-Token': this.state.token
 			},
@@ -434,7 +432,7 @@ class ChatGroup extends Component {
 		console.log(REQUEST_URL)
 		fetch(REQUEST_URL, {
 			method: 'POST',
-			headers: { 
+			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 				'QB-Token': this.state.token
 			},
@@ -451,11 +449,11 @@ class ChatGroup extends Component {
 
 		}).catch((e) => {
 			console.log(e)
-		})   
+		})
 	}
 
 	render() {
-		var {params} = this.props.navigation.state 
+		var {params} = this.props.navigation.state
 		return (
 			<View style={styles.container}>
 				<View style = {styles.tabView}>
@@ -466,7 +464,7 @@ class ChatGroup extends Component {
 
 					{this.chatEdit()}
 
-					{this.createGroup()}					
+					{this.createGroup()}
                 </View>
                 <View style = {styles.bodyView}>
                     {this.renderChat()}

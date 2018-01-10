@@ -20,9 +20,10 @@ import {
 import Constant from '../common/Constant'
 import { connect } from 'react-redux'
 import {sendRequest} from '../actions/http';
-
+import RNFirebase from 'react-native-firebase';
 const datas = []
 var currentPage = 0
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 // create a component
 class TabChats extends Component {
@@ -37,54 +38,108 @@ class TabChats extends Component {
             userID: '',
         }
     }
+
     componentWillMount() {
+      console.log("Personal chat.");
         currentPage = 0
         datas = []
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
             this.setState({ userID: value })
         })
-        this.loadData()     
+        //this.loadData()
+        this.loadDataFromFirebase()
     }
+
+    loadDataFromFirebase() {
+
+      this.loadGroupUsingID(2)
+      .then((result) => {
+        console.log("this.state.dialogs2",result);
+        if (result) {
+          for (key in result) {
+            this.state.dialogs.push(result[key])
+            this.setState({dialogs:this.state.dialogs})
+          }
+        }
+        this.loadGroupUsingID(3)
+        .then((result1) => {
+          console.log("this.state.dialogs3",result1);
+          if (result1) {
+            for (key in result1) {
+              this.state.dialogs.push(result1[key])
+              this.setState({dialogs:this.state.dialogs})
+              this.setState({ loading: false })
+            }
+          }
+        })
+      })
+    }
+
+    loadGroupUsingID = (groupid) => {
+      return new Promise((resolve, reject) => {
+      firebase.database()
+          .ref(`/dialog`)
+          .orderByChild("type")
+          .equalTo(groupid)
+          .once("value")
+          .then(snapshot => {
+              if (snapshot.val()) {
+                resolve(snapshot.val());
+              } else {
+                resolve(null);
+              }
+          });
+        })
+    }
+
     loadData(){
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?type[in]=2,3' + '&limit=50' + '&skip=' + currentPage*10
             fetch(REQUEST_URL, {
                 method: 'GET',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
-                    'QB-Token': token
+                    'QB-Token': "be2598a63b4fbd3cbffd5cab6c140c4d5d0089b4"
                 },
             })
             .then((response) => response.json())
             .then((responseData) => {
+              console.log("Dialogs:",responseData);
                 if(responseData.limit > 0){
+                  console.log("Dialogs:",responseData.items);
+
                     datas.push(responseData.items)
                     currentPage ++
-                    this.setState({ 
+                    this.setState({
                         dialogs: JSON.parse(JSON.stringify(datas[0])),
                         token: token,
-                        loading: false 
+                        loading: false
                     })
-                }else{
+                } else {
                     this.setState({ loading: false })
                 }
-                
+
             }).catch((e) => {
                 console.log(e)
-            })   
+            })
         })
     }
+
     _onRefresh() {
-        this.loadData() 
+        this.loadData()
         this.setState({refreshing: true});
         setTimeout(() => {
-            this.loadData() 
+            this.loadData()
             this.setState({
                 refreshing: false
             })
         }, 2000)
     }
-    downloadLastUser(occupants_ids){
+
+    downloadLastUser(occupants_ids) {
+
+      console.log("occupants_ids:",occupants_ids);
+
         var last_message_userid = ''
         for(var j=0; j<occupants_ids.length; j++){
             if(occupants_ids[j] != this.state.userID){
@@ -95,7 +150,7 @@ class TabChats extends Component {
 
         fetch(REQUEST_URL, {
             method: 'GET',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'QB-Token': this.state.token
             },
@@ -111,14 +166,15 @@ class TabChats extends Component {
             this.setState({
                 refresh: true
             });
-            
+
             this.props.ChatsUsers(this.state.dialogs)
 
         }).catch((e) => {
             console.log(e)
         })
     }
-    renderChats(){
+
+    renderChats() {
         if(this.state.loading){
             return (
 				<View style={styles.loadingView}>
@@ -135,7 +191,7 @@ class TabChats extends Component {
                         <Image source = {{
                                 uri: Constant.BLOB_URL + data.blob_id + '/download.json',
                                 method:'GET',
-                                headers: { 
+                                headers: {
                                         'Content-Type': 'application/json',
                                         'QB-Token': this.state.token
                                     },
@@ -147,10 +203,10 @@ class TabChats extends Component {
                                 <Text style = {styles.lastmessage} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
                             </View>
                       </TouchableOpacity>
-                    )    
+                    )
                 })
             )
-        }   
+        }
     }
     render() {
         return (
@@ -185,7 +241,7 @@ const styles = StyleSheet.create({
     },
     mList: {
         height: 500,
-        paddingBottom: 30, 
+        paddingBottom: 30,
         backgroundColor:'white'
     },
     customerName:{
@@ -222,17 +278,17 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
     lastmessage:{
-        fontSize: 12, 
-        color:'gray', 
-        width: 200, 
+        fontSize: 12,
+        color:'gray',
+        width: 200,
         fontStyle:'italic',
         marginTop: 5,
     },
     tabChannelListCell: {
-        width: Constant.WIDTH_SCREEN, 
-        height: 70, 
-        flexDirection:'row', 
-        padding: 10, 
+        width: Constant.WIDTH_SCREEN,
+        height: 70,
+        flexDirection:'row',
+        padding: 10,
         justifyContent:'center',
     }
 });
@@ -247,4 +303,3 @@ const mapDispatchToProps = dispatch => ({
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(TabChats)
-

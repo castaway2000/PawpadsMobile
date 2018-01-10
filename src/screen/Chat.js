@@ -48,7 +48,7 @@ class Chat extends Component {
 
 	componentWillMount() {
         this.getChatMessage()
-		
+
 		AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
 			currentUserid = value
 			this.downloadLastUser()
@@ -70,7 +70,7 @@ class Chat extends Component {
             var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=50'
             fetch(REQUEST_URL, {
                 method: 'GET',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'QB-Token': value
                 },
@@ -91,12 +91,12 @@ class Chat extends Component {
                 }
             }).catch((e) => {
                 console.log(e)
-            })   
+            })
         })
-    } 
-	
+    }
+
 	downloadLastUser(){
-		
+
 		var {params} = this.props.navigation.state
 		var last_message_userid = ''
         for(var j=0; j<params.Dialog.occupants_ids.length; j++){
@@ -108,7 +108,7 @@ class Chat extends Component {
 			var REQUEST_URL = Constant.USERS_URL +  last_message_userid + '.json'
 			fetch(REQUEST_URL, {
 				method: 'GET',
-				headers: { 
+				headers: {
 					'Content-Type': 'application/json',
 					'QB-Token':token
 				},
@@ -123,7 +123,7 @@ class Chat extends Component {
 			})
 		})
     }
-    
+
 
 	animateChatBoxUser() {
 		this.animatedValue.setValue(0);
@@ -141,23 +141,22 @@ class Chat extends Component {
 		var newArray = []
 		var {params} = this.props.navigation.state
 		Keyboard.dismiss();
-	
+
 		AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
-			let formdata = new FormData()
-			formdata.append('chat_dialog_id', params.Dialog._id)
-			formdata.append('message', text)
+			let formdata = {"chat_dialog_id":params.Dialog._id,
+							"message": text}
             var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL
             fetch(REQUEST_URL, {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
+                headers: {
+                    'Content-Type': 'multipart/form-data',
                     'QB-Token': value
                 },
 				body: formdata
             })
             .then((response) => response.json())
             .then((responseData) => {
-				
+
 				newArray.push({
 					_id: responseData._id,
 					attachments: responseData.attachments,
@@ -189,7 +188,7 @@ class Chat extends Component {
 
             }).catch((e) => {
                 console.log(e)
-            })   
+            })
         })
 	}
 
@@ -236,7 +235,7 @@ class Chat extends Component {
 						})}/>
 				);
 			}
-			
+
 		}
 		else {
 			if(item.STICKER){
@@ -265,7 +264,7 @@ class Chat extends Component {
 						})}/>
 				);
 			}
-			
+
 		}
 	}
 
@@ -296,7 +295,7 @@ class Chat extends Component {
 				ref={scrollView => this.scrollView = scrollView}>
 
 				{this.renderChatMessage()}
-				
+
 			</ScrollView>
 		);
 	}
@@ -314,7 +313,7 @@ class Chat extends Component {
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
 					<ChatMessageBox sendMessage={(text) => this.sendMessage(text)}/>
-				</KeyboardAvoidingView> 
+				</KeyboardAvoidingView>
 			);
 		}
 
@@ -327,7 +326,7 @@ class Chat extends Component {
 				<Image source = {{
 					uri: Constant.BLOB_URL + params.Dialog.blob_id + '/download.json',
 					method:'GET',
-					headers: { 
+					headers: {
 							'Content-Type': 'application/json',
 							'QB-Token': params.Token,
 						},
@@ -339,7 +338,7 @@ class Chat extends Component {
 	}
 
 	render() {
-		var {params} = this.props.navigation.state 
+		var {params} = this.props.navigation.state
 		return (
 			<View style={styles.container}>
 				<View style = {styles.tabView}>
@@ -347,7 +346,7 @@ class Chat extends Component {
                         <Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
                     </TouchableOpacity>
                     <Text style = {styles.title} numberOfLines = {1} ellipsizeMode = 'tail'>{params.GroupName}</Text>
-					{this.createGroup()}					
+					{this.createGroup()}
                 </View>
                 <View style = {styles.bodyView}>
                     {this.renderChat()}
@@ -390,9 +389,9 @@ const styles = {
         backgroundColor: 'white',
     },
 	menuIcon: {
-		width: 30, 
+		width: 30,
 		height: 30,
-		borderRadius: 15, 
+		borderRadius: 15,
 		resizeMode:'contain'
 	}
 };

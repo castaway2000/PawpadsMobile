@@ -42,7 +42,7 @@ class About extends Component {
                     <Text style = {styles.privacy}>@2016 PawPads<Text style = {{fontWeight:'bold'}}>  Privacy Policy</Text></Text>
 
                 </View>
-                
+
             </View>
         );
     }

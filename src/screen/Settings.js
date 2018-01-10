@@ -27,12 +27,12 @@ class Settings extends Component {
     componentWillMount() {
         AsyncStorage.getItem(Constant.SETTINGS_DISTANCE_UNIT).then((value) => {
             if(value == 'km'){
-                this.setState({ 
+                this.setState({
                     isKilometerSelected: true,
                     isMilesSelected: false
                 })
             }else{
-                this.setState({ 
+                this.setState({
                     isKilometerSelected: false,
                     isMilesSelected: true
                 })
@@ -45,19 +45,19 @@ class Settings extends Component {
         })
         AsyncStorage.getItem(Constant.SETTINGS_GPS_ACCURACY).then((value) => {
             if(value == 'High'){
-                this.setState({ 
+                this.setState({
                     isHighSelected: true,
                     isMediumSelected: false,
                     isLowSelected: false,
                 })
             }else if(value == 'Medium'){
-                this.setState({ 
+                this.setState({
                     isHighSelected: false,
                     isMediumSelected: true,
                     isLowSelected: false,
                 })
             }else{
-                this.setState({ 
+                this.setState({
                     isHighSelected: false,
                     isMediumSelected: false,
                     isLowSelected: true,
@@ -185,7 +185,7 @@ class Settings extends Component {
                                 <Image source = {this.state.isLowSelected? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
                                 <Text style = {styles.settingsItem}>Low</Text>
                             </TouchableOpacity>
-                            
+
                             <Text style = {[styles.settingTxt, {marginTop: 10}]}>Notification Settings</Text>
                             <TouchableOpacity style = {{flexDirection: 'row', width: 280, height: 40, alignItems: 'center'}} onPress = {this.handleSelectedPush}>
                                 <Image source = {this.state.isTogglepushSelected? require('../assets/img/fill-check-box.png'): require('../assets/img/blank-check-box.png')}  style = {styles.checkBox}/>
@@ -203,7 +203,7 @@ class Settings extends Component {
                                     <Text style = {{color: 'white'}}>Delete</Text>
                                 </TouchableOpacity>
                             </View>
-                            
+
                         </View>
                     </ScrollView>
                 </View>
@@ -320,13 +320,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         justifyContent:'center',
         alignItems:'center',
-        
+
     },
     cancelBtn: {
-        backgroundColor: '#fb5e33', 
-        width: Constant.WIDTH_SCREEN*0.75, 
-        height: 40, 
-        alignItems:'center', 
+        backgroundColor: '#fb5e33',
+        width: Constant.WIDTH_SCREEN*0.75,
+        height: 40,
+        alignItems:'center',
         justifyContent:'center'
     },
     inputText: {
