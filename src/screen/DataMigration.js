@@ -240,8 +240,9 @@ class DataMigration extends Component {
 
         console.log("Quickblox: Getting... Dialog data");
 
-        var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + "?skip=" + this.state.userDialogSkipped*100 + "&type[in]=2,3"
+        var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + "?skip=" + this.state.userDialogSkipped*100 + "&type[in]=1,2,3"
 
+        console.log("Quickblox: Getting... Dialog data");
         fetch(REQUEST_URL, {
             method: 'GET',
             headers: {
@@ -316,10 +317,6 @@ class DataMigration extends Component {
     }
       _saveUserChattoFirebase = (responseData,index) => {
 
-      var updates = {};
-      var newKey = firebase.database().ref().child('chats').push().key;
-      updates = responseData["items"][index]
-      firebase.database().ref().child('/chats/' + responseData["items"][index]["_id"]).set(updates)
     }
 
       /**
@@ -345,10 +342,19 @@ class DataMigration extends Component {
             for (var index in responseData["items"]) {
               //Store to firebase
 
+              //Push in user section
               var updates = {};
               var newKey = firebase.database().ref().child('users').child('content').push().key;
               updates['/users/' + this.state.tableId + '/content/' + newKey] = responseData["items"][index]["blob"]
               firebase.database().ref().update(updates)
+
+              //Push in user section
+              var updates1 = {};
+              var newKey1 = firebase.database().ref().child('content').push().key;
+              responseData["items"][index]["blob"]["userid"] = this.state.userid;
+              responseData["items"][index]["blob"]["tableId"] = this.state.tableId
+              updates1['/content/' + newKey1] = responseData["items"][index]["blob"]
+              firebase.database().ref().update(updates1)
 
               //Download Images
               this._downloadImages(responseData, index);
@@ -429,6 +435,9 @@ class DataMigration extends Component {
           firebase.database().ref('users/' + this.state.tableId).update({"isDataMigrated": "true"});
 
           this.setState({bodyText: "Migration finished."})
+
+          const { navigate } = this.props.navigation
+          navigate ('Drawer')
         }
 
       render() {

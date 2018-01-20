@@ -103,7 +103,7 @@ class TabNearBy extends Component {
                 AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
                     if(this.state.distance_unit == 'km'){
                         var REQUEST_URL = Constant.NEARBY_FIND_USER_URL + '?radius=' + this.state.search_range + '&current_position=' + this.state.latitude + '%3B' + this.state.longitude + '&sort_by=distance' + '&per_page=100'
-                    }else{
+                    } else {
                         var REQUEST_URL = Constant.NEARBY_FIND_USER_URL + '?radius=' + parseInt(this.state.search_range)*1.60934 + '&current_position=' + this.state.latitude + '%3B' + this.state.longitude + '&sort_by=distance' + '&per_page=100'
                     }
                     fetch(REQUEST_URL, {
@@ -154,6 +154,7 @@ class TabNearBy extends Component {
         );
     }
 
+
     _queryuser = () => {
       const geofireRef = new geofire(firebaseApp.database().ref('geofire/'))
 
@@ -178,6 +179,7 @@ class TabNearBy extends Component {
          .once("value")
          .then(snapshot => {
            if (snapshot.val()) {
+
              console.log("snapshot is:",snapshot.val());
 
              var profile = snapshot.val();
@@ -191,7 +193,7 @@ class TabNearBy extends Component {
                    let content = profile["content"][item]
                    let blobid =  content["id"]
 
-                   if (blobid = profile["blob_id"]) {
+                   if (blobid == profile["blob_id"]) {
                      datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
                      firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
                        profile["profileImageURL"] =  url;

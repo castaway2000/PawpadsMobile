@@ -64,11 +64,11 @@ class TabChats extends Component {
         this.loadGroupUsingID(3)
         .then((result1) => {
           console.log("this.state.dialogs3",result1);
+          this.setState({ loading: false })
           if (result1) {
             for (key in result1) {
               this.state.dialogs.push(result1[key])
               this.setState({dialogs:this.state.dialogs})
-              this.setState({ loading: false })
             }
           }
         })
@@ -136,6 +136,65 @@ class TabChats extends Component {
         }, 2000)
     }
 
+    downloadLastUserFirebase(occupants_ids) {
+      console.log("occupants_ids:",occupants_ids);
+
+        var last_message_userid = ''
+        for(var j=0; j<occupants_ids.length; j++){
+            if(occupants_ids[j] != this.state.userID){
+                last_message_userid = occupants_ids[j].toString()
+            }
+        }
+
+        firebase.database()
+            .ref(`/users`)
+            .orderByChild("id")
+            .equalTo(last_message_userid)
+            .once("value")
+            .then(snapshot => {
+
+              if (snapshot.val()) {
+                var profileObj = snapshot.val();
+
+                if (profileObj) {
+                  let keys = Object.keys(profileObj);
+
+                  var profile = null;
+                  if (keys.length > 0) {
+                    profile = profileObj[keys[0]]
+                  }
+
+                  if (profile) {
+                    if (profile["content"]) {
+                      for (let item in profile["content"]) {
+                        let content = profile["content"][item]
+                        let blobid =  content["id"]
+
+                        if (blobid = profile["blob_id"]) {
+
+                          firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
+                            for(var i = 0;i < this.state.dialogs.length; i++){
+                                if(this.state.dialogs[i].last_message_user_id == profile["id"]){
+                                    this.state.dialogs[i]['blob_id'] = url;
+                                    console.log("url IS a a:",url);
+                                }
+                            }
+                            this.setState({
+                                refresh: true
+                            });
+
+                            this.props.ChannelsUsers(this.state.dialogs)
+
+                          })
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            })
+    }
+
     downloadLastUser(occupants_ids) {
 
       console.log("occupants_ids:",occupants_ids);
@@ -187,14 +246,9 @@ class TabChats extends Component {
                 this.state.dialogs.map((data, index) => {
                     return(
                       <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('Chat', {GroupName: data.name, GroupChatting: true, Dialog: data, Token: this.state.token})} key = {index}>
-                        {this.state.refresh == false? this.downloadLastUser(data.occupants_ids) : null}
+                        {this.state.refresh == false? this.downloadLastUserFirebase(data.occupants_ids) : null}
                         <Image source = {{
-                                uri: Constant.BLOB_URL + data.blob_id + '/download.json',
-                                method:'GET',
-                                headers: {
-                                        'Content-Type': 'application/json',
-                                        'QB-Token': this.state.token
-                                    },
+                                uri: data.blob_id
                                 }}
                                 defaultSource = {require('../assets/img/user_placeholder.png')}
                                 style = {styles.menuIcon} />

@@ -15,12 +15,16 @@ import {
 	View,
 	StyleProvider,
 	getTheme,
-	variables,    
+	variables,
 } from 'native-base'
 import {connect} from 'react-redux';
 import Constant from '../common/Constant'
 import {PullView} from 'react-native-pull';
 import {Dialog} from 'react-native-popup-dialog';
+
+import RNFirebase from 'react-native-firebase';
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+import {PullList} from 'react-native-pull';
 
 var datas = []
 var currentPage = 0
@@ -38,15 +42,25 @@ class TabChannels extends Component {
             token: '',
             last_message_user_id: 0,
             refresh:false,
+            refresh1:false,
+            pagekey:null,
+            pagetimestamp:null,
         }
         this.onPullRelease = this.onPullRelease.bind(this);
         this.topIndicatorRender = this.topIndicatorRender.bind(this);
     }
-    onPullRelease(resolve){
+
+    onPullRelease(resolve) {
         console.log('*')
         this.setState({refreshing: true});
         setTimeout(() => {
-           this.loadData() 
+
+          this.setState({pagekey: null});
+          this.setState({pagetimestamp: null});
+          this.setState({dialogs: []});
+
+           this.loadDataFromFirebase(null,null)
+
            resolve()
         }, 3000)
     }
@@ -54,45 +68,267 @@ class TabChannels extends Component {
     componentWillMount() {
         currentPage = 0
         datas = []
-        this.loadData()     
+        this.loadDataFromFirebase(null,null)
     }
 
     loadData(){
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             token = token
-            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?limit=100' + '&type[in]=1,2' + '&skip=' + currentPage*10 
+            var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?limit=100' + '&type[in]=1,2' + '&skip=' + currentPage*10
+
+            console.log("Request url - ",REQUEST_URL);
+
             fetch(REQUEST_URL, {
                 method: 'GET',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
-                    'QB-Token': token
+                    'QB-Token': "820ed709accdffd4b3fa640c5c1034fc8f0089b4"
                 },
             })
             .then((response) => response.json())
             .then((responseData) => {
+              console.log("response:",responseData);
                 if(responseData.limit > 0){
                     datas.push(responseData.items)
                     console.log(datas)
                     currentPage ++
-                    this.setState({ 
+                    this.setState({
                         dialogs: JSON.parse(JSON.stringify(datas[0])),
                         token: token,
-                        loading: false 
+                        loading: false
                     })
                 }else{
                     this.setState({ loading: false })
                 }
             }).catch((e) => {
                 console.log(e)
-            })   
+            })
         })
     }
-    
+
+    loadDataFromFirebase(pagekey,pagetimestamp) {
+
+      console.log("pagekey:",pagekey);
+      console.log("pagetimestamp:",pagetimestamp);
+      if (pagekey && pagetimestamp) {
+        this.loadGroupUsingIDPage(1,pagekey,pagetimestamp)
+        .then((result) => {
+          console.log("this.state.dialogs2",result);
+          if (result) {
+            for (key in result) {
+              let obj = result[key]
+              obj["pagekey"] = key
+              this.state.dialogs.push(obj)
+            }
+
+            if (this.state.dialogs.length > 0) {
+              this.state.dialogs.sort(function(a, b) {
+                  var keyA = a.last_message_date_sent,
+                      keyB = b.last_message_date_sent;
+                  if(keyA > keyB) return -1;
+                  if(keyA < keyB) return 1;
+                  return 0;
+              });
+
+              let obj =  this.state.dialogs[this.state.dialogs.length-1]
+              this.setState({ pagekey: obj["pagekey"] })
+              this.setState({ pagetimestamp: obj["last_message_date_sent"] })
+            }
+
+            this.setState({ loading: false })
+            this.setState({dialogs:this.state.dialogs})
+          }
+        })
+      } else {
+        this.loadGroupUsingID(1)
+        .then((result) => {
+          console.log("this.state.dialogs2",result);
+          if (result) {
+            for (key in result) {
+              let obj = result[key]
+              obj["pagekey"] = key
+              this.state.dialogs.push(obj)
+            }
+
+            if (this.state.dialogs.length > 0) {
+              this.state.dialogs.sort(function(a, b) {
+                  var keyA = a.last_message_date_sent,
+                      keyB = b.last_message_date_sent;
+                  if(keyA > keyB) return -1;
+                  if(keyA < keyB) return 1;
+                  return 0;
+              });
+
+              let obj =  this.state.dialogs[this.state.dialogs.length-1]
+              this.setState({ pagekey: obj["pagekey"] })
+              this.setState({ pagetimestamp: obj["last_message_date_sent"] })
+            }
+            this.setState({ loading: false })
+            this.setState({dialogs:this.state.dialogs})
+          }
+        })
+      }
+    }
+
+    // loadGroupUsingID = (groupid) => {
+    //   return new Promise((resolve, reject) => {
+    //   firebase.database()
+    //       .ref(`/dialog`)
+    //       .orderByChild("type")
+    //       .limitToFirst(20)
+    //       .equalTo(groupid)
+    //       .once("value")
+    //       .then(snapshot => {
+    //           if (snapshot.val()) {
+    //             resolve(snapshot.val());
+    //           } else {
+    //             resolve(null);
+    //           }
+    //       });
+    //     })
+    // }
+
+    loadGroupUsingID = (groupid) => {
+      return new Promise((resolve, reject) => {
+      firebase.database()
+          .ref(`/dialog`)
+          .orderByChild("last_message_date_sent")
+          .limitToLast(20)
+          .once("value")
+          .then(snapshot => {
+              if (snapshot.val()) {
+                resolve(snapshot.val());
+              } else {
+                resolve(null);
+              }
+          });
+        })
+    }
+
+    loadGroupUsingIDPage = (groupid,pagekey,pagetimestamp) => {
+      return new Promise((resolve, reject) => {
+      firebase.database()
+          .ref(`/dialog`)
+          .orderByChild("last_message_date_sent")
+          .endAt(pagetimestamp-1, pagekey)
+          .limitToLast(20)
+          .once("value")
+          .then(snapshot => {
+              if (snapshot.val()) {
+                resolve(snapshot.val());
+              } else {
+                resolve(null);
+              }
+          });
+        })
+    }
+
+    downloadGroupPhotoFirebase(photo_id,id) {
+
+      if (photo_id) {
+        console.log("downloadGroupPhotoFirebase...");
+        firebase.database()
+            .ref(`/content`)
+            .orderByChild("id")
+            .equalTo(parseInt(photo_id))
+            .once("value")
+
+            .then(snapshot => {
+
+              if (snapshot.val()) {
+
+                  var contentObj = snapshot.val();
+
+                if (contentObj) {
+                  let keys = Object.keys(contentObj);
+
+                  var content = null;
+                  if (keys.length > 0) {
+                    content = contentObj[keys[0]]
+                  }
+
+                  if (content) {
+                    let imagename = content["name"]
+
+                    firebase.storage().ref("content/" + content["tableId"] + "/" + imagename).getDownloadURL().then((url) => {
+                      for(var i = 0;i < this.state.dialogs.length; i++){
+                          if(this.state.dialogs[i]._id == id){
+                              this.state.dialogs[i]['photo'] = url;
+                              console.log("url IS a a:",url);
+                          }
+                      }
+                      this.setState({
+                          refresh: true
+                      });
+                      this.props.ChannelsUsers(this.state.dialogs)
+                    })
+                  }
+                }
+
+                this.setState({
+                    refresh1: true
+                });
+              }
+            })
+          }
+        }
+
+    downloadLastUserFirebase(last_message_userid) {
+      if (last_message_userid) {
+        console.log("downloadLastUser...");
+          firebase.database()
+              .ref(`/users`)
+              .orderByChild("id")
+              .equalTo(last_message_userid)
+              .once("value")
+              .then(snapshot => {
+
+                if (snapshot.val()) {
+                  var profileObj = snapshot.val();
+
+                  if (profileObj) {
+                    let keys = Object.keys(profileObj);
+
+                    var profile = null;
+                    if (keys.length > 0) {
+                      profile = profileObj[keys[0]]
+                    }
+
+                    if (profile) {
+                      if (profile["content"]) {
+                        for (let item in profile["content"]) {
+                          let content = profile["content"][item]
+                          let blobid =  content["id"]
+
+                          if (blobid = profile["blob_id"]) {
+
+                            firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
+                              for(var i = 0;i < this.state.dialogs.length; i++){
+                                  if(this.state.dialogs[i].last_message_user_id == profile["id"]){
+                                      this.state.dialogs[i]['blob_id'] = url;
+                                      console.log("url IS a a:",url);
+                                  }
+                              }
+                              this.setState({refresh: true});
+
+                              this.props.ChannelsUsers(this.state.dialogs)
+
+                            })
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              })
+            }
+          }
+
     downloadLastUser(last_message_userid){
         var REQUEST_URL = Constant.USERS_URL +  last_message_userid +'.json'
         fetch(REQUEST_URL, {
             method: 'GET',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'QB-Token': this.state.token
             },
@@ -101,7 +337,7 @@ class TabChannels extends Component {
         .then((responseData) => {
             for(var i = 0;i < this.state.dialogs.length; i++){
                 if(this.state.dialogs[i].last_message_user_id == responseData.user.id){
-                    this.state.dialogs[i]['blob_id'] = responseData.user.blob_id.toString();
+                    this.state.dialogs[i]['profileImageURL'] = responseData.user.blob_id.toString();
                 }
             }
             this.setState({
@@ -118,7 +354,7 @@ class TabChannels extends Component {
 
 
     _onRefresh() {
-        // this.loadData()   
+        // this.loadData()
         this.setState({refreshing: true});
         setTimeout(() => {
             this.setState({
@@ -131,38 +367,29 @@ class TabChannels extends Component {
     showLoadData(){
         if(this.state.loading){
             return (
-				<View style={styles.loadingView}>
-					<ActivityIndicator color={'black'} size={'large'}/>
-				</View>
-			);
+        <View style={styles.loadingView}>
+          <ActivityIndicator color={'black'} size={'large'}/>
+        </View>
+      );
         }
-        else{
+        else {
             return(
                 this.state.dialogs.map((data, index) => {
                     return(
                       <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})} key = {index}>
-                        {this.state.refresh == false? this.downloadLastUser(data.last_message_user_id) : null}
+                        {this.state.refresh == false? this.downloadLastUserFirebase(data.last_message_user_id) : null}
+                        {this.state.refresh1 == false? this.downloadGroupPhotoFirebase(data.photo,data._id) : null}
                         <Image source = {{
-                            uri: Constant.BLOB_URL + data.photo + '/download.json',
-                            method:'GET',
-                            headers: { 
-                                    'Content-Type': 'application/json',
-                                    'QB-Token': this.state.token
-                                },
+                            uri: data.photo
                             }}
                             defaultSource = {require('../assets/img/user_placeholder.png')}
                             style = {styles.menuIcon} />
                         <View style = {{flex: 1, marginLeft: 15}}>
                             <Text style = {styles.menuItem}>{data.name}</Text>
                             <View style = {{flexDirection:'row',marginTop: 5}}>
-                                
+
                                 <Image source = {{
-                                    uri: Constant.BLOB_URL + data.blob_id + '/download.json',
-                                    method:'GET',
-                                    headers: { 
-                                            'Content-Type': 'application/json',
-                                            'QB-Token': this.state.token
-                                        },
+                                    uri: data.blob_id
                                     }}
                                     defaultSource = {require('../assets/img/user_placeholder.png')}
                                     style = {{width: 20, height: 20, borderRadius: 10}} />
@@ -170,11 +397,11 @@ class TabChannels extends Component {
                             </View>
                         </View>
                       </TouchableOpacity>
-                    )    
+                    )
                 })
-            )  
+            )
         }
-        
+
     }
 
     topIndicatorRender(pulling, pullok, pullrelease){
@@ -192,7 +419,7 @@ class TabChannels extends Component {
             } else if(pullrelease){
                 this.txtPulling && this.txtPulling.setNativeProps({style:hide});
                 this.txtPullok && this.txtPullok.setNativeProps({style:hide});
-                this.txtPullrelease && this.txtPullrelease.setNativeProps({style:show});  
+                this.txtPullrelease && this.txtPullrelease.setNativeProps({style:show});
             }
         }, 1);
         return(
@@ -208,11 +435,11 @@ class TabChannels extends Component {
         return (
             <Container>
                 <Content bounces={false} contentContainerStyle={{ flex: 1, backgroundColor: 'white', alignItems:'center' }}>
-                    <PullView 
-                        style = {{flex: 1, width:Constant.WIDTH_SCREEN}} 
+                    <PullView
+                        style = {{flex: 1, width:Constant.WIDTH_SCREEN}}
                         onPullRelease = {this.onPullRelease}
                         topIndicatorRender = {this.topIndicatorRender}
-                        
+
                         onRefresh={this._onRefresh.bind(this)}
                         >
                         {/*<ScrollView
@@ -246,7 +473,7 @@ const styles = StyleSheet.create({
     mList: {
         height: Constant.HEIGHT_SCREEN - 140,
         width: Constant.WIDTH_SCREEN,
-        paddingBottom: 30, 
+        paddingBottom: 30,
         backgroundColor:'white'
     },
     menuItem:{
@@ -270,17 +497,17 @@ const styles = StyleSheet.create({
         top: 200
     },
     lastmessage:{
-        fontSize: 12, 
-        marginLeft: 10, 
-        color:'gray', 
-        width: 150, 
+        fontSize: 12,
+        marginLeft: 10,
+        color:'gray',
+        width: 150,
         fontStyle:'italic'
     },
     tabChannelListCell: {
-        width: Constant.WIDTH_SCREEN, 
-        height: 70, 
-        flexDirection:'row', 
-        padding: 10, 
+        width: Constant.WIDTH_SCREEN,
+        height: 70,
+        flexDirection:'row',
+        padding: 10,
         justifyContent:'center'
     }
 });
@@ -294,4 +521,3 @@ const mapDispatchToProps = dispatch => ({
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(TabChannels)
-
