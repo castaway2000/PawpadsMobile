@@ -61,6 +61,7 @@ class TabChats extends Component {
             this.setState({dialogs:this.state.dialogs})
           }
         }
+
         this.loadGroupUsingID(3)
         .then((result1) => {
           console.log("this.state.dialogs3",result1);
@@ -72,6 +73,7 @@ class TabChats extends Component {
             }
           }
         })
+
       })
     }
 

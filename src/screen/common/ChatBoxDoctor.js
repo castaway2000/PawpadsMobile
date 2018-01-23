@@ -12,7 +12,7 @@ import {colors} from '../../actions/const';
 import Constant from '../../common/Constant'
 
 class ChatBoxDoctor extends Component {
-	constructor(props){
+	constructor(props) {
         super(props)
         this.state = {
             refresh: false,
@@ -29,7 +29,7 @@ class ChatBoxDoctor extends Component {
 			var REQUEST_URL = Constant.USERS_URL +  last_message_userid +'.json'
 			fetch(REQUEST_URL, {
 				method: 'GET',
-				headers: { 
+				headers: {
 					'Content-Type': 'application/json',
 					'QB-Token':token
 				},
@@ -46,7 +46,7 @@ class ChatBoxDoctor extends Component {
 				console.log(e)
 			})
 		})
-        
+
     }
 
 	showUserProfiel  = () => {
@@ -60,12 +60,12 @@ class ChatBoxDoctor extends Component {
 					<Image source = {{
 						uri: Constant.BLOB_URL + this.state.blob_id + '/download.json',
 						method:'GET',
-						headers: { 
+						headers: {
 								'Content-Type': 'application/json',
 								'QB-Token': this.state.token
 							},
 						}}
-						style={styles.messagePhoto} 
+						style={styles.messagePhoto}
 						defaultSource = {require('../../assets/img/user_placeholder.png')} />
 				</TouchableOpacity>
 			)
@@ -73,7 +73,7 @@ class ChatBoxDoctor extends Component {
 		else{
 			return null
 		}
-		
+
 	}
 	showUserName(){
 		return(
@@ -103,7 +103,7 @@ class ChatBoxDoctor extends Component {
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
 					var distance = this.distanceInKmBetweenEarthCoordinates(Math.round(this.props.latitude), Math.round(position.coords.latitude), Math.round(this.props.longitude), Math.round(position.coords.longitude))
-					this.setState({ 
+					this.setState({
 						distance: distance.toFixed(2),
 						distancerefresh: true,
 					})
@@ -113,7 +113,7 @@ class ChatBoxDoctor extends Component {
 			):
 			null
 		}
-		
+
 		return(
 			<Text style={[styles.messageTime, styles.messageDistance]}>{this.state.distance} km</Text>
 		)
@@ -126,12 +126,12 @@ class ChatBoxDoctor extends Component {
 					<Image source = {{
 							uri: Constant.BLOB_URL + this.props.messageImage[0].id + '/download.json',
 							method:'GET',
-							headers: { 
+							headers: {
 									'Content-Type': 'application/json',
 									'QB-Token': this.state.token
 								},
 							}}
-							style = {styles.messageImg} 
+							style = {styles.messageImg}
 					/>
 				</View>
 			)
@@ -141,12 +141,12 @@ class ChatBoxDoctor extends Component {
 					<Image source = {{
 							uri: this.props.messageSticker,
 							method:'GET',
-							headers: { 
+							headers: {
 									'Content-Type': 'application/json',
 									'QB-Token': this.state.token
 								},
 							}}
-							style = {styles.messageImg} 
+							style = {styles.messageImg}
 					/>
 				</View>
 			)
@@ -158,7 +158,7 @@ class ChatBoxDoctor extends Component {
 				</View>
 			)
 		}
-		
+
 	}
 	render() {
 		const {doctorMessageContainer, messagesContainer, messageTime, messageText, messagePhoto} = styles;
@@ -169,7 +169,7 @@ class ChatBoxDoctor extends Component {
 					{this.state.refresh == false? this.downloadLastUser(this.props.messageSenderPhoto) : null}
 					{this.showUserphoto()}
 					{this.showMessageBody()}
-					
+
 				</View>
 				<View style = {{flexDirection:'row', marginTop:3}}>
 					{ this.showUserName()}

@@ -315,8 +315,12 @@ class DataMigration extends Component {
             console.log(e)
         })
     }
-      _saveUserChattoFirebase = (responseData,index) => {
 
+      _saveUserChattoFirebase = (responseData,index) => {
+        var updates = {};
+        var newKey = firebase.database().ref().child('chats').push().key;
+        updates = responseData["items"][index]
+        firebase.database().ref().child('/chats/' + responseData["items"][index]["_id"]).set(updates)
     }
 
       /**

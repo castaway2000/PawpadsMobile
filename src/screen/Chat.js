@@ -29,7 +29,8 @@ import {Actions} from 'react-native-router-flux';
 import {getChatMessage, sendMessage} from '../actions';
 import {colors} from '../actions/const';
 import {ChatMessageBox, ChatBoxUser, ChatBoxDoctor} from './common';
-
+import RNFirebase from 'react-native-firebase';
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 var messages = []
 var currentUserid = ''
@@ -47,11 +48,12 @@ class Chat extends Component {
 	}
 
 	componentWillMount() {
-        this.getChatMessage()
+		console.log("getChatMessageFirebase");
+		this.getChatMessageFirebase()
 
 		AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
 			currentUserid = value
-			this.downloadLastUser()
+			this.downloadLastUserFirebase()
 		})
 	}
 
@@ -63,24 +65,32 @@ class Chat extends Component {
 			});
 		}
 	}
-    getChatMessage(){
+
+    getChatMessage() {
 		var {params} = this.props.navigation.state
         messages = []
         AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
             var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=50'
+
+						console.log("URL:",REQUEST_URL);
+
             fetch(REQUEST_URL, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'QB-Token': value
+                    'QB-Token': "396746f4c6505e87ce7a1577abe9e17e6e0089b4"
                 },
             })
             .then((response) => response.json())
             .then((responseData) => {
-                if(responseData.limit > 0){
+							console.log("responseData:",responseData);
+                if(responseData.limit > 0) {
                     responseData.items.map((item, index) => {
                         messages.push(item)
                     })
+
+										console.log("messages :",messages);
+
                     this.setState({
 						messages: messages,
                         loading: false,
@@ -95,7 +105,43 @@ class Chat extends Component {
         })
     }
 
-	downloadLastUser(){
+		getChatMessageFirebase() {
+			var {params} = this.props.navigation.state
+			messages = []
+
+			firebase.database()
+					.ref(`/chats`)
+					.orderByChild("chat_dialog_id")
+					.equalTo(params.Dialog._id)
+					.once("value")
+					.then(snapshot => {
+
+							if (snapshot.val()) {
+
+								let chatobj =  snapshot.val();
+
+								let keys = Object.keys(chatobj);
+
+								for (var i = 0; i < keys.length; i++) {
+
+									if (!chatobj[keys[i]]["attachments"]) {
+								  		chatobj[keys[i]]["attachments"] = [];
+									}
+									messages.push(chatobj[keys[i]])
+								}
+
+						  		console.log("messages :",messages);
+
+									this.setState({messages:messages,loading: false})
+
+								} else {
+									this.setState({ loading: false })
+
+							}
+					})
+		}
+
+	downloadLastUser() {
 
 		var {params} = this.props.navigation.state
 		var last_message_userid = ''
@@ -104,6 +150,7 @@ class Chat extends Component {
                 last_message_userid = params.Dialog.occupants_ids[j].toString()
             }
         }
+
 		AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
 			var REQUEST_URL = Constant.USERS_URL +  last_message_userid + '.json'
 			fetch(REQUEST_URL, {
@@ -123,6 +170,65 @@ class Chat extends Component {
 			})
 		})
     }
+
+		downloadLastUserFirebase() {
+
+			var {params} = this.props.navigation.state
+			var last_message_userid = ''
+					for(var j=0; j<params.Dialog.occupants_ids.length; j++){
+							if(params.Dialog.occupants_ids[j] != currentUserid){
+									last_message_userid = params.Dialog.occupants_ids[j].toString()
+							}
+					}
+
+					if (last_message_userid) {
+						console.log("downloadLastUser...");
+							firebase.database()
+									.ref(`/users`)
+									.orderByChild("id")
+									.equalTo(last_message_userid)
+									.once("value")
+									.then(snapshot => {
+
+										if (snapshot.val()) {
+											var profileObj = snapshot.val();
+
+											if (profileObj) {
+												let keys = Object.keys(profileObj);
+
+												var profile = null;
+												if (keys.length > 0) {
+													profile = profileObj[keys[0]]
+												}
+
+												if (profile) {
+
+													this.setState({
+														userprofile: profile,
+													});
+
+													if (profile["content"]) {
+														for (let item in profile["content"]) {
+															let content = profile["content"][item]
+															let blobid =  content["id"]
+
+															if (blobid == profile["blob_id"]) {
+
+																firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
+																	this.state.userprofile["profileurl"] = url;
+																	this.setState({
+																		userprofile: profile,
+																	});
+																})
+															}
+														}
+													}
+												}
+											}
+										}
+									})
+								}
+		}
 
 
 	animateChatBoxUser() {

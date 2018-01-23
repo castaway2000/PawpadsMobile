@@ -154,7 +154,6 @@ class TabNearBy extends Component {
         );
     }
 
-
     _queryuser = () => {
       const geofireRef = new geofire(firebaseApp.database().ref('geofire/'))
 
@@ -227,7 +226,6 @@ class TabNearBy extends Component {
        });
     }
 
-
     _saveUserLocation = () => {
       firebase.database().ref('users/' + this.state.tableId).update({
         "latitude":parseFloat(this.state.latitude),
@@ -252,8 +250,8 @@ class TabNearBy extends Component {
         }, 2000)
     }
 
-    renderNearBy(){
-        if(this.state.loading){
+    renderNearBy() {
+        if(this.state.loading) {
             return (
 				<View style={styles.loadingView}>
 					<ActivityIndicator color={'black'} size={'large'}/>

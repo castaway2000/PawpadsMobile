@@ -50,7 +50,7 @@ class Search extends Component {
     }
 
     componentWillMount() {
-        var { nearbyusers } = this.props;     
+        var { nearbyusers } = this.props;
 
         AsyncStorage.getItem(Constant.SETTINGS_DISTANCE_UNIT).then((value) => {
             if(value){
@@ -95,23 +95,23 @@ class Search extends Component {
                             onRefresh={this._onRefresh.bind(this)}
                         />
                     }
-                    style = {styles.mList} 
+                    style = {styles.mList}
                     dataArray={ nearbySearchUsers == undefined ? this.state.searchResults : nearbySearchUsers}
                     renderRow={data =>
                         <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data.geo_datum.user.user})} style = {{height:70}}>
                             <Image source = {{
                                     uri: Constant.BLOB_URL + data.geo_datum.user.user.blob_id + '/download.json',
                                     method:'GET',
-                                    headers: { 
+                                    headers: {
                                             'Content-Type': 'application/json',
                                             'QB-Token': this.state.token
                                         },
                                     }}
                                     defaultSource = {require('../assets/img/user_placeholder.png')}
-                                    style = {styles.menuIcon} 
+                                    style = {styles.menuIcon}
                             />
                             {data.geo_datum.user.user.full_name?
-                                <Text style = {styles.menuItem}>{data.geo_datum.user.user.full_name}</Text> : 
+                                <Text style = {styles.menuItem}>{data.geo_datum.user.user.full_name}</Text> :
                                 <Text style = {styles.menuItem}>{data.geo_datum.user.user.login}</Text> }
                             {this.state.distance_unit == 'km' ?
                                 <Text style = {styles.distance}>{parseInt(data.geo_datum.distance)} {this.state.distance_unit}</Text> :
@@ -121,8 +121,8 @@ class Search extends Component {
                 >
                 </List>
             )
-        } 
-        
+        }
+
         if(params.TabName == 'CHATS'){
             if(chatsSearchUsers == undefined){
                 return(
@@ -133,7 +133,7 @@ class Search extends Component {
                             <Image source = {{
                                     uri: Constant.BLOB_URL + data.blob_id + '/download.json',
                                     method:'GET',
-                                    headers: { 
+                                    headers: {
                                             'Content-Type': 'application/json',
                                             'QB-Token': this.state.token
                                         },
@@ -145,9 +145,9 @@ class Search extends Component {
                                 <Text style = {styles.lastmessage} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
                             </View>
                         </TouchableOpacity>
-                        )    
+                        )
                     })
-                )   
+                )
             }else{
                 return(
                     chatsSearchUsers.map((data, index) => {
@@ -156,7 +156,7 @@ class Search extends Component {
                             <Image source = {{
                                     uri: Constant.BLOB_URL + data.blob_id + '/download.json',
                                     method:'GET',
-                                    headers: { 
+                                    headers: {
                                             'Content-Type': 'application/json',
                                             'QB-Token': this.state.token
                                         },
@@ -168,9 +168,9 @@ class Search extends Component {
                                 <Text style = {styles.lastmessage} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
                             </View>
                         </TouchableOpacity>
-                        )    
+                        )
                     })
-                )   
+                )
             }
         }
 
@@ -183,7 +183,7 @@ class Search extends Component {
                             <Image source = {{
                                 uri: Constant.BLOB_URL + data.photo + '/download.json',
                                 method:'GET',
-                                headers: { 
+                                headers: {
                                         'Content-Type': 'application/json',
                                         'QB-Token': this.state.token
                                     },
@@ -193,11 +193,11 @@ class Search extends Component {
                             <View style = {{flex: 1, marginLeft: 15}}>
                                 <Text style = {styles.menuItem1}>{data.name}</Text>
                                 <View style = {{flexDirection:'row',marginTop: 5, alignItems:'center'}}>
-                                    
+
                                     <Image source = {{
                                         uri: Constant.BLOB_URL + data.blob_id + '/download.json',
                                         method:'GET',
-                                        headers: { 
+                                        headers: {
                                                 'Content-Type': 'application/json',
                                                 'QB-Token': this.state.token
                                             },
@@ -208,7 +208,7 @@ class Search extends Component {
                                 </View>
                             </View>
                         </TouchableOpacity>
-                        )    
+                        )
                     })
                 )
             }else{
@@ -220,7 +220,7 @@ class Search extends Component {
                             <Image source = {{
                                 uri: Constant.BLOB_URL + data.photo + '/download.json',
                                 method:'GET',
-                                headers: { 
+                                headers: {
                                         'Content-Type': 'application/json',
                                         'QB-Token': this.state.token
                                     },
@@ -230,11 +230,11 @@ class Search extends Component {
                             <View style = {{flex: 1, marginLeft: 15}}>
                                 <Text style = {styles.menuItem1}>{data.name}</Text>
                                 <View style = {{flexDirection:'row',marginTop: 5}}>
-                                    
+
                                     <Image source = {{
                                         uri: Constant.BLOB_URL + data.blob_id + '/download.json',
                                         method:'GET',
-                                        headers: { 
+                                        headers: {
                                                 'Content-Type': 'application/json',
                                                 'QB-Token': this.state.token
                                             },
@@ -245,13 +245,13 @@ class Search extends Component {
                                 </View>
                             </View>
                         </TouchableOpacity>
-                        )    
+                        )
                     })
                 )
             }
-            
+
         }
-        
+
     }
     showSearchUserBox(){
         var { nearbyusers } = this.props;
@@ -287,7 +287,7 @@ class Search extends Component {
             barStyle = "light-content"
             backgroundColor = 'blue'
         />
-          
+
         return (
             <View style={styles.container}>
                 <View style = {styles.statusbar}/>
@@ -301,9 +301,9 @@ class Search extends Component {
                     <Content bounces={false} contentContainerStyle={{ flex: 1, backgroundColor: 'white',alignItems:'center'}}>
 
                         {this.showSearchResultView()}
-                        
+
                     </Content>
-                    
+
                 </View>
             </View>
         );
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
         textAlign:'left',
         fontSize: 14,
         color: 'black',
-        
+
     },
     bodyView: {
         flex: 1,
@@ -402,23 +402,23 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     tabChannelListCell: {
-        width: Constant.WIDTH_SCREEN, 
-        height: 70, 
-        flexDirection:'row', 
-        padding: 10, 
+        width: Constant.WIDTH_SCREEN,
+        height: 70,
+        flexDirection:'row',
+        padding: 10,
         justifyContent:'center',
     },
     lastmessage:{
-        fontSize: 12, 
-        color:'gray', 
-        width: 200, 
+        fontSize: 12,
+        color:'gray',
+        width: 200,
         fontStyle:'italic',
         marginTop: 5,
     },
     lastmessage1:{
-        fontSize: 12, 
-        color:'gray', 
-        width: 200, 
+        fontSize: 12,
+        color:'gray',
+        width: 200,
         fontStyle:'italic',
         marginLeft: 10,
     },
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
         opacity: 1,
         fontSize: 15,
     },
-    
+
 });
 
 

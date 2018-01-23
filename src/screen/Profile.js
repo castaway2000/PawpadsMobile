@@ -70,7 +70,13 @@ class Profile extends Component {
 
     showUserAbout(){
         var {params} = this.props.navigation.state
-        var json = JSON.parse(params.UserInfo.custom_data)
+
+        var json = null;
+
+        if (params.UserInfo.custom_data) {
+          json = JSON.parse(params.UserInfo.custom_data)
+        }
+
         console.log(json)
         return(
                 <Text style = {styles.detail}>
@@ -84,7 +90,13 @@ class Profile extends Component {
 
     showUserAge(){
         var {params} = this.props.navigation.state
-        var json = JSON.parse(params.UserInfo.custom_data)
+
+        var json = null;
+
+        if (params.UserInfo.custom_data) {
+           json = JSON.parse(params.UserInfo.custom_data)
+        }
+
         if(json){
             var today = new Date()
             if(json.age > 0){
@@ -101,7 +113,13 @@ class Profile extends Component {
 
     showUserHobby(){
         var {params} = this.props.navigation.state
-        var json = JSON.parse(params.UserInfo.custom_data)
+
+          var json = null;
+        if (params.UserInfo.custom_data) {
+         json = JSON.parse(params.UserInfo.custom_data)
+        }
+
+
         return(
             <Text style = {styles.job}>
                 { json ?

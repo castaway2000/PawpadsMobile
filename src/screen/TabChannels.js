@@ -21,13 +21,51 @@ import {connect} from 'react-redux';
 import Constant from '../common/Constant'
 import {PullView} from 'react-native-pull';
 import {Dialog} from 'react-native-popup-dialog';
-
+import { FlatList } from "react-native";
 import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
-import {PullList} from 'react-native-pull';
 
 var datas = []
 var currentPage = 0
+var tmpThis = null
+
+class MyListItem extends React.PureComponent {
+
+  _onPress = () => {
+      this.props.onPressItem(this.props.index);
+  };
+
+render() {
+  const data = this.props.item;
+
+  console.log("data:",data);
+
+  return(
+            <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => tmpThis.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})} key = {this.props.index}>
+              {tmpThis.state.refresh == false? tmpThis.downloadLastUserFirebase(data.last_message_user_id) : null}
+              {tmpThis.state.refresh1 == false? tmpThis.downloadGroupPhotoFirebase(data.photo,data._id) : null}
+              <Image source = {{
+                  uri: data.photo
+                  }}
+                  defaultSource = {require('../assets/img/user_placeholder.png')}
+                  style = {styles.menuIcon} />
+              <View style = {{flex: 1, marginLeft: 15}}>
+                  <Text style = {styles.menuItem}>{data.name}</Text>
+                  <View style = {{flexDirection:'row',marginTop: 5}}>
+
+                      <Image source = {{
+                          uri: data.blob_id
+                          }}
+                          defaultSource = {require('../assets/img/user_placeholder.png')}
+                          style = {{width: 20, height: 20, borderRadius: 10}} />
+                      <Text style = {styles.lastmessage} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
+                  </View>
+              </View>
+            </TouchableOpacity>
+  )
+  }
+}
+
 
 // create a component
 class TabChannels extends Component {
@@ -69,9 +107,10 @@ class TabChannels extends Component {
         currentPage = 0
         datas = []
         this.loadDataFromFirebase(null,null)
+        tmpThis  = this
     }
 
-    loadData(){
+    loadData() {
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             token = token
             var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?limit=100' + '&type[in]=1,2' + '&skip=' + currentPage*10
@@ -165,8 +204,16 @@ class TabChannels extends Component {
             }
             this.setState({ loading: false })
             this.setState({dialogs:this.state.dialogs})
+            console.log(z);
+
           }
         })
+      }
+    }
+
+    handleLoadMore = () => {
+      if (!this.state.loading) {
+        this.loadDataFromFirebase(this.state.pagekey,this.state.pagetimestamp);
       }
     }
 
@@ -183,7 +230,7 @@ class TabChannels extends Component {
     //             resolve(snapshot.val());
     //           } else {
     //             resolve(null);
-    //           }
+    //           }s
     //       });
     //     })
     // }
@@ -193,7 +240,8 @@ class TabChannels extends Component {
       firebase.database()
           .ref(`/dialog`)
           .orderByChild("last_message_date_sent")
-          .limitToLast(20)
+
+          .limitToLast(15)
           .once("value")
           .then(snapshot => {
               if (snapshot.val()) {
@@ -237,7 +285,7 @@ class TabChannels extends Component {
 
               if (snapshot.val()) {
 
-                  var contentObj = snapshot.val();
+                var contentObj = snapshot.val();
 
                 if (contentObj) {
                   let keys = Object.keys(contentObj);
@@ -254,12 +302,13 @@ class TabChannels extends Component {
                       for(var i = 0;i < this.state.dialogs.length; i++){
                           if(this.state.dialogs[i]._id == id){
                               this.state.dialogs[i]['photo'] = url;
-                              console.log("url IS a a:",url);
+                              console.log("downloadGroupPhotoFirebase:",url);
                           }
                       }
                       this.setState({
                           refresh: true
                       });
+                      this.setState({dialogs:this.state.dialogs})
                       this.props.ChannelsUsers(this.state.dialogs)
                     })
                   }
@@ -300,19 +349,19 @@ class TabChannels extends Component {
                           let content = profile["content"][item]
                           let blobid =  content["id"]
 
-                          if (blobid = profile["blob_id"]) {
+                          if (blobid == profile["blob_id"]) {
 
                             firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
                               for(var i = 0;i < this.state.dialogs.length; i++){
-                                  if(this.state.dialogs[i].last_message_user_id == profile["id"]){
+                                  if(this.state.dialogs[i].last_message_user_id == profile["id"]) {
                                       this.state.dialogs[i]['blob_id'] = url;
-                                      console.log("url IS a a:",url);
+                                      console.log("downloadLastUserFirebase:",url);
                                   }
                               }
                               this.setState({refresh: true});
+                              this.setState({dialogs:this.state.dialogs})
 
                               this.props.ChannelsUsers(this.state.dialogs)
-
                             })
                           }
                         }
@@ -324,7 +373,7 @@ class TabChannels extends Component {
             }
           }
 
-    downloadLastUser(last_message_userid){
+    downloadLastUser(last_message_userid) {
         var REQUEST_URL = Constant.USERS_URL +  last_message_userid +'.json'
         fetch(REQUEST_URL, {
             method: 'GET',
@@ -340,6 +389,7 @@ class TabChannels extends Component {
                     this.state.dialogs[i]['profileImageURL'] = responseData.user.blob_id.toString();
                 }
             }
+
             this.setState({
                 refresh: true
             });
@@ -352,19 +402,7 @@ class TabChannels extends Component {
         })
     }
 
-
-    _onRefresh() {
-        // this.loadData()
-        this.setState({refreshing: true});
-        setTimeout(() => {
-            this.setState({
-                refreshing: false
-            })
-
-        }, 3000)
-
-    }
-    showLoadData(){
+    showLoadData() {
         if(this.state.loading){
             return (
         <View style={styles.loadingView}>
@@ -372,13 +410,15 @@ class TabChannels extends Component {
         </View>
       );
         }
-        else {
+        else{
             return(
                 this.state.dialogs.map((data, index) => {
                     return(
                       <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})} key = {index}>
                         {this.state.refresh == false? this.downloadLastUserFirebase(data.last_message_user_id) : null}
+
                         {this.state.refresh1 == false? this.downloadGroupPhotoFirebase(data.photo,data._id) : null}
+
                         <Image source = {{
                             uri: data.photo
                             }}
@@ -401,10 +441,9 @@ class TabChannels extends Component {
                 })
             )
         }
-
     }
 
-    topIndicatorRender(pulling, pullok, pullrelease){
+    topIndicatorRender(pulling, pullok, pullrelease) {
         const hide = {position:'absolute', left: 10000};
         const show = {position:'relative', left: 0};
         setTimeout(() =>{
@@ -422,6 +461,7 @@ class TabChannels extends Component {
                 this.txtPullrelease && this.txtPullrelease.setNativeProps({style:show});
             }
         }, 1);
+
         return(
             <View style = {{flexDirection:'row', justifyContent:'center', alignItems:'center', height: 60}}>
                 <ActivityIndicator size = 'small' color = 'gray'/>
@@ -431,28 +471,27 @@ class TabChannels extends Component {
             </View>
         );
     }
+
+    _keyExtractor = (item, index) => index;
+
     render() {
         return (
             <Container>
                 <Content bounces={false} contentContainerStyle={{ flex: 1, backgroundColor: 'white', alignItems:'center' }}>
-                    <PullView
-                        style = {{flex: 1, width:Constant.WIDTH_SCREEN}}
-                        onPullRelease = {this.onPullRelease}
-                        topIndicatorRender = {this.topIndicatorRender}
 
-                        onRefresh={this._onRefresh.bind(this)}
-                        >
-                        {/*<ScrollView
-                            refreshControl={
-                                <RefreshControl
-                                    refreshing={this.state.refreshing}
-                                    onRefresh={this._onRefresh.bind(this)}
-                                />
-                            }
-                        >*/}
-                            {this.showLoadData()}
-                        {/*</ScrollView>*/}
-                    </PullView>
+                <FlatList
+                  data={this.state.dialogs}
+                  renderItem={this._renderItem}
+                  keyExtractor={this._keyExtractor}
+                  maxToRenderPerBatch={1}
+                  removeClippedSubviews={false}
+                  onRefresh={() => this.onRefresh()}
+                  refreshing={this.state.refreshing}
+                  onRefreshItems= {this.props.onRefreshItems}
+                  onEndReached={this.handleLoadMore}
+                  onEndReachedThreshold={0}
+                  />
+
                 </Content>
                 <TouchableOpacity style = {styles.chatBtn} onPress={() => this.props.navigation.navigate('ChatGroupEdit')}>
                     <Image source = {require('../assets/img/chat_button_new.png')} style = {{width: 70, height: 70}}/>
@@ -460,6 +499,22 @@ class TabChannels extends Component {
             </Container>
         );
     }
+
+    onRefresh() {
+      this.setState({refreshing: true});
+      setTimeout(() => {
+          this.setState({
+              refreshing: false
+          })
+
+      }, 3000)
+    }
+
+    _renderItem = ({ item, index }) => ( <MyListItem
+        index = { index }
+        item = { item }
+        onPressItem = { this._onPressItem }/>
+    );
 }
 
 // define your styles

@@ -17,12 +17,12 @@ class ChatBoxUser extends Component {
 				<Image source = {{
 						uri: Constant.BLOB_URL + this.props.messageImage[0].id + '/download.json',
 						method:'GET',
-						headers: { 
+						headers: {
 								'Content-Type': 'application/json',
 								'QB-Token': this.props.token
 							},
 						}}
-						style = {styles.messageImg} 
+						style = {styles.messageImg}
 				/>
 			)
 		}

@@ -32,6 +32,9 @@ import {ChatMessageBox, ChatBoxUser, ChatBoxDoctor} from './common';
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
 var ImagePicker = require("react-native-image-picker");
 
+import RNFirebase from 'react-native-firebase';
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
 var messages = []
 var currentUserid = ''
 var isCamera = false;
@@ -50,7 +53,7 @@ class ChatGroup extends Component {
 	}
 
 	componentWillMount() {
-        this.getChatMessage()
+        this.getChatMessageFirebase()
 		AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
 			currentUserid = value
 		})
@@ -64,6 +67,7 @@ class ChatGroup extends Component {
 			});
 		}
 	}
+
     getChatMessage() {
 		var {params} = this.props.navigation.state
         messages = []
@@ -82,10 +86,7 @@ class ChatGroup extends Component {
                     responseData.items.map((item, index) => {
                         messages.push(item)
                     })
-                    this.setState({
-						messages: messages,
-                        loading: false,
-						token: value
+                    this.setState({ messages: messages, loading: false, token: value
                     })
                 }else{
                     this.setState({ loading: false })
@@ -97,9 +98,56 @@ class ChatGroup extends Component {
     }
 
 
+		getChatMessageFirebase() {
+			var {params} = this.props.navigation.state
+			messages = []
+
+			firebase.database()
+					.ref(`/chats`)
+					.orderByChild("chat_dialog_id")
+					.equalTo(params.Dialog._id)
+					.once("value")
+					.then(snapshot => {
+
+							if (snapshot.val()) {
+
+								let chatobj =  snapshot.val();
+
+								let keys = Object.keys(chatobj);
+
+								for (var i = 0; i < keys.length; i++) {
+
+									if (!chatobj[keys[i]]["attachments"]) {
+
+								  		chatobj[keys[i]]["attachments"] = [];
+									}
+									messages.push(chatobj[keys[i]])
+								}
+
+								if (messages.length > 0) {
+									messages.sort(function(a, b) {
+											var keyA = a.date_sent,
+													keyB = b.date_sent;
+											if(keyA > keyB) return -1;
+											if(keyA < keyB) return 1;
+											return 0;
+									});}
+
+						  		console.log("messages :",messages);
+
+									this.setState({messages:messages,loading: false})
+
+								} else {
+
+									this.setState({ loading: false })
+							}
+					})
+		}
+
+
 	animateChatBoxUser() {
 		this.animatedValue.setValue(0);
-		Animated.timing(
+		Animated.timing (
 			this.animatedValue,
 			{
 				toValue: 1,
@@ -169,7 +217,7 @@ class ChatGroup extends Component {
 	renderListMessages(item, index) {
 		var {params} = this.props.navigation.state
 		if (item.sender_id != currentUserid) {
-			if(item.STICKER){
+			if(item.STICKER) {
 				return (
 					<ChatBoxDoctor
 						key={index}
@@ -187,7 +235,7 @@ class ChatGroup extends Component {
 							day: 'numeric',
 						})}/>
 				);
-			}else{
+			} else {
 				return (
 					<ChatBoxDoctor
 						key={index}
@@ -205,9 +253,7 @@ class ChatGroup extends Component {
 						})}/>
 				);
 			}
-
-		}
-		else {
+		} else {
 			if(item.STICKER){
 				return (
 					<ChatBoxUser
@@ -221,7 +267,7 @@ class ChatGroup extends Component {
 							minute: '2-digit'
 						})}/>
 				);
-			}else{
+			} else {
 				return (
 					<ChatBoxUser
 						key={index}
@@ -234,15 +280,13 @@ class ChatGroup extends Component {
 						})}/>
 				);
 			}
-
 		}
 	}
 
 	renderChatMessage() {
 		if (this.state.loading) {
 			return <ActivityIndicator style={{margin: 200}} color={'black'} size={'large'}/>;
-		}
-		else {
+		} else {
 			var newArray = []
 			for(var i = this.state.messages.length-1; i > -1 ;i--){
 				newArray.push(this.state.messages[i])
@@ -292,7 +336,7 @@ class ChatGroup extends Component {
 		this.popupDialog.show()
 	}
 
-	chatEdit(){
+	chatEdit() {
 		var {params} = this.props.navigation.state
 		if(params.GroupChatting){
 			return(
@@ -304,7 +348,8 @@ class ChatGroup extends Component {
 			return null
 		}
 	}
-	createGroup(){
+
+	createGroup() {
 		var {params} = this.props.navigation.state
 		if(params.GroupChatting){
 			return(
@@ -313,12 +358,13 @@ class ChatGroup extends Component {
 				</TouchableOpacity>
 			)
 		}
+
 		else{
 			return null
 		}
 	}
 
-	onCamera = () => {
+	 onCamera = () => {
 		isCamera = true
 		isGallery = false
         this.popupDialog.dismiss()
@@ -370,7 +416,8 @@ class ChatGroup extends Component {
 			waitUntilSaved: true
 			}
 		}
-		if(isCamera){
+
+		if(isCamera) {
 			ImagePicker.launchCamera(options, (response)  => {
 				console.log('Response = ', response);
 
@@ -394,7 +441,7 @@ class ChatGroup extends Component {
 					console.log(source)
 				}
 			});
-		}else{
+		} else {
 			ImagePicker.launchImageLibrary(options, (response)  => {
 				console.log('Response = ', response);
 
@@ -408,8 +455,7 @@ class ChatGroup extends Component {
 				}
 				else if (response.customButton) {
 					console.log('User tapped custom button: ', response.customButton);
-				}
-				else {
+				} else {
 					var source = ''
 					// console.log("ProfileScreen.js Platform: ", Platform);
 					// if (Platform.OS === 'ios') {
@@ -423,9 +469,9 @@ class ChatGroup extends Component {
 				}
 			});
 		}
-  	}
+	}
 
-	sendPhotoMessage(source){
+	sendPhotoMessage(source) {
 		var {params} = this.props.navigation.state
 
 		var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + "?chat_dialog_id=" + params.Dialog._id + "&attachments[0][id]=" + this.state.blob_id + "&attachments[0][type]=image&attachments[0][url]=" + source;
