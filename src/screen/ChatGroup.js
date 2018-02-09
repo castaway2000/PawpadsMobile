@@ -39,6 +39,7 @@ var messages = []
 var currentUserid = ''
 var isCamera = false;
 var isGallery = false;
+var firbaseChatObserver = null
 
 class ChatGroup extends Component {
 	constructor(props) {
@@ -49,14 +50,21 @@ class ChatGroup extends Component {
 			protected: this.props.profile,
 			token: '',
 			blob_id: '',
+			tableId:'',
 		};
 	}
 
 	componentWillMount() {
-        this.getChatMessageFirebase()
+		this.getChatMessageFirebase()
 		AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
 			currentUserid = value
 		})
+
+		AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+			console.log("tableId is:",value);
+			this.setState({tableId: value })
+		})
+
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -99,50 +107,136 @@ class ChatGroup extends Component {
 
 
 		getChatMessageFirebase() {
-			var {params} = this.props.navigation.state
-			messages = []
+					var {params} = this.props.navigation.state
+					messages = []
 
-			firebase.database()
-					.ref(`/chats`)
-					.orderByChild("chat_dialog_id")
-					.equalTo(params.Dialog._id)
-					.once("value")
-					.then(snapshot => {
+					/*
+					if (firbaseChatObserver) {
+						if (firbaseChatObserver) firbaseChatObserver.off();
+						if (firbaseChatObserver) firbaseChatObserver.off('child_added');
+					}
 
-							if (snapshot.val()) {
+						firbaseChatObserver = firebase.database().ref(`/chats`).orderByChild("chat_dialog_id").equalTo(params.Dialog._id).limitToFirst(20)
 
-								let chatobj =  snapshot.val();
+								firbaseChatObserver.on('child_added', (snapshot) => {
 
-								let keys = Object.keys(chatobj);
+									console.log("firbaseChatObserver child_added:",snapshot.val());
 
-								for (var i = 0; i < keys.length; i++) {
+									if (snapshot.val()) {
 
-									if (!chatobj[keys[i]]["attachments"]) {
+										let chatobj =  snapshot.val();
 
-								  		chatobj[keys[i]]["attachments"] = [];
+										if (!chatobj["attachments"]) {
+												chatobj["attachments"] = [];
+										}
+										messages.push(chatobj)
+
+										if (messages.length > 0) {
+											messages.sort(function(a, b) {
+													var keyA = a.date_sent,
+															keyB = b.date_sent;
+													if(keyA > keyB) return -1;
+													if(keyA < keyB) return 1;
+													return 0;
+											});}
+
+											console.log("messages :",messages);
+
+											this.setState({messages:messages,loading: false})
+
+										} else {
+											this.setState({ loading: false })
+										}
+									})*/
+
+
+
+
+					firebase.database()
+							.ref(`/chats`)
+							.orderByChild("chat_dialog_id")
+							.equalTo(params.Dialog._id)
+							.once("value")
+							.then(snapshot => {
+
+									if (snapshot.val()) {
+
+										let chatobj =  snapshot.val();
+
+										let keys = Object.keys(chatobj);
+
+										for (var i = 0; i < keys.length; i++) {
+
+											if (!chatobj[keys[i]]["attachments"]) {
+										  		chatobj[keys[i]]["attachments"] = [];
+											}
+											messages.push(chatobj[keys[i]])
+										}
+
+										if (messages.length > 0) {
+											messages.sort(function(a, b) {
+													var keyA = a.date_sent,
+															keyB = b.date_sent;
+													if(keyA > keyB) return -1;
+													if(keyA < keyB) return 1;
+													return 0;
+											});}
+
+								  		console.log("messages :",messages);
+
+											this.setState({messages:messages,loading: false})
+
+											this.updateChats()
+
+										} else {
+											this.setState({ loading: false })
+										}
+							})
+				}
+
+				updateChats() {
+					var {params} = this.props.navigation.state
+
+					if (firbaseChatObserver) {
+						if (firbaseChatObserver) firbaseChatObserver.off();
+						if (firbaseChatObserver) firbaseChatObserver.off('child_added');
+					}
+
+						firbaseChatObserver = firebase.database().ref(`/chats`).orderByChild("chat_dialog_id").equalTo(params.Dialog._id).limitToLast(10)
+
+								firbaseChatObserver.on('child_added', (snapshot) => {
+
+									console.log("firbaseChatObserver child_added:",snapshot.val());
+
+									if (snapshot.val()) {
+
+										let chatobj =  snapshot.val();
+
+										if (!chatobj["attachments"]) {
+												chatobj["attachments"] = [];
+										}
+
+										var isFound = false
+										for (var i = 0; i < messages.length; i++) {
+													let message =	messages[i]
+													if (chatobj["_id"] == message["_id"]) {
+														isFound = true
+													}
+										}
+
+										if (!isFound) {
+											messages.unshift(chatobj)
+										}
+
+											console.log("messages :",messages);
+
+											this.setState({messages:messages,loading: false})
+
+										} else {
+											this.setState({ loading: false })
+										}
+										})
 									}
-									messages.push(chatobj[keys[i]])
-								}
-
-								if (messages.length > 0) {
-									messages.sort(function(a, b) {
-											var keyA = a.date_sent,
-													keyB = b.date_sent;
-											if(keyA > keyB) return -1;
-											if(keyA < keyB) return 1;
-											return 0;
-									});}
-
-						  		console.log("messages :",messages);
-
-									this.setState({messages:messages,loading: false})
-
-								} else {
-
-									this.setState({ loading: false })
-							}
-					})
-		}
 
 
 	animateChatBoxUser() {
@@ -155,6 +249,42 @@ class ChatGroup extends Component {
 				easing: Easing.linear
 			}
 		).start();
+	}
+
+	sendMessageFirebase(text) {
+		console.log("Send message tapped...");
+
+		var updates = {};
+		var newKey = firebase.database().ref().child('chats').push().key;
+
+		var {params} = this.props.navigation.state
+
+		var milliseconds = (new Date).getTime()/1000|0;
+		console.log(milliseconds);
+
+		var date = new Date();
+		console.log(date.toISOString());
+
+
+		var chatdict = {
+      "_id" : newKey,
+      "chat_dialog_id" : params.Dialog._id,
+      "created_at" : date,
+      "date_sent" : milliseconds,
+      "latitude" : "",
+      "longitude" : "",
+      "message" : text,
+      "read" : 0,
+      "recipient_id" : "",
+      "send_to_chat" : "1",
+      "sender_id" : currentUserid,
+      "updated_at" : date
+    }
+
+		updates['/chats/' + newKey] = chatdict;
+		firebase.database().ref().update(updates)
+
+		this.updateChats()
 	}
 
 	sendMessage(text) {
@@ -319,14 +449,14 @@ class ChatGroup extends Component {
 			return (
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessage(text)} onPressFile = {this._onClickedFile}/>
+					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile}/>
 				</KeyboardAvoidingView>
 			);
 		} else {
 			return (
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessage(text)} onPressFile = {this._onClickedFile}/>
+					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile}/>
 				</KeyboardAvoidingView>
 			);
 		}
@@ -365,20 +495,25 @@ class ChatGroup extends Component {
 	}
 
 	 onCamera = () => {
-		isCamera = true
-		isGallery = false
-        this.popupDialog.dismiss()
-		this.getAttachmentID()
-    }
-    onGallery = () => {
-		isCamera = false
-		isGallery = true
-        this.popupDialog.dismiss()
-		this.getAttachmentID()
-    }
-    onCancel = () => {
-        this.popupDialog.dismiss()
-    }
+		 isCamera = true
+		 isGallery = false
+		 this.popupDialog.dismiss()
+		 //this.getAttachmentID()
+		 this.showPicker()
+	 }
+
+	 onGallery = () => {
+		 isCamera = false
+		 isGallery = true
+		 this.popupDialog.dismiss()
+		 //this.getAttachmentID()
+		 this.showPicker()
+	 }
+
+	 onCancel = () => {
+		 this.popupDialog.dismiss()
+	 }
+
 	getAttachmentID(){
 		var today = new Date()
 		var yyyy = today.getFullYear().toString()
@@ -405,6 +540,7 @@ class ChatGroup extends Component {
 			console.log(e)
 		})
 	}
+
 	showPicker() {
 		const options = {
 			quality: 1.0,
@@ -429,8 +565,7 @@ class ChatGroup extends Component {
 				}
 				else if (response.customButton) {
 					console.log('User tapped custom button: ', response.customButton);
-				}
-				else {
+				} else {
 					var source = ''
 					console.log("ProfileScreen.js Platform: ", Platform);
 					if (Platform.OS === 'ios') {
@@ -439,6 +574,7 @@ class ChatGroup extends Component {
 						source = {uri: response.uri, isStatic: true};
 					}
 					console.log(source)
+					this.sendPhotoMessage(source, response.fileName)
 				}
 			});
 		} else {
@@ -465,38 +601,100 @@ class ChatGroup extends Component {
 					// 	source = {uri: response.uri, isStatic: true};
 					// }
 					console.log(source)
-					this.sendPhotoMessage(source)
+					this.sendPhotoMessage(source, response.fileName)
 				}
 			});
 		}
 	}
 
-	sendPhotoMessage(source) {
-		var {params} = this.props.navigation.state
+	sendPhotoMessage(source, fileName) {
+		//Upload Image to firebase
 
-		var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + "?chat_dialog_id=" + params.Dialog._id + "&attachments[0][id]=" + this.state.blob_id + "&attachments[0][type]=image&attachments[0][url]=" + source;
-		console.log(REQUEST_URL)
-		fetch(REQUEST_URL, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-				'QB-Token': this.state.token
-			},
-		})
-		.then((response) => response.json())
-		.then((responseData) => {
-			console.log(responseData)
+		firebase.storage().ref("content/" + this.state.tableId + "/" + fileName).putFile(source)
+		.on('state_changed', (snapshot) => {
 
-			var {dispatch} = this.props
-			dispatch({
-				type: CHANGE_MESSAGE_LIST,
-				payload: newArray,
-			})
+		}, (err) => {
+			console.log("Error " + err);
 
-		}).catch((e) => {
-			console.log(e)
-		})
+			Alert("Image can not uploaded!")
+
+		}, (uploadedAsset) => {
+			console.log("Image uploaded successfully.");
+
+
+			var updates = {};
+			var newKey = firebase.database().ref().child('chats').push().key;
+
+			var {params} = this.props.navigation.state
+
+			var milliseconds = (new Date).getTime()/1000|0;
+			console.log(milliseconds);
+
+			var date = new Date();
+			console.log(date.toISOString());
+
+			let chatdict = {
+				"_id" : newKey,
+				"attachments" : [ {
+					"id" : milliseconds.toString(),
+					"name" : fileName,
+					"type" : "photo"
+				} ],
+				"chat_dialog_id" : params.Dialog._id,
+				"created_at" : date.toISOString(),
+				"date_sent" : milliseconds,
+				"delivered_ids" : [],
+				"message" : fileName,
+				"read" : 1,
+				"read_ids" : [ ],
+				"recipient_id" : "",
+				"sender_id" : currentUserid,
+				"updated_at" : date.toISOString()
+			}
+
+			updates['/chats/' + newKey] = chatdict;
+			firebase.database().ref().update(updates)
+
+			//Update content
+			var updatescontent = {};
+			var newKeycontent = firebase.database().ref().child('content').push().key;
+
+			let content = {
+				"blob_status" : "complete",
+				"content_type" : "image/jpeg",
+				"created_at" : date.toISOString(),
+				"id" : milliseconds,
+				"name" : fileName,
+				"public" : false,
+				"set_completed_at" : date.toISOString(),
+				"size" : 0,
+				"tableId" : this.state.tableId,
+				"uid" : this.uidString(),
+				"updated_at" : date.toISOString(),
+				"userid" : currentUserid
+			}
+
+			updatescontent['/content/' + newKeycontent] = content;
+			firebase.database().ref().update(updatescontent)
+
+			//Update User  content
+			var newKeyUsercontent = firebase.database().ref().child('users').child('content').push().key;
+
+			updatescontent['/users/' + this.state.tableId  + '/content/'+ newKeycontent] = content;
+			firebase.database().ref().update(updatescontent)
+
+			//TODO: update chat dialog
+			this.updateChats()
+
+		});
 	}
+
+	uidString() {
+		return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+		return v.toString(16);
+	});
+}
 
 	render() {
 		var {params} = this.props.navigation.state
@@ -523,7 +721,7 @@ class ChatGroup extends Component {
                     overlayOpacity = {0.9}
                     height = {200}
                     width = {280}
-                >
+										>
                     <View style = {{backgroundColor:'white', padding: 15, borderRadius: 10}}>
                         <Text style = {{textAlign:'left', margin: 10, fontSize: 20, fontWeight: 'bold'}}>Select file</Text>
                         <TouchableOpacity onPress = {this.onCamera}>

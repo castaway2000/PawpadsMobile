@@ -30,6 +30,7 @@
 		2B5CF74E76B44CF4BC823D70 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 56A0B229144D4477AF64C7F1 /* MaterialIcons.ttf */; };
 		31AB82FE468E42E7BA1FC1F7 /* Proxima_Nova_Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 337F1C4D91414410A04727A1 /* Proxima_Nova_Regular.otf */; };
 		33760386FE6449B79A727377 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 13D1EF1A65C649D280EC1527 /* Feather.ttf */; };
+		3519ECA4202D7AB600476425 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 229AFF3F1F95BA4C00EBFE37 /* libRNImagePicker.a */; };
 		35421AB41FD82045005B4D1F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 35421AB31FD82045005B4D1F /* GoogleService-Info.plist */; };
 		35620A181FD94BBD0088941C /* libRCTFBSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35620A151FD94A340088941C /* libRCTFBSDK.a */; };
 		35620A1A1FD94CAC0088941C /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35620A191FD94CAC0088941C /* Bolts.framework */; };
@@ -444,6 +445,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3519ECA4202D7AB600476425 /* libRNImagePicker.a in Frameworks */,
 				35D7364D1FD952CE00B87455 /* libRNFirebase.a in Frameworks */,
 				35620A1F1FD94D130088941C /* FBSDKLoginKit.framework in Frameworks */,
 				35620A1A1FD94CAC0088941C /* Bolts.framework in Frameworks */,

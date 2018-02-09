@@ -108,7 +108,7 @@ class ChatMessageBox extends Component {
 		const {container, buttonContainer,graphicIcon} = styles;
 		const {heightIOS} = this.state;
 		return (
-			<View style={Platform.OS === 'ios' ? [container, {height: (heightIOS+40)}] : container}>
+			<View style={Platform.OS === 'ios' ? [container, {height: (heightIOS+40)}] : [container, {height: (heightIOS+40)}]}>
 				<View style = {{flexDirection:'row', alignItems:'center'}}>
 					{this.renderTextInput()}
 					<TouchableOpacity style={buttonContainer} onPress={() => this.onButtonPress(this.state.text)}>

@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "801182429951",
-    "firebase_url": "https://pawpads-59185.firebaseio.com",
-    "project_id": "pawpads-59185",
-    "storage_bucket": "pawpads-59185.appspot.com"
+    "project_number": "637762013744",
+    "firebase_url": "https://pawpads-rn.firebaseio.com",
+    "project_id": "pawpads-rn",
+    "storage_bucket": "pawpads-rn.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:801182429951:android:3237ec101a08a61c",
+        "mobilesdk_app_id": "1:637762013744:android:3237ec101a08a61c",
         "android_client_info": {
           "package_name": "com.pawpads"
         }
       },
       "oauth_client": [
         {
-          "client_id": "801182429951-nr4f2sranl9cl4kskqu1i6ac1h0op5j7.apps.googleusercontent.com",
+          "client_id": "637762013744-q3arg3458m2nu9f2t13dfluguhjl4128.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB3T2i39UcqYlwoEoi4jZDtPckoJCQMl08"
+          "current_key": "AIzaSyD2_Yi3_GYefckW4oCLQ7q-IpObMskiADI"
         }
       ],
       "services": {

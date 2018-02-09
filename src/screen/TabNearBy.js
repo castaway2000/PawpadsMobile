@@ -272,11 +272,12 @@ class TabNearBy extends Component {
                         dataArray={this.state.nearByUsers}
                         renderRow={data =>
                             <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})} style = {{height:70}}>
+                            <View style = {styles.menuIcon} >
                                 <Image  source={{uri: data["profileImageURL"]}}
-
-                                        defaultSource = {require('../assets/img/user_placeholder.png')}
-                                        style = {styles.menuIcon}
+                                  defaultSource = {require('../assets/img/user_placeholder.png')}
+                                  style = {styles.menuIcon}
                                 />
+                                </View>
                                 {data.full_name?
                                     <Text style = {styles.menuItem}>{data.full_name}</Text> :
                                     <Text style = {styles.menuItem}>{data.login}</Text> }

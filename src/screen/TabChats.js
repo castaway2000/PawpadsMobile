@@ -139,7 +139,6 @@ class TabChats extends Component {
     }
 
     downloadLastUserFirebase(occupants_ids) {
-      console.log("occupants_ids:",occupants_ids);
 
         var last_message_userid = ''
         for(var j=0; j<occupants_ids.length; j++){
@@ -161,6 +160,8 @@ class TabChats extends Component {
                 if (profileObj) {
                   let keys = Object.keys(profileObj);
 
+                  console.log("profileObj IS a a:",profileObj);
+
                   var profile = null;
                   if (keys.length > 0) {
                     profile = profileObj[keys[0]]
@@ -168,13 +169,15 @@ class TabChats extends Component {
 
                   if (profile) {
                     if (profile["content"]) {
+
                       for (let item in profile["content"]) {
                         let content = profile["content"][item]
                         let blobid =  content["id"]
 
-                        if (blobid = profile["blob_id"]) {
+                        if (blobid == profile["blob_id"]) {
 
                           firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
+                            console.log("url IS a a:",url);
                             for(var i = 0;i < this.state.dialogs.length; i++){
                                 if(this.state.dialogs[i].last_message_user_id == profile["id"]){
                                     this.state.dialogs[i]['blob_id'] = url;
@@ -249,16 +252,16 @@ class TabChats extends Component {
                     return(
                       <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('Chat', {GroupName: data.name, GroupChatting: true, Dialog: data, Token: this.state.token})} key = {index}>
                         {this.state.refresh == false? this.downloadLastUserFirebase(data.occupants_ids) : null}
-                        <Image source = {{
-                                uri: data.blob_id
-                                }}
-                                defaultSource = {require('../assets/img/user_placeholder.png')}
-                                style = {styles.menuIcon} />
-                            <View style = {{flex: 1, marginLeft: 15, justifyContent:'center'}}>
-                                <Text style = {styles.menuItem}>{data.name}</Text>
-                                <Text style = {styles.lastmessage} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
-                            </View>
-                      </TouchableOpacity>
+                        <View style = {styles.menuIcon} >
+                          <Image source = {{ uri: data.blob_id }}
+                          defaultSource = {require('../assets/img/user_placeholder.png')}
+                          style = {styles.menuIcon} />
+                        </View>
+                        <View style = {{flex: 1, marginLeft: 15, justifyContent:'center'}}>
+                          <Text style = {styles.menuItem}>{data.name}</Text>
+                          <Text style = {styles.lastmessage} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
+                        </View>
+                        </TouchableOpacity>
                     )
                 })
             )
@@ -313,6 +316,8 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
+        backgroundColor: 'white',
+
     },
     chatBtn: {
         position:'absolute',

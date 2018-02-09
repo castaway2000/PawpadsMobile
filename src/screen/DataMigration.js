@@ -240,7 +240,7 @@ class DataMigration extends Component {
 
         console.log("Quickblox: Getting... Dialog data");
 
-        var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + "?skip=" + this.state.userDialogSkipped*100 + "&type[in]=1,2,3"
+        var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + "?skip=" + this.state.userDialogSkipped*100 + "&type[in]=2,3"
 
         console.log("Quickblox: Getting... Dialog data");
         fetch(REQUEST_URL, {

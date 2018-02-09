@@ -8,19 +8,56 @@ import {
 	TouchableOpacity,
 } from 'react-native';
 import Constant from '../../common/Constant'
+import RNFirebase from 'react-native-firebase';
+
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 class ChatBoxUser extends Component {
+	constructor(props) {
+        super(props)
+        this.state = {
+					attachmentimageurl: '',
+        }
+    }
 
-	showMessageBody(){
+	downloadAttachmentimageurl(imageid) {
+		console.log("imageid",imageid);
+		firebase.database()
+				.ref(`/content`)
+				.orderByChild("id")
+				.equalTo(parseInt(imageid))
+				.once("value")
+				.then(snapshot => {
+
+					let contents = snapshot.val()
+
+					if (contents) {
+						var keys = Object.keys(contents);
+
+						if (keys.length > 0) {
+							let content = contents[keys[0]]
+
+							firebase.storage().ref("content/" + content["tableId"] + "/" + content["name"]).getDownloadURL().then((url) => {
+								this.setState({
+									attachmentimageurl: url,
+								});
+							})
+						}
+					}
+				})
+	}
+
+	showMessageBody() {
+
 		if(this.props.messageImage.length > 0){
+
+			if (this.state.attachmentimageurl == '') {
+				this.downloadAttachmentimageurl(this.props.messageImage[0].id)
+			}
+
 			return(
 				<Image source = {{
-						uri: Constant.BLOB_URL + this.props.messageImage[0].id + '/download.json',
-						method:'GET',
-						headers: {
-								'Content-Type': 'application/json',
-								'QB-Token': this.props.token
-							},
+						uri: this.state.attachmentimageurl,
 						}}
 						style = {styles.messageImg}
 				/>
@@ -32,6 +69,7 @@ class ChatBoxUser extends Component {
 			)
 		}
 	}
+
 	render() {
 		const {userMessageContainer, messagesContainer, messageTime, messageText} = styles;
 		return (

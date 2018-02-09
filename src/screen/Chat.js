@@ -31,9 +31,15 @@ import {colors} from '../actions/const';
 import {ChatMessageBox, ChatBoxUser, ChatBoxDoctor} from './common';
 import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
+var ImagePicker = require("react-native-image-picker");
 
 var messages = []
 var currentUserid = ''
+var firbaseChatObserver = null
+
+var isCamera = false;
+var isGallery = false;
 
 class Chat extends Component {
 	constructor(props) {
@@ -44,6 +50,7 @@ class Chat extends Component {
 			protected: this.props.profile,
 			token: '',
 			userprofile: [],
+			tableId:'',
 		};
 	}
 
@@ -53,7 +60,13 @@ class Chat extends Component {
 
 		AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
 			currentUserid = value
+			console.log("USER ID IS:",currentUserid);
 			this.downloadLastUserFirebase()
+		})
+
+		AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+			console.log("tableId is:",value);
+			this.setState({tableId: value })
 		})
 	}
 
@@ -66,7 +79,12 @@ class Chat extends Component {
 		}
 	}
 
-    getChatMessage() {
+	componentWillUnmount() {
+		console.log("componentWillUnmount");
+	}
+
+
+getChatMessage() {
 		var {params} = this.props.navigation.state
         messages = []
         AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
@@ -105,9 +123,54 @@ class Chat extends Component {
         })
     }
 
-		getChatMessageFirebase() {
+
+getChatMessageFirebase() {
 			var {params} = this.props.navigation.state
 			messages = []
+
+
+			console.log("Dialog id is:",params.Dialog._id);
+			/*
+			if (firbaseChatObserver) {
+				if (firbaseChatObserver) firbaseChatObserver.off();
+				if (firbaseChatObserver) firbaseChatObserver.off('child_added');
+			}
+
+				firbaseChatObserver = firebase.database().ref(`/chats`).orderByChild("chat_dialog_id").equalTo(params.Dialog._id).limitToFirst(20)
+
+						firbaseChatObserver.on('child_added', (snapshot) => {
+
+							console.log("firbaseChatObserver child_added:",snapshot.val());
+
+							if (snapshot.val()) {
+
+								let chatobj =  snapshot.val();
+
+								if (!chatobj["attachments"]) {
+										chatobj["attachments"] = [];
+								}
+								messages.push(chatobj)
+
+								if (messages.length > 0) {
+									messages.sort(function(a, b) {
+											var keyA = a.date_sent,
+													keyB = b.date_sent;
+											if(keyA > keyB) return -1;
+											if(keyA < keyB) return 1;
+											return 0;
+									});}
+
+									console.log("messages :",messages);
+
+									this.setState({messages:messages,loading: false})
+
+								} else {
+									this.setState({ loading: false })
+								}
+							})*/
+
+
+
 
 			firebase.database()
 					.ref(`/chats`)
@@ -130,16 +193,70 @@ class Chat extends Component {
 									messages.push(chatobj[keys[i]])
 								}
 
+								if (messages.length > 0) {
+									messages.sort(function(a, b) {
+											var keyA = a.date_sent,
+													keyB = b.date_sent;
+											if(keyA > keyB) return -1;
+											if(keyA < keyB) return 1;
+											return 0;
+									});}
+
 						  		console.log("messages :",messages);
+
+									this.setState({messages:messages,loading: false})
+
+									this.updateChats()
+
+								} else {
+									this.setState({ loading: false })
+								}
+					})
+		}
+
+		updateChats() {
+			var {params} = this.props.navigation.state
+
+			if (firbaseChatObserver) {
+				if (firbaseChatObserver) firbaseChatObserver.off();
+				if (firbaseChatObserver) firbaseChatObserver.off('child_added');
+			}
+
+				firbaseChatObserver = firebase.database().ref(`/chats`).orderByChild("chat_dialog_id").equalTo(params.Dialog._id).limitToLast(10)
+
+						firbaseChatObserver.on('child_added', (snapshot) => {
+
+							console.log("firbaseChatObserver child_added:",snapshot.val());
+
+							if (snapshot.val()) {
+
+								let chatobj =  snapshot.val();
+
+								if (!chatobj["attachments"]) {
+										chatobj["attachments"] = [];
+								}
+
+								var isFound = false
+								for (var i = 0; i < messages.length; i++) {
+											let message =	messages[i]
+											if (chatobj["_id"] == message["_id"]) {
+												isFound = true
+											}
+								}
+
+								if (!isFound) {
+									messages.unshift(chatobj)
+								}
+
+									console.log("messages :",messages);
 
 									this.setState({messages:messages,loading: false})
 
 								} else {
 									this.setState({ loading: false })
-
+								}
+								})
 							}
-					})
-		}
 
 	downloadLastUser() {
 
@@ -243,6 +360,46 @@ class Chat extends Component {
 		).start();
 	}
 
+	sendMessageFirebase(text) {
+		console.log("Send message tapped...");
+
+		var updates = {};
+		var newKey = firebase.database().ref().child('chats').push().key;
+
+		var {params} = this.props.navigation.state
+
+		var milliseconds = (new Date).getTime()/1000|0;
+		console.log(milliseconds);
+
+		var date = new Date();
+		console.log(date.toISOString());
+
+
+		var chatdict = {
+      "_id" : newKey,
+      "chat_dialog_id" : params.Dialog._id,
+      "created_at" : date,
+      "date_sent" : milliseconds,
+      "delivered_ids" : [],
+      "latitude" : "",
+      "longitude" : "",
+      "message" : text,
+      "read" : 0,
+      "read_ids" : [],
+      "recipient_id" : "",
+      "send_to_chat" : "1",
+      "sender_id" : currentUserid,
+      "updated_at" : date
+    }
+
+		updates['/chats/' + newKey] = chatdict;
+		firebase.database().ref().update(updates)
+
+		//TODO: update chat dialog
+
+		this.updateChats()
+	}
+
 	sendMessage(text) {
 		var newArray = []
 		var {params} = this.props.navigation.state
@@ -275,7 +432,7 @@ class Chat extends Component {
 					recipient_id: responseData.recipient_id,
 					sender_id: responseData.sender_id,
 					updated_at: responseData.updated_at,
-   					read: responseData.read,
+					read: responseData.read,
 				});
 
 				for(var i = 0; i<this.state.messages.length; i++) {
@@ -411,14 +568,14 @@ class Chat extends Component {
 			return (
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessage(text)}/>
+					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile}/>
 				</KeyboardAvoidingView>
 			);
 		} else {
 			return (
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessage(text)}/>
+					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile}/>
 				</KeyboardAvoidingView>
 			);
 		}
@@ -430,12 +587,7 @@ class Chat extends Component {
 		return(
 			<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('Profile', {UserInfo: this.state.userprofile})}>
 				<Image source = {{
-					uri: Constant.BLOB_URL + params.Dialog.blob_id + '/download.json',
-					method:'GET',
-					headers: {
-							'Content-Type': 'application/json',
-							'QB-Token': params.Token,
-						},
+					uri: this.state.userprofile["profileurl"],
 					}}
 					defaultSource = {require('../assets/img/user_placeholder.png')}
 					style = {styles.menuIcon} />
@@ -443,7 +595,189 @@ class Chat extends Component {
 		)
 	}
 
+
+		 onCamera = () => {
+			 isCamera = true
+			 isGallery = false
+			 this.popupDialog.dismiss()
+			 this.showPicker()
+
+		 }
+
+	    onGallery = () => {
+				isCamera = false
+				isGallery = true
+				this.popupDialog.dismiss()
+				this.showPicker()
+			}
+
+	    onCancel = () => {
+				this.popupDialog.dismiss()
+	    }
+
+			_onClickedFile = () => {
+				this.popupDialog.show()
+			}
+
+			showPicker() {
+				const options = {
+					quality: 1.0,
+					maxWidth: 200,
+					maxHeight: 200,
+					storageOptions: {
+					skipBackup: true,
+					cameraRoll: true,
+					waitUntilSaved: true
+					}
+				}
+
+				if(isCamera) {
+					ImagePicker.launchCamera(options, (response)  => {
+						console.log('Response = ', response);
+
+						if (response.didCancel) {
+							console.log('User cancelled image picker');
+						}
+						else if (response.error) {
+							console.log('ImagePicker Error: ', response.error);
+						}
+						else if (response.customButton) {
+							console.log('User tapped custom button: ', response.customButton);
+						}
+						else {
+							var source = ''
+							console.log("ProfileScreen.js Platform: ", Platform);
+							if (Platform.OS === 'ios') {
+								source = {uri: response.uri.replace('file://', ''), isStatic: true};
+							} else {
+								source = {uri: response.uri, isStatic: true};
+							}
+							console.log(source)
+							this.sendPhotoMessage(source, response.fileName)
+						}
+					});
+				} else {
+					ImagePicker.launchImageLibrary(options, (response)  => {
+						console.log('Response = ', response);
+
+						// console.log('Response Data = ', response.data);
+
+						if (response.didCancel) {
+							console.log('User cancelled image picker');
+						}
+						else if (response.error) {
+							console.log('ImagePicker Error: ', response.error);
+						}
+						else if (response.customButton) {
+							console.log('User tapped custom button: ', response.customButton);
+						} else {
+							var source = ''
+							// console.log("ProfileScreen.js Platform: ", Platform);
+							// if (Platform.OS === 'ios') {
+								 source = response.uri.replace('file://', '');
+								// source = response.uri
+							// } else {
+							// 	source = {uri: response.uri, isStatic: true};
+							// }
+							console.log(source)
+							this.sendPhotoMessage(source, response.fileName)
+						}
+					});
+				}
+			}
+
+			sendPhotoMessage(source, fileName) {
+				//Upload Image to firebase
+
+				firebase.storage().ref("content/" + this.state.tableId + "/" + fileName).putFile(source)
+				.on('state_changed', (snapshot) => {
+
+				}, (err) => {
+					console.log("Error " + err);
+
+					Alert("Image can not uploaded!")
+
+				}, (uploadedAsset) => {
+					console.log("Image uploaded successfully.");
+
+
+					var updates = {};
+					var newKey = firebase.database().ref().child('chats').push().key;
+
+					var {params} = this.props.navigation.state
+
+					var milliseconds = (new Date).getTime()/1000|0;
+					console.log(milliseconds);
+
+					var date = new Date();
+					console.log(date.toISOString());
+
+					let chatdict = {
+						"_id" : newKey,
+						"attachments" : [ {
+							"id" : milliseconds.toString(),
+							"name" : fileName,
+							"type" : "photo"
+						} ],
+						"chat_dialog_id" : params.Dialog._id,
+						"created_at" : date.toISOString(),
+						"date_sent" : milliseconds,
+						"delivered_ids" : [],
+						"message" : fileName,
+						"read" : 1,
+						"read_ids" : [ ],
+						"recipient_id" : "",
+						"sender_id" : currentUserid,
+						"updated_at" : date.toISOString()
+					}
+
+					updates['/chats/' + newKey] = chatdict;
+					firebase.database().ref().update(updates)
+
+					//Update content
+					var updatescontent = {};
+					var newKeycontent = firebase.database().ref().child('content').push().key;
+
+					let content = {
+						"blob_status" : "complete",
+						"content_type" : "image/jpeg",
+						"created_at" : date.toISOString(),
+						"id" : milliseconds,
+						"name" : fileName,
+						"public" : false,
+						"set_completed_at" : date.toISOString(),
+						"size" : 0,
+						"tableId" : this.state.tableId,
+						"uid" : this.uidString(),
+						"updated_at" : date.toISOString(),
+						"userid" : currentUserid
+					}
+
+					updatescontent['/content/' + newKeycontent] = content;
+					firebase.database().ref().update(updatescontent)
+
+					//Update User  content
+					var newKeyUsercontent = firebase.database().ref().child('users').child('content').push().key;
+
+					updatescontent['/users/' + this.state.tableId  + '/content/'+ newKeycontent] = content;
+					firebase.database().ref().update(updatescontent)
+
+					//TODO: update chat dialog
+					this.updateChats()
+
+				});
+			}
+
+			uidString() {
+	  		return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    		var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    		return v.toString(16);
+			});
+
+}
+
 	render() {
+
 		var {params} = this.props.navigation.state
 		return (
 			<View style={styles.container}>
@@ -457,6 +791,28 @@ class Chat extends Component {
                 <View style = {styles.bodyView}>
                     {this.renderChat()}
                 </View>
+
+								<PopupDialog
+														ref={(popupDialog) => { this.popupDialog = popupDialog; }}
+														//dialogStyle = {styles.dialogView}
+														overlayBackgroundColor = {'black'}
+														overlayOpacity = {0.9}
+														height = {200}
+														width = {280}
+														>
+														<View style = {{backgroundColor:'white', padding: 15, borderRadius: 10}}>
+																<Text style = {{textAlign:'left', margin: 10, fontSize: 20, fontWeight: 'bold'}}>Select file</Text>
+																<TouchableOpacity onPress = {this.onCamera}>
+																		<Text style = {{textAlign:'left', fontSize: 17, marginTop: 10, marginLeft: 10}}>Take from camera</Text>
+																</TouchableOpacity>
+																<TouchableOpacity onPress = {this.onGallery}>
+																		<Text style = {{textAlign:'left', fontSize: 17, marginTop: 20, marginLeft: 10}}>Choose from gallery</Text>
+																</TouchableOpacity>
+																<TouchableOpacity onPress = {this.onCancel}>
+																		<Text style = {{textAlign:'left', fontSize: 17, marginTop: 20, marginLeft: 10}}>Cancel</Text>
+																</TouchableOpacity>
+														</View>
+												</PopupDialog>
 			</View>
 		);
 	}

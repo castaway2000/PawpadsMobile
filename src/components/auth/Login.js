@@ -37,10 +37,10 @@ class Login extends Component {
         header: null
     };
 
-    constructor(props){
+    constructor(props) {
         super(props)
         this.state = {
-            name: 'cris', //cris 1BITJAY_1875640410  howsonanna stad
+            name: 'cris', //cris 1BITJAY_1875640410  howsonanna stad blaze test001
             password: '12345678',
             qb_token: '',
             loading: this.props.loading,
@@ -597,6 +597,7 @@ class Login extends Component {
               var updates = {};
               var newKey = firebase.database().ref().child('users').push().key;
               responseData.user.password = ciphertext
+              responseData.user.id = responseData.user.id.toString()
               responseData.user["firid"] = newKey
               updates['/users/' + newKey] = responseData.user;
               firebase.database().ref().update(updates)
@@ -666,6 +667,7 @@ class Login extends Component {
                   var updates = {};
                   var newKey = firebase.database().ref().child('users').push().key;
                   responseData.user.password = ciphertext
+                  responseData.user.id = responseData.user.id.toString()
                   responseData.user["firid"] = newKey
                   updates['/users/' + newKey] = responseData.user;
                   firebase.database().ref().update(updates)
@@ -776,6 +778,7 @@ class Login extends Component {
             var updates = {};
             var newKey = firebase.database().ref().child('users').push().key;
             responseData.user.password = ciphertext
+            responseData.user.id = responseData.user.id.toString()
             responseData.user["firid"] = newKey
             updates['/users/' + newKey] = responseData.user;
             firebase.database().ref().update(updates)

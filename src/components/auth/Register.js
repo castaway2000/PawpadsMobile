@@ -208,6 +208,13 @@ class Register extends Component {
 
                           updates['/users/' + newKey] = user;
                           firebase.database().ref().update(updates)
+
+                          //Save to local storage
+                          AsyncStorage.setItem(Constant.USER_TABEL_ID, newKey);
+                          AsyncStorage.setItem(Constant.QB_USERID, newKey);
+                          AsyncStorage.setItem(Constant.USER_FULL_NAME, this.state.name);
+                          AsyncStorage.setItem(Constant.USER_EMAIL, this.state.email);
+
                           this.props.navigation.goBack()
                         }
                     })

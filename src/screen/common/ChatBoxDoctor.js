@@ -10,21 +10,25 @@ import {
 } from 'react-native';
 import {colors} from '../../actions/const';
 import Constant from '../../common/Constant'
+import RNFirebase from 'react-native-firebase';
+
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 class ChatBoxDoctor extends Component {
 	constructor(props) {
         super(props)
         this.state = {
-            refresh: false,
-			distancerefresh: false,
-			blob_id:'',
-			userprofile: [],
-			distance_unit: 'km',
-			distance: Number,
+					refresh: false,
+					distancerefresh: false,
+					blob_id:'',
+					userprofile: [],
+					distance_unit: 'km',
+					distance: Number,
+					attachmentimageurl:'',
         }
     }
 
-	downloadLastUser(last_message_userid){
+	downloadLastUser(last_message_userid) {
 		AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
 			var REQUEST_URL = Constant.USERS_URL +  last_message_userid +'.json'
 			fetch(REQUEST_URL, {
@@ -46,8 +50,86 @@ class ChatBoxDoctor extends Component {
 				console.log(e)
 			})
 		})
+	}
 
-    }
+		downloadLastUserFirebase(last_message_userid) {
+
+			console.log("last_message_userid IS a a:",last_message_userid);
+			firebase.database()
+					.ref(`/users`)
+					.orderByChild("id")
+					.equalTo(last_message_userid.toString())
+					.once("value")
+					.then(snapshot => {
+
+						if (snapshot.val()) {
+							var profileObj = snapshot.val();
+
+							if (profileObj) {
+								let keys = Object.keys(profileObj);
+
+								console.log("profileObj IS a a:",profileObj);
+
+								var profile = null;
+								if (keys.length > 0) {
+									profile = profileObj[keys[0]]
+								}
+
+								if (profile) {
+
+									if (profile["content"]) {
+
+										for (let item in profile["content"]) {
+											let content = profile["content"][item]
+											let blobid =  content["id"]
+
+											if (blobid == profile["blob_id"]) {
+
+												firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
+													console.log("url IS a a:",url);
+
+													this.setState({
+														userprofile: profile,
+														blob_id: url,
+														refresh: true
+													});
+
+												})
+											}
+										}
+									}
+								}
+							}
+						}
+					})
+		}
+
+		downloadAttachmentimageurl(imageid) {
+			console.log("imageid",imageid);
+			firebase.database()
+					.ref(`/content`)
+					.orderByChild("id")
+					.equalTo(parseInt(imageid))
+					.once("value")
+					.then(snapshot => {
+
+						let contents = snapshot.val()
+
+						if (contents) {
+							var keys = Object.keys(contents);
+
+							if (keys.length > 0) {
+								let content = contents[keys[0]]
+
+								firebase.storage().ref("content/" + content["tableId"] + "/" + content["name"]).getDownloadURL().then((url) => {
+									this.setState({
+										attachmentimageurl: url,
+									});
+								})
+							}
+						}
+					})
+				}
 
 	showUserProfiel  = () => {
 		this.props.navigation.navigate('Profile', {UserInfo: this.state.userprofile})
@@ -58,12 +140,7 @@ class ChatBoxDoctor extends Component {
 			return(
 				<TouchableOpacity onPress = {() => this.showUserProfiel()}>
 					<Image source = {{
-						uri: Constant.BLOB_URL + this.state.blob_id + '/download.json',
-						method:'GET',
-						headers: {
-								'Content-Type': 'application/json',
-								'QB-Token': this.state.token
-							},
+						uri: this.state.blob_id
 						}}
 						style={styles.messagePhoto}
 						defaultSource = {require('../../assets/img/user_placeholder.png')} />
@@ -120,22 +197,25 @@ class ChatBoxDoctor extends Component {
 	}
 
 	showMessageBody(){
+
+		console.log("Doctor : this.props.messageImage.length",this.props.messageImage);
+
 		if(this.props.messageImage.length > 0){
+
+			if (this.state.attachmentimageurl == '') {
+ 				this.downloadAttachmentimageurl(this.props.messageImage[0].id)
+			}
+
 			return(
 				<View style={styles.doctorMessageImageContainer}>
 					<Image source = {{
-							uri: Constant.BLOB_URL + this.props.messageImage[0].id + '/download.json',
-							method:'GET',
-							headers: {
-									'Content-Type': 'application/json',
-									'QB-Token': this.state.token
-								},
+							uri: this.state.attachmentimageurl,
 							}}
 							style = {styles.messageImg}
 					/>
 				</View>
 			)
-		}else if (this.props.messageSticker) {
+		} else if (this.props.messageSticker) {
 			return(
 				<View style={styles.doctorMessageImageContainer}>
 					<Image source = {{
@@ -166,7 +246,7 @@ class ChatBoxDoctor extends Component {
 			<View style = {messagesContainer}>
 				<Text style={messageTime}>{this.props.messageLocalTimestamp}</Text>
 				<View style = {{flexDirection:'row', alignItems:'flex-end', marginTop:3}}>
-					{this.state.refresh == false? this.downloadLastUser(this.props.messageSenderPhoto) : null}
+					{this.state.refresh == false? this.downloadLastUserFirebase(this.props.messageSenderPhoto) : null}
 					{this.showUserphoto()}
 					{this.showMessageBody()}
 

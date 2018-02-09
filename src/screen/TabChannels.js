@@ -44,11 +44,13 @@ render() {
             <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => tmpThis.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})} key = {this.props.index}>
               {tmpThis.state.refresh == false? tmpThis.downloadLastUserFirebase(data.last_message_user_id) : null}
               {tmpThis.state.refresh1 == false? tmpThis.downloadGroupPhotoFirebase(data.photo,data._id) : null}
+              <View style = {styles.menuIcon} >
               <Image source = {{
                   uri: data.photo
                   }}
                   defaultSource = {require('../assets/img/user_placeholder.png')}
                   style = {styles.menuIcon} />
+                  </View>
               <View style = {{flex: 1, marginLeft: 15}}>
                   <Text style = {styles.menuItem}>{data.name}</Text>
                   <View style = {{flexDirection:'row',marginTop: 5}}>
@@ -418,12 +420,13 @@ class TabChannels extends Component {
                         {this.state.refresh == false? this.downloadLastUserFirebase(data.last_message_user_id) : null}
 
                         {this.state.refresh1 == false? this.downloadGroupPhotoFirebase(data.photo,data._id) : null}
-
+                        <View style = {styles.menuIcon} >
                         <Image source = {{
                             uri: data.photo
                             }}
                             defaultSource = {require('../assets/img/user_placeholder.png')}
                             style = {styles.menuIcon} />
+                            </View>
                         <View style = {{flex: 1, marginLeft: 15}}>
                             <Text style = {styles.menuItem}>{data.name}</Text>
                             <View style = {{flexDirection:'row',marginTop: 5}}>
@@ -540,6 +543,7 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
+        backgroundColor: '#f1eff0',
     },
     chatBtn: {
         position:'absolute',
