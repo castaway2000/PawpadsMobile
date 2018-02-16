@@ -11,6 +11,7 @@ import Constant from '../../common/Constant'
 import RNFirebase from 'react-native-firebase';
 
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+import {CachedImage} from 'react-native-img-cache';
 
 class ChatBoxUser extends Component {
 	constructor(props) {
@@ -56,7 +57,7 @@ class ChatBoxUser extends Component {
 			}
 
 			return(
-				<Image source = {{
+				<CachedImage source = {{
 						uri: this.state.attachmentimageurl,
 						}}
 						style = {styles.messageImg}

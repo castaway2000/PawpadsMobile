@@ -14,13 +14,15 @@ import RNFirebase from 'react-native-firebase';
 
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
+import {CachedImage} from 'react-native-img-cache';
+
 class ChatBoxDoctor extends Component {
 	constructor(props) {
         super(props)
         this.state = {
 					refresh: false,
 					distancerefresh: false,
-					blob_id:'',
+					profileurl:'',
 					userprofile: [],
 					distance_unit: 'km',
 					distance: Number,
@@ -86,15 +88,32 @@ class ChatBoxDoctor extends Component {
 											if (blobid == profile["blob_id"]) {
 
 												firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
-													console.log("url IS a a:",url);
-
+													console.log("url IS a a:",url); //profileurl
+													profile.profileurl = url;
 													this.setState({
 														userprofile: profile,
-														blob_id: url,
+														profileurl: url,
 														refresh: true
 													});
 
 												})
+											}
+
+											if(profile.custom_data) {
+												var json = JSON.parse(profile.custom_data)
+
+												if (blobid == json["backgroundId"]) {
+													let path = "content/" + profile["firid"] + "/" + profile["content"][item]["name"]
+													console.log('coverPictureURL path:', path);
+
+													firebase.storage().ref(path).getDownloadURL().then((url) => {
+														console.log("coverPictureURL IS a a:",url);
+														this.state.userprofile["coverPictureURL"] = url;
+														this.setState({
+															userprofile: profile,
+														});
+													})
+												}
 											}
 										}
 									}
@@ -140,7 +159,7 @@ class ChatBoxDoctor extends Component {
 			return(
 				<TouchableOpacity onPress = {() => this.showUserProfiel()}>
 					<Image source = {{
-						uri: this.state.blob_id
+						uri: this.state.profileurl
 						}}
 						style={styles.messagePhoto}
 						defaultSource = {require('../../assets/img/user_placeholder.png')} />
@@ -152,6 +171,7 @@ class ChatBoxDoctor extends Component {
 		}
 
 	}
+
 	showUserName(){
 		return(
 			<Text style={styles.messageTime}>
@@ -175,15 +195,30 @@ class ChatBoxDoctor extends Component {
 		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
 		return earthRadiusKm * c
 	}
+
 	showUserDistance(){
+
 		{this.state.distancerefresh == false?
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
 					var distance = this.distanceInKmBetweenEarthCoordinates(Math.round(this.props.latitude), Math.round(position.coords.latitude), Math.round(this.props.longitude), Math.round(position.coords.longitude))
-					this.setState({
-						distance: distance.toFixed(2),
-						distancerefresh: true,
-					})
+
+					AsyncStorage.getItem(Constant.SETTINGS_DISTANCE_UNIT).then((value) => {
+	            if(value){
+	                this.setState({ distance_unit: value })
+
+									if (this.state.distance_unit == 'miles') {
+										distance = distance/1.60934
+									}
+
+									this.setState({
+										distance: distance.toFixed(2),
+										distancerefresh: true,
+									})
+	            }
+	        })
+
+
 				},
 				(error) => this.setState({error: error.message}),
             	{enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
@@ -192,7 +227,7 @@ class ChatBoxDoctor extends Component {
 		}
 
 		return(
-			<Text style={[styles.messageTime, styles.messageDistance]}>{this.state.distance} km</Text>
+			<Text style={[styles.messageTime, styles.messageDistance]}>{this.state.distance} {this.state.distance_unit}</Text>
 		)
 	}
 
@@ -208,7 +243,7 @@ class ChatBoxDoctor extends Component {
 
 			return(
 				<View style={styles.doctorMessageImageContainer}>
-					<Image source = {{
+					<CachedImage source = {{
 							uri: this.state.attachmentimageurl,
 							}}
 							style = {styles.messageImg}

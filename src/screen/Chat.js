@@ -34,6 +34,8 @@ const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
 var ImagePicker = require("react-native-image-picker");
 
+import {CachedImage} from 'react-native-img-cache';
+
 var messages = []
 var currentUserid = ''
 var firbaseChatObserver = null
@@ -338,6 +340,23 @@ getChatMessageFirebase() {
 																	});
 																})
 															}
+
+															if(profile.custom_data) {
+																var json = JSON.parse(profile.custom_data)
+
+																if (blobid == json["backgroundId"]) {
+																	let path = "content/" + profile["firid"] + "/" + profile["content"][item]["name"]
+																	console.log('coverPictureURL path:', path);
+
+																	firebase.storage().ref(path).getDownloadURL().then((url) => {
+																		console.log("coverPictureURL IS a a:",url);
+																		this.state.userprofile["coverPictureURL"] = url;
+																		this.setState({
+																			userprofile: profile,
+																		});
+																	})
+																}
+															}
 														}
 													}
 												}
@@ -345,7 +364,7 @@ getChatMessageFirebase() {
 										}
 									})
 								}
-		}
+							}
 
 
 	animateChatBoxUser() {
@@ -586,7 +605,7 @@ getChatMessageFirebase() {
 		var {params} = this.props.navigation.state
 		return(
 			<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('Profile', {UserInfo: this.state.userprofile})}>
-				<Image source = {{
+				<CachedImage source = {{
 					uri: this.state.userprofile["profileurl"],
 					}}
 					defaultSource = {require('../assets/img/user_placeholder.png')}
@@ -689,24 +708,15 @@ getChatMessageFirebase() {
 			sendPhotoMessage(source, fileName) {
 				//Upload Image to firebase
 
-				firebase.storage().ref("content/" + this.state.tableId + "/" + fileName).putFile(source)
-				.on('state_changed', (snapshot) => {
-
-				}, (err) => {
-					console.log("Error " + err);
-
-					Alert("Image can not uploaded!")
-
-				}, (uploadedAsset) => {
-					console.log("Image uploaded successfully.");
-
+				firebase.storage().ref("content/" + this.state.tableId + "/" + fileName).putFile(source)  .then(uploadedFile => {
+          console.log('Uploaded to firebase:', uploadedFile)
 
 					var updates = {};
 					var newKey = firebase.database().ref().child('chats').push().key;
 
 					var {params} = this.props.navigation.state
 
-					var milliseconds = (new Date).getTime()/1000|0;
+					var milliseconds = (new Date).getTime();
 					console.log(milliseconds);
 
 					var date = new Date();
@@ -764,8 +774,7 @@ getChatMessageFirebase() {
 
 					//TODO: update chat dialog
 					this.updateChats()
-
-				});
+        })
 			}
 
 			uidString() {

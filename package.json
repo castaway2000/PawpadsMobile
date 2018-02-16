@@ -20,6 +20,7 @@
     "react-native-firebase": "^3.1.1",
     "react-native-icon-checkbox": "^1.2.0",
     "react-native-image-picker": "^0.26.7",
+    "react-native-img-cache": "^1.5.3",
     "react-native-keyboard-aware-scroll-view": "^0.3.0",
     "react-native-maps": "^0.17.0",
     "react-native-popup-dialog": "^0.9.36",

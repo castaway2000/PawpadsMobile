@@ -15,7 +15,8 @@ import {
 	StatusBar,
 	ListView,
     AsyncStorage,
-	RefreshControl
+	RefreshControl,
+	Alert
 } from 'react-native';
 import {
 	START_LOAD_CHAT_MESSAGE,
@@ -610,15 +611,8 @@ class ChatGroup extends Component {
 	sendPhotoMessage(source, fileName) {
 		//Upload Image to firebase
 
-		firebase.storage().ref("content/" + this.state.tableId + "/" + fileName).putFile(source)
-		.on('state_changed', (snapshot) => {
-
-		}, (err) => {
-			console.log("Error " + err);
-
-			Alert("Image can not uploaded!")
-
-		}, (uploadedAsset) => {
+		firebase.storage().ref("content/" + this.state.tableId + "/" + fileName).putFile(source) .then(uploadedFile => {
+			console.log('Uploaded to firebase:', uploadedFile)
 			console.log("Image uploaded successfully.");
 
 
@@ -627,7 +621,7 @@ class ChatGroup extends Component {
 
 			var {params} = this.props.navigation.state
 
-			var milliseconds = (new Date).getTime()/1000|0;
+			var milliseconds = (new Date).getTime();
 			console.log(milliseconds);
 
 			var date = new Date();
@@ -680,13 +674,13 @@ class ChatGroup extends Component {
 			//Update User  content
 			var newKeyUsercontent = firebase.database().ref().child('users').child('content').push().key;
 
-			updatescontent['/users/' + this.state.tableId  + '/content/'+ newKeycontent] = content;
-			firebase.database().ref().update(updatescontent)
+			var updatescontent1 = {};
+			updatescontent1['/users/' + this.state.tableId  + '/content/'+ newKeyUsercontent] = content;
+			firebase.database().ref().update(updatescontent1)
 
 			//TODO: update chat dialog
 			this.updateChats()
-
-		});
+		})
 	}
 
 	uidString() {

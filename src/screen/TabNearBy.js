@@ -20,6 +20,14 @@ import {
 import Constant from '../common/Constant'
 import { connect } from 'react-redux'
 
+import {
+    DrawerNavigator,
+    StackNavigator } from 'react-navigation'
+var { Router, Scene } = require('react-native-router-flux');
+
+import SideBar from '../components/sidebar/SideBar'
+
+
 import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 firebase.database().goOnline()
@@ -27,6 +35,8 @@ firebase.database().goOnline()
 // Geofire
 import { initializeApp } from 'firebase'
 const geofire = require('geofire');
+
+import {CachedImage} from "react-native-img-cache";
 
 const firebaseApp = initializeApp({
   apiKey: Constant.FIREBASE_API_KEY,
@@ -43,7 +53,8 @@ var datamigrationobj = null
 
 // create a component
 class TabNearBy extends Component {
-    constructor(props){
+
+    constructor(props) {
         super(props)
         this.state = {
             loading: true,
@@ -89,6 +100,8 @@ class TabNearBy extends Component {
         //this.loadData()
         this.loadDataFirebase()
         //this._getUsers()
+
+
     }
 
     loadData() {
@@ -136,16 +149,25 @@ class TabNearBy extends Component {
         );
     }
 
+     isNumeric(n) {
+       return !isNaN(parseFloat(n)) && isFinite(n);
+     }
+
     loadDataFirebase() {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                this.setState({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    error: null,
-                })
-                this._saveUserLocation()
-                this._queryuser()
+
+              if (position.coords.latitude && position.coords.longitude) {
+                if (this.isNumeric(position.coords.latitude) && this.isNumeric(position.coords.longitude)) {
+                  this.setState({
+                      latitude: position.coords.latitude,
+                      longitude: position.coords.longitude,
+                      error: null,
+                  })
+                  this._saveUserLocation()
+                  this._queryuser()
+                }
+              }
             },
             (error) => this.setState({error: error.message}),
             {
@@ -155,91 +177,136 @@ class TabNearBy extends Component {
     }
 
     _queryuser = () => {
-      const geofireRef = new geofire(firebaseApp.database().ref('geofire/'))
 
-      var radious = 0
-      if (this.state.distance_unit == 'km') {
-        radious = parseInt(this.state.search_range)
-      } else {
-        radious = parseInt(this.state.search_range)*1.60934
-      }
+      if (this.state.latitude && this.state.longitude) {
+        const geofireRef = new geofire(firebaseApp.database().ref('geofire/'))
 
-      var geoQuery = geofireRef.query({
-        center: [this.state.latitude, this.state.longitude],
-        radius: radious
-      });
+        var radious = 0
+        if (this.state.distance_unit == 'km') {
+          radious = parseInt(this.state.search_range)
+        } else {
+          radious = parseInt(this.state.search_range)*1.60934
+        }
 
-      var onKeyEnteredRegistration = geoQuery.on("key_entered", function(key, location) {
-         console.log(key + " entered the query. Hi " + key + "!");
+        var geoQuery = geofireRef.query({
+          center: [this.state.latitude, this.state.longitude],
+          radius: radious
+        });
 
-         //Get all data
-         firebase.database()
-         .ref('users/' + key)
-         .once("value")
-         .then(snapshot => {
-           if (snapshot.val()) {
+        var onKeyEnteredRegistration = geoQuery.on("key_entered", function(key, location) {
+           console.log(key + " entered the query. Hi " + key + "!");
 
-             console.log("snapshot is:",snapshot.val());
+           //Get all data
+           firebase.database()
+           .ref('users/' + key)
+           .once("value")
+           .then(snapshot => {
+             if (snapshot.val()) {
 
-             var profile = snapshot.val();
+               console.log("snapshot is:",snapshot.val());
 
-             if (profile["firid"] != datamigrationobj.state.tableId) {
+               var profile = snapshot.val();
 
-               if (profile["content"]) {
+               if (profile["firid"] != datamigrationobj.state.tableId) {
 
-                 for (let item in profile["content"]) {
 
-                   let content = profile["content"][item]
-                   let blobid =  content["id"]
 
-                   if (blobid == profile["blob_id"]) {
-                     datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
-                     firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
-                       profile["profileImageURL"] =  url;
-                       console.log("image loaded:",url);
-                       datamigrationobj.state.nearByUsers.push(profile)
-                       datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
-                     })
+                 let index =  datamigrationobj.state.nearByUsers.indexOf(profile)
+
+                 if (profile["content"]) {
+
+                   for (let item in profile["content"]) {
+
+                     let content = profile["content"][item]
+                     let blobid =  content["id"]
+
+                     //datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
+
+                     if (blobid == profile["blob_id"]) {
+
+                       firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
+
+
+                         profile["profileurl"] =  url; //profileurl
+
+                         console.log("image loaded:",url);
+
+
+                         datamigrationobj.state.nearByUsers.push(profile)
+                         datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
+
+                       })
+                     }
+
+                     if(profile.custom_data) {
+                       var json = JSON.parse(profile.custom_data)
+
+                       if (blobid == json["backgroundId"]) {
+                         let path = "content/" + profile["firid"] + "/" + profile["content"][item]["name"]
+                         console.log('path:', path);
+
+                         firebase.storage().ref(path).getDownloadURL().then((url) => {
+                           console.log("url IS a a:",url);
+
+                            profile["coverPictureURL"] =  url; //profileurl
+
+                         })
+                       }
+                     }
+
                    }
+                 } else {
+                   datamigrationobj.state.nearByUsers.push(profile)
+                   datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
                  }
-               } else {
-                 datamigrationobj.state.nearByUsers.push(profile)
-                 datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
                }
              }
-           }
-         })
-       });
+           })
+         });
 
-       var onKeyExitedRegistration = geoQuery.on("key_exited", function(key, location) {
-         console.log(key + " migrated out of the query. Bye bye :(");
-       });
+         var onKeyExitedRegistration = geoQuery.on("key_exited", function(key, location) {
+           console.log(key + " migrated out of the query. Bye bye :(");
+         });
 
-       var onKeyMovedRegistration = geoQuery.on("key_moved", function(key, location) {
-         console.log(key + " moved to somewere else within the query.");
-       });
+         var onKeyMovedRegistration = geoQuery.on("key_moved", function(key, location) {
+           console.log(key + " moved to somewere else within the query.");
+         });
 
-       var onKeyMovedRegistration = geoQuery.on("ready", function(key, location) {
-         console.log("ready!!");
-         console.log("datamigrationobj.state.nearByUsers",datamigrationobj.state.nearByUsers);
-         datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers,loading: false});
-       });
+         var onKeyMovedRegistration = geoQuery.on("ready", function(key, location) {
+           console.log("ready!!");
+           console.log("datamigrationobj.state.nearByUsers",datamigrationobj.state.nearByUsers);
+           datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers,loading: false});
+         });
+      }
+
+
     }
+
 
     _saveUserLocation = () => {
-      firebase.database().ref('users/' + this.state.tableId).update({
-        "latitude":parseFloat(this.state.latitude),
-        "longitude":parseFloat(this.state.longitude),
-      });
 
-      //Save to geofire
-      const geofireRef = new geofire(firebaseApp.database().ref('geofire/'))
-      geofireRef.set(this.state.tableId, [this.state.latitude, this.state.longitude]).then(function() {
-        console.log("Provided key has been added to GeoFire");
-      }, function(error) {
-        console.log("Error: " + error);
-      });
+      if (this.state.latitude && this.state.latitude && this.state.longitude) {
+        firebase.database().ref('users/' + this.state.tableId).update({
+          "latitude":parseFloat(this.state.latitude),
+          "longitude":parseFloat(this.state.longitude),
+        });
+
+
+        //Save to geofire
+        const geofireRef = new geofire(firebaseApp.database().ref('geofire/'))
+
+        console.log("this.state.tableId",this.state.tableId);
+        console.log("this.state.latitude",this.state.latitude);
+        console.log("this.state.longitude",this.state.longitude);
+
+        geofireRef.set(this.state.tableId, [this.state.latitude, this.state.longitude]).then(function() {
+          console.log("Provided key has been added to GeoFire");
+        }, function(error) {
+          console.log("Error: " + error);
+        });
+      }
     }
+
 
     _onRefresh() {
         this.setState({refreshing: true});
@@ -250,6 +317,7 @@ class TabNearBy extends Component {
         }, 2000)
     }
 
+
     renderNearBy() {
         if(this.state.loading) {
             return (
@@ -257,26 +325,23 @@ class TabNearBy extends Component {
 					<ActivityIndicator color={'black'} size={'large'}/>
 				</View>
 			);
-        }
-        else{
+        } else{
             if(this.state.nearByUsers){
                 return(
                     <List
                         refreshControl={
                             <RefreshControl
                                 refreshing={this.state.refreshing}
-                                onRefresh={this._onRefresh.bind(this)}
-                            />
+                                onRefresh={this._onRefresh.bind(this)}/>
                         }
                         style = {styles.mList}
                         dataArray={this.state.nearByUsers}
                         renderRow={data =>
                             <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})} style = {{height:70}}>
                             <View style = {styles.menuIcon} >
-                                <Image  source={{uri: data["profileImageURL"]}}
+                                <CachedImage source={{uri: data["profileurl"]}}
                                   defaultSource = {require('../assets/img/user_placeholder.png')}
-                                  style = {styles.menuIcon}
-                                />
+                                  style = {styles.menuIcon}/>
                                 </View>
                                 {data.full_name?
                                     <Text style = {styles.menuItem}>{data.full_name}</Text> :

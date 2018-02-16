@@ -5,10 +5,11 @@ import { Container, Header, Content, Button } from 'native-base';
 import Constant from '../common/Constant'
 import reactNativeKeyboardAwareScrollView from 'react-native-keyboard-aware-scroll-view';
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
+import {CachedImage} from 'react-native-img-cache';
 
 // create a component
 class Profile extends Component {
-    constructor(props){
+    constructor(props) {
         super(props)
         this.state = {
             isalert: false,
@@ -21,13 +22,19 @@ class Profile extends Component {
             userid:'',
         }
     }
+
     componentWillMount() {
+
+      console.log(Profile.js);
+
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             this.setState({ token: token })
         })
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
             this.setState({ userid: value })
         })
+
+        console.log('Profile.js');
     }
 
     _onback = () => {
@@ -46,29 +53,22 @@ class Profile extends Component {
                     },
                 }}
                 defaultSource = {require('../assets/img/user_placeholder.png')}
-                style = {[styles.addphoto, {marginTop: -40}]}
-            />
+                style = {[styles.addphoto, {marginTop: -40}]}/>
         )
     }
 
     showUserPhoto() {
         var {params} = this.props.navigation.state
         return(
-            <Image source = {{
-                uri: Constant.BLOB_URL + params.UserInfo.blob_id + '/download.json',
-                method:'GET',
-                headers: {
-                        'Content-Type': 'application/json',
-                        'QB-Token': this.state.token
-                    },
-                }}
+            <CachedImage source = {{
+                uri: params.UserInfo.profileurl,
+              }}
                 defaultSource = {require('../assets/img/user_placeholder.png')}
-                style = {styles.userphoto}
-            />
+                style = {styles.userphoto} />
         )
     }
 
-    showUserAbout(){
+    showUserAbout() {
         var {params} = this.props.navigation.state
 
         var json = null;
@@ -88,7 +88,7 @@ class Profile extends Component {
         )
     }
 
-    showUserAge(){
+    showUserAge() {
         var {params} = this.props.navigation.state
 
         var json = null;
@@ -183,7 +183,12 @@ class Profile extends Component {
                     <View style = {styles.statusbar}/>
                     <ScrollView style = {{backgroundColor: 'white'}}>
                     <View style = {styles.tabView}>
-                        <Image source = {require('../assets/img/app_bar_bg.png')} style = {styles.tabViewBg}/>
+                        <CachedImage source = {{
+                            uri: params.UserInfo.coverPictureURL,
+                            }}
+                            defaultSource = {require('../assets/img/app_bar_bg.png')}
+                            style = {styles.tabViewBg} />
+
                         <View style = {styles.backView}>
                             <TouchableOpacity style = {styles.backButton} onPress = {this._onback}>
                                 <Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
@@ -242,10 +247,8 @@ class Profile extends Component {
                     </TouchableHighlight>
                 </PopupDialog>
                 </View>
-
-
         );
-    }
+    }d
 }
 
 // define your styles
@@ -255,12 +258,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: Constant.APP_COLOR,
     },
+
     tabView: {
         width: Constant.WIDTH_SCREEN,
         height: Constant.HEIGHT_SCREEN*0.25,
         paddingLeft: 5,
         // marginTop: (Platform.OS == 'ios')? 20 : StatusBar.currentHeight,
     },
+
     statusbar:{
         width: Constant.WIDTH_SCREEN,
         height: (Platform.OS == 'ios')? 20 : StatusBar.currentHeight,
@@ -269,25 +274,28 @@ const styles = StyleSheet.create({
         top: 0,
         left: 0,
     },
+
     backView: {
         width: Constant.WIDTH_SCREEN,
         height: 60,
         flexDirection:'row',
         alignItems:'center',
     },
+
     tabViewBg: {
-        flex: 1,
-        height: 160,
-        position: 'absolute',
-        top: 0,
-        left: 0,
+      flex: 1,
+      height: 100,
+      width: '110%',
+      position: 'absolute',
     },
+
     backButton: {
         width: 50,
         height: 50,
         justifyContent: 'center',
         alignItems:'center',
     },
+
     title: {
         color: 'white',
         marginLeft: 10,
@@ -302,11 +310,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 50
     },
+
     userphoto: {
         width: 100,
         height: 100,
         borderRadius: 50,
     },
+
     addphoto: {
         width: 50,
         height: 50,
@@ -321,7 +331,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         position:'absolute',
         left: 0,
-        top: (Platform.OS == 'ios')? Constant.HEIGHT_SCREEN/4-55:Constant.HEIGHT_SCREEN/4-51
+        top: (Platform.OS == 'ios')? Constant.HEIGHT_SCREEN/4-115:Constant.HEIGHT_SCREEN/4-111
     },
     mscrollView: {
         // flex: 1,
@@ -339,6 +349,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginTop: 10
     },
+
     detail: {
         color: 'gray',
         fontSize: 15,

@@ -38,7 +38,6 @@
         android:icon="@mipmap/ic_launcher"
         android:label="Pawpads-Dev"
         android:supportsRtl="true"
-        android:testOnly="true"
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.pawpads.MainActivity"

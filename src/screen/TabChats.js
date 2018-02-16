@@ -21,9 +21,12 @@ import Constant from '../common/Constant'
 import { connect } from 'react-redux'
 import {sendRequest} from '../actions/http';
 import RNFirebase from 'react-native-firebase';
+import {CachedImage} from 'react-native-img-cache';
+
 const datas = []
 var currentPage = 0
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
 
 // create a component
 class TabChats extends Component {
@@ -73,7 +76,6 @@ class TabChats extends Component {
             }
           }
         })
-
       })
     }
 
@@ -253,7 +255,7 @@ class TabChats extends Component {
                       <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('Chat', {GroupName: data.name, GroupChatting: true, Dialog: data, Token: this.state.token})} key = {index}>
                         {this.state.refresh == false? this.downloadLastUserFirebase(data.occupants_ids) : null}
                         <View style = {styles.menuIcon} >
-                          <Image source = {{ uri: data.blob_id }}
+                          <CachedImage source = {{ uri: data.blob_id }}
                           defaultSource = {require('../assets/img/user_placeholder.png')}
                           style = {styles.menuIcon} />
                         </View>

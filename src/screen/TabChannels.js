@@ -24,6 +24,7 @@ import {Dialog} from 'react-native-popup-dialog';
 import { FlatList } from "react-native";
 import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+import {CachedImage} from 'react-native-img-cache';
 
 var datas = []
 var currentPage = 0
@@ -45,7 +46,7 @@ render() {
               {tmpThis.state.refresh == false? tmpThis.downloadLastUserFirebase(data.last_message_user_id) : null}
               {tmpThis.state.refresh1 == false? tmpThis.downloadGroupPhotoFirebase(data.photo,data._id) : null}
               <View style = {styles.menuIcon} >
-              <Image source = {{
+              <CachedImage source = {{
                   uri: data.photo
                   }}
                   defaultSource = {require('../assets/img/user_placeholder.png')}
@@ -55,7 +56,7 @@ render() {
                   <Text style = {styles.menuItem}>{data.name}</Text>
                   <View style = {{flexDirection:'row',marginTop: 5}}>
 
-                      <Image source = {{
+                      <CachedImage source = {{
                           uri: data.blob_id
                           }}
                           defaultSource = {require('../assets/img/user_placeholder.png')}
@@ -330,7 +331,7 @@ class TabChannels extends Component {
           firebase.database()
               .ref(`/users`)
               .orderByChild("id")
-              .equalTo(last_message_userid)
+              .equalTo(last_message_userid.toString())
               .once("value")
               .then(snapshot => {
 
@@ -358,9 +359,10 @@ class TabChannels extends Component {
                                   if(this.state.dialogs[i].last_message_user_id == profile["id"]) {
                                       this.state.dialogs[i]['blob_id'] = url;
                                       console.log("downloadLastUserFirebase:",url);
+                                      this.setState({dialogs:this.state.dialogs})
                                   }
                               }
-                              this.setState({refresh: true});
+                              this.setState({refresh: false});
                               this.setState({dialogs:this.state.dialogs})
 
                               this.props.ChannelsUsers(this.state.dialogs)

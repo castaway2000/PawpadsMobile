@@ -99,36 +99,58 @@ class Settings extends Component {
         })
     }
     handleSelectedPush = (checked) => {
+      if (this.state.isTogglepushSelected == false) {
         this.setState({
-            isTogglepushSelected: checked,
+            isTogglepushSelected: true,
         })
+      } else {
+        this.setState({
+            isTogglepushSelected: false,
+        })
+      }
+
     }
     handleSelectedMessaging = (checked) => {
-        this.setState({
-            isToggleMessagingSelected: checked
-        })
+
+
+        if (this.state.isToggleMessagingSelected == false) {
+          this.setState({
+              isToggleMessagingSelected: true,
+          })
+        } else {
+          this.setState({
+              isTogglepushSelected: false,
+          })
+        }
     }
 
     _onback = () => {
+
         if(this.state.isKilometerSelected){
             AsyncStorage.setItem(Constant.SETTINGS_DISTANCE_UNIT, 'km');
         }
+
         if(this.state.isMilesSelected){
             AsyncStorage.setItem(Constant.SETTINGS_DISTANCE_UNIT, 'miles');
         }
+
         AsyncStorage.setItem(Constant.SETTINGS_RANGE, this.state.searchRange);
         if(this.state.isHighSelected){
             AsyncStorage.setItem(Constant.SETTINGS_GPS_ACCURACY, 'High');
         }
+
         if(this.state.isMediumSelected){
             AsyncStorage.setItem(Constant.SETTINGS_GPS_ACCURACY, 'Medium');
         }
+
         if(this.state.isLowSelected){
             AsyncStorage.setItem(Constant.SETTINGS_GPS_ACCURACY, 'Low');
         }
+
         if(this.state.isTogglepushSelected){
             AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_PUSH_NOTIFICATIONS, 'push_notification');
         }
+
         if(this.state.isToggleMessagingSelected){
             AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_MESSAGING_POPUPS, 'messaging_popups')
         }
@@ -166,8 +188,7 @@ class Settings extends Component {
                                     value = {this.state.searchRange}
                                     placeholderTextColor = {Constant.APP_COLOR}
                                     keyboardType = 'numeric'
-                                    underlineColorAndroid = 'transparent'
-                                />
+                                    underlineColorAndroid = 'transparent'/>
                                 <Image source = {require('../assets/img/pencil_icon.png')} style = {styles.icon}/>
                                 <View style = {styles.lineBottom}/>
                             </View>
@@ -177,7 +198,7 @@ class Settings extends Component {
                                 <Image source = {this.state.isHighSelected? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
                                 <Text style = {styles.settingsItem}>High</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style = {{flexDirection: 'row', width: 200, height: 40, alignItems: 'center'}} onPress = {this.isMediumSelected}>
+                            <TouchableOpacity style = {{flexDirection: 'row', width: 200, height: 40, alignItems: 'center'}} onPress = {this.handleSelectedMedium}>
                                 <Image source = {this.state.isMediumSelected? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
                                 <Text style = {styles.settingsItem}>Medium</Text>
                             </TouchableOpacity>
