@@ -14,7 +14,7 @@ class Dashboard extends Component {
         header: null
     };
 
-    constructor(props){
+    constructor(props) {
         super(props)
         this.state = {
             isNearby: true,

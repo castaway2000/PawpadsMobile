@@ -56,12 +56,15 @@ render() {
                   <Text style = {styles.menuItem}>{data.name}</Text>
                   <View style = {{flexDirection:'row',marginTop: 5}}>
 
+                  <View style = {{width: 20, height: 20, borderRadius: 10, backgroundColor: '#f1eff0'}} >
                       <CachedImage source = {{
                           uri: data.blob_id
                           }}
                           defaultSource = {require('../assets/img/user_placeholder.png')}
                           style = {{width: 20, height: 20, borderRadius: 10}} />
+                          </View>
                       <Text style = {styles.lastmessage} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
+
                   </View>
               </View>
             </TouchableOpacity>

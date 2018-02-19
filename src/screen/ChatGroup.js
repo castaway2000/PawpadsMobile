@@ -24,6 +24,7 @@ import {
 	LOAD_CHAT_MESSAGE_FAIL,
 	CHANGE_MESSAGE_LIST
 } from '../actions/types';
+
 import {connect} from 'react-redux';
 import Constant from '../common/Constant'
 import {Actions} from 'react-native-router-flux';
@@ -65,7 +66,6 @@ class ChatGroup extends Component {
 			console.log("tableId is:",value);
 			this.setState({tableId: value })
 		})
-
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -284,6 +284,16 @@ class ChatGroup extends Component {
 
 		updates['/chats/' + newKey] = chatdict;
 		firebase.database().ref().update(updates)
+
+		//TODO: update chat dialog
+		var diloagDict = {
+			"last_message" : text,
+			"last_message_date_sent" : date,
+			"last_message_user_id" : currentUserid,
+			"updated_at" : date,
+		}
+
+		firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
 
 		this.updateChats()
 	}
@@ -679,6 +689,15 @@ class ChatGroup extends Component {
 			firebase.database().ref().update(updatescontent1)
 
 			//TODO: update chat dialog
+			var diloagDict = {
+				"last_message" : 'photo',
+				"last_message_date_sent" : date,
+				"last_message_user_id" : currentUserid,
+				"updated_at" : date,
+			}
+
+			firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+
 			this.updateChats()
 		})
 	}
@@ -763,7 +782,7 @@ const styles = {
     bodyView: {
         // flex: 1,
         width: Constant.WIDTH_SCREEN,
-		height: Constant.HEIGHT_SCREEN - 80,
+		    height: Constant.HEIGHT_SCREEN - 80,
         backgroundColor: 'white',
     },
 };

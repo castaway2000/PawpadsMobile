@@ -15,12 +15,14 @@ import {
 	View,
 	StyleProvider,
 	getTheme,
+
 	variables,
 } from 'native-base'
 import Constant from '../common/Constant'
 import { connect } from 'react-redux'
 import SearchQBUserBox from './common/SearchQBUserBox'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import {CachedImage} from 'react-native-img-cache';
 
 var isAlert = false
 var isName = false
@@ -86,7 +88,8 @@ class Search extends Component {
         var { channelsUsers } = this.props;
         var { channelsSearchUsers } = this.props;
         var {params} = this.props.navigation.state
-        if(params.TabName == 'NEARBY'){
+
+        if(params.TabName == 'NEARBY') {
             return(
                 <List
                     refreshControl={
@@ -98,24 +101,19 @@ class Search extends Component {
                     style = {styles.mList}
                     dataArray={ nearbySearchUsers == undefined ? this.state.searchResults : nearbySearchUsers}
                     renderRow={data =>
-                        <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data.geo_datum.user.user})} style = {{height:70}}>
-                            <Image source = {{
-                                    uri: Constant.BLOB_URL + data.geo_datum.user.user.blob_id + '/download.json',
-                                    method:'GET',
-                                    headers: {
-                                            'Content-Type': 'application/json',
-                                            'QB-Token': this.state.token
-                                        },
+                        <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})} style = {{height:70}}>
+                            <CachedImage source = {{
+                                    uri: data.profileurl,
                                     }}
                                     defaultSource = {require('../assets/img/user_placeholder.png')}
                                     style = {styles.menuIcon}
                             />
-                            {data.geo_datum.user.user.full_name?
-                                <Text style = {styles.menuItem}>{data.geo_datum.user.user.full_name}</Text> :
-                                <Text style = {styles.menuItem}>{data.geo_datum.user.user.login}</Text> }
+                            {data.full_name?
+                                <Text style = {styles.menuItem}>{data.full_name}</Text> :
+                                <Text style = {styles.menuItem}>{data.login}</Text> }
                             {this.state.distance_unit == 'km' ?
-                                <Text style = {styles.distance}>{parseInt(data.geo_datum.distance)} {this.state.distance_unit}</Text> :
-                                <Text style = {styles.distance} numberOfLines = {1}>{parseInt((data.geo_datum.distance)/1.60934)} {this.state.distance_unit}</Text>}
+                                <Text style = {styles.distance}>{data.distance} {this.state.distance_unit}</Text> :
+                                <Text style = {styles.distance} numberOfLines = {1}>{parseInt(data.distance/1.60934)} {this.state.distance_unit}</Text>}
                         </ListItem>
                     }
                 >
@@ -123,20 +121,15 @@ class Search extends Component {
             )
         }
 
-        if(params.TabName == 'CHATS'){
-            if(chatsSearchUsers == undefined){
+        if(params.TabName == 'CHATS') {
+            if(chatsSearchUsers == undefined) {
                 return(
                     chatsUsers.map((data, index) => {
                         return(
                         <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('Chat', {GroupName: data.name, GroupChatting: true, Dialog: data, Token: this.state.token})} key = {index}>
                             {/*{this.state.refresh == false? this.downloadLastUser(data.occupants_ids) : null}*/}
-                            <Image source = {{
-                                    uri: Constant.BLOB_URL + data.blob_id + '/download.json',
-                                    method:'GET',
-                                    headers: {
-                                            'Content-Type': 'application/json',
-                                            'QB-Token': this.state.token
-                                        },
+                            <CachedImage source = {{
+                                    uri: data.profileurl,
                                     }}
                                     defaultSource = {require('../assets/img/user_placeholder.png')}
                                     style = {styles.menuIcon} />
@@ -148,18 +141,13 @@ class Search extends Component {
                         )
                     })
                 )
-            }else{
+            } else {
                 return(
                     chatsSearchUsers.map((data, index) => {
                         return(
                         <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('Chat', {GroupName: data.name, GroupChatting: true, Dialog: data, Token: this.state.token})} key = {index}>
-                            <Image source = {{
-                                    uri: Constant.BLOB_URL + data.blob_id + '/download.json',
-                                    method:'GET',
-                                    headers: {
-                                            'Content-Type': 'application/json',
-                                            'QB-Token': this.state.token
-                                        },
+                            <CachedImage source = {{
+                                    uri: data.profileurl,
                                     }}
                                     defaultSource = {require('../assets/img/user_placeholder.png')}
                                     style = {styles.menuIcon} />
@@ -188,6 +176,7 @@ class Search extends Component {
                                         'QB-Token': this.state.token
                                     },
                                 }}
+
                                 defaultSource = {require('../assets/img/user_placeholder.png')}
                                 style = {styles.menuIcon} />
                             <View style = {{flex: 1, marginLeft: 15}}>
@@ -249,10 +238,9 @@ class Search extends Component {
                     })
                 )
             }
-
         }
-
     }
+
     showSearchUserBox(){
         var { nearbyusers } = this.props;
         var { chatsUsers } = this.props;
@@ -298,13 +286,12 @@ class Search extends Component {
                     {this.showSearchUserBox()}
                 </View>
                 <View style = {styles.bodyView}>
+                  <ScrollView>
                     <Content bounces={false} contentContainerStyle={{ flex: 1, backgroundColor: 'white',alignItems:'center'}}>
-
-                        {this.showSearchResultView()}
-
+                      {this.showSearchResultView()}
                     </Content>
-
-                </View>
+                  </ScrollView>
+               </View>
             </View>
         );
     }
@@ -427,7 +414,6 @@ const styles = StyleSheet.create({
         opacity: 1,
         fontSize: 15,
     },
-
 });
 
 

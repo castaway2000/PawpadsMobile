@@ -40,8 +40,8 @@ class Login extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            name: '', //cris 1BITJAY_1875640410  howsonanna stad blaze test001 test001
-            password: '', //12345678
+            name: 'test001', //cris 1BITJAY_1875640410  howsonanna stad blaze test001
+            password: '12345678', //
             qb_token: '',
             loading: this.props.loading,
             isname: true,

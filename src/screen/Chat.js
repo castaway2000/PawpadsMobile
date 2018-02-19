@@ -171,9 +171,6 @@ getChatMessageFirebase() {
 								}
 							})*/
 
-
-
-
 			firebase.database()
 					.ref(`/chats`)
 					.orderByChild("chat_dialog_id")
@@ -408,13 +405,23 @@ getChatMessageFirebase() {
       "recipient_id" : "",
       "send_to_chat" : "1",
       "sender_id" : currentUserid,
-      "updated_at" : date
+      "updated_at" : date,
+			"last_message_date_sent" : date,
     }
 
 		updates['/chats/' + newKey] = chatdict;
 		firebase.database().ref().update(updates)
 
 		//TODO: update chat dialog
+		var diloagDict = {
+			"last_message" : text,
+			"last_message_date_sent" : date,
+			"last_message_user_id" : currentUserid,
+			"updated_at" : date,
+		}
+
+		firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+
 
 		this.updateChats()
 	}
@@ -708,7 +715,8 @@ getChatMessageFirebase() {
 			sendPhotoMessage(source, fileName) {
 				//Upload Image to firebase
 
-				firebase.storage().ref("content/" + this.state.tableId + "/" + fileName).putFile(source)  .then(uploadedFile => {
+				firebase.storage().ref("content/" + this.state.tableId + "/" + fileName).putFile(source).then(uploadedFile => {
+
           console.log('Uploaded to firebase:', uploadedFile)
 
 					var updates = {};
@@ -773,6 +781,15 @@ getChatMessageFirebase() {
 					firebase.database().ref().update(updatescontent)
 
 					//TODO: update chat dialog
+					var diloagDict = {
+						"last_message" : 'photo',
+						"last_message_date_sent" : date,
+						"last_message_user_id" : currentUserid,
+						"updated_at" : date,
+					}
+
+					firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+
 					this.updateChats()
         })
 			}
@@ -782,7 +799,6 @@ getChatMessageFirebase() {
     		var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
     		return v.toString(16);
 			});
-
 }
 
 	render() {
