@@ -252,6 +252,11 @@ class ChatGroup extends Component {
 		).start();
 	}
 
+	_onGiphyPicked= (url) => {
+		console.log('_onGiphyPicked',url);
+		this.sendGIFMessageFirebase(url)
+	}
+
 	sendMessageFirebase(text) {
 		console.log("Send message tapped...");
 
@@ -288,6 +293,53 @@ class ChatGroup extends Component {
 		//TODO: update chat dialog
 		var diloagDict = {
 			"last_message" : text,
+			"last_message_date_sent" : date,
+			"last_message_user_id" : currentUserid,
+			"updated_at" : date,
+		}
+
+		firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+
+		this.updateChats()
+	}
+
+	sendGIFMessageFirebase(url) {
+		console.log("Send message tapped...");
+
+		var updates = {};
+		var newKey = firebase.database().ref().child('chats').push().key;
+
+		var {params} = this.props.navigation.state
+
+		var milliseconds = (new Date).getTime()/1000|0;
+		console.log(milliseconds);
+
+		var date = new Date();
+		console.log(date.toISOString());
+
+
+		var chatdict = {
+			"_id" : newKey,
+			"STICKER": url,
+			"chat_dialog_id" : params.Dialog._id,
+			"created_at" : date,
+			"date_sent" : milliseconds,
+			"latitude" : "",
+			"longitude" : "",
+			"message" : 'sticker',
+			"read" : 0,
+			"recipient_id" : "",
+			"send_to_chat" : "1",
+			"sender_id" : currentUserid,
+			"updated_at" : date
+		}
+
+		updates['/chats/' + newKey] = chatdict;
+		firebase.database().ref().update(updates)
+
+		//TODO: update chat dialog
+		var diloagDict = {
+			"last_message" : 'sticker',
 			"last_message_date_sent" : date,
 			"last_message_user_id" : currentUserid,
 			"updated_at" : date,
@@ -460,14 +512,14 @@ class ChatGroup extends Component {
 			return (
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile}/>
+					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile} giphyPicked = {this._onGiphyPicked}/>
 				</KeyboardAvoidingView>
 			);
 		} else {
 			return (
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile}/>
+					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile} giphyPicked = {this._onGiphyPicked}/>
 				</KeyboardAvoidingView>
 			);
 		}

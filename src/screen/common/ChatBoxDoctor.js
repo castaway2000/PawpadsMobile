@@ -154,7 +154,7 @@ class ChatBoxDoctor extends Component {
 		this.props.navigation.navigate('Profile', {UserInfo: this.state.userprofile})
 	}
 
-	showUserphoto(){
+	showUserphoto() {
 		if(this.props.messageSenderPhoto){
 			return(
 				<TouchableOpacity onPress = {() => this.showUserProfiel()}>
@@ -239,6 +239,7 @@ class ChatBoxDoctor extends Component {
 
 			if (this.state.attachmentimageurl == '') {
  				this.downloadAttachmentimageurl(this.props.messageImage[0].id)
+				this.state.attachmentimageurl = ' '
 			}
 
 			return(

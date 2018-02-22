@@ -32,6 +32,9 @@ import {ChatMessageBox, ChatBoxUser, ChatBoxDoctor} from './common';
 import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
+
+import GifScroller from '../components/ThirdParty/GifScroller.js';
+
 var ImagePicker = require("react-native-image-picker");
 
 import {CachedImage} from 'react-native-img-cache';
@@ -53,6 +56,7 @@ class Chat extends Component {
 			token: '',
 			userprofile: [],
 			tableId:'',
+			showGif: false,
 		};
 	}
 
@@ -112,11 +116,11 @@ getChatMessage() {
 										console.log("messages :",messages);
 
                     this.setState({
-						messages: messages,
-                        loading: false,
-						token: value
+											messages: messages,
+											loading: false,
+											token: value
                     })
-                }else{
+                } else {
                     this.setState({ loading: false })
                 }
             }).catch((e) => {
@@ -376,110 +380,7 @@ getChatMessageFirebase() {
 		).start();
 	}
 
-	sendMessageFirebase(text) {
-		console.log("Send message tapped...");
 
-		var updates = {};
-		var newKey = firebase.database().ref().child('chats').push().key;
-
-		var {params} = this.props.navigation.state
-
-		var milliseconds = (new Date).getTime()/1000|0;
-		console.log(milliseconds);
-
-		var date = new Date();
-		console.log(date.toISOString());
-
-
-		var chatdict = {
-      "_id" : newKey,
-      "chat_dialog_id" : params.Dialog._id,
-      "created_at" : date,
-      "date_sent" : milliseconds,
-      "delivered_ids" : [],
-      "latitude" : "",
-      "longitude" : "",
-      "message" : text,
-      "read" : 0,
-      "read_ids" : [],
-      "recipient_id" : "",
-      "send_to_chat" : "1",
-      "sender_id" : currentUserid,
-      "updated_at" : date,
-			"last_message_date_sent" : date,
-    }
-
-		updates['/chats/' + newKey] = chatdict;
-		firebase.database().ref().update(updates)
-
-		//TODO: update chat dialog
-		var diloagDict = {
-			"last_message" : text,
-			"last_message_date_sent" : date,
-			"last_message_user_id" : currentUserid,
-			"updated_at" : date,
-		}
-
-		firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
-
-
-		this.updateChats()
-	}
-
-	sendMessage(text) {
-		var newArray = []
-		var {params} = this.props.navigation.state
-		Keyboard.dismiss();
-
-		AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
-			let formdata = {"chat_dialog_id":params.Dialog._id,
-							"message": text}
-            var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL
-            fetch(REQUEST_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'QB-Token': value
-                },
-				body: formdata
-            })
-            .then((response) => response.json())
-            .then((responseData) => {
-
-				newArray.push({
-					_id: responseData._id,
-					attachments: responseData.attachments,
-					chat_dialog_id: responseData.chat_dialog_id,
-					created_at: responseData.created_at,
-					date_sent: responseData.date_sent,
-					delivered_ids: responseData.delivered_ids,
-					message: responseData.message,
-					read_ids: responseData.read_ids,
-					recipient_id: responseData.recipient_id,
-					sender_id: responseData.sender_id,
-					updated_at: responseData.updated_at,
-					read: responseData.read,
-				});
-
-				for(var i = 0; i<this.state.messages.length; i++) {
-					newArray.push(this.state.messages[i])
-				}
-
-				this.setState({
-					messages:newArray
-				});
-
-				var {dispatch} = this.props
-				dispatch({
-					type: CHANGE_MESSAGE_LIST,
-					payload: newArray,
-				})
-
-            }).catch((e) => {
-                console.log(e)
-            })
-        })
-	}
 
 	componentWillUnmount() {
 		Keyboard.dismiss();
@@ -594,14 +495,14 @@ getChatMessageFirebase() {
 			return (
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile}/>
+					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile} onPressEmoji = {this._onClickedEmoji} onPressGif = {this._onClickedGif} onPressAdd = {this._onClickedAdd} giphyPicked = {this._onGiphyPicked}/>
 				</KeyboardAvoidingView>
 			);
 		} else {
 			return (
 				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
 					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile}/>
+					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile} onPressEmoji = {this._onClickedEmoji} onPressGif = {this._onClickedGif} onPressAdd = {this._onClickedAdd} giphyPicked = {this._onGiphyPicked}/>
 				</KeyboardAvoidingView>
 			);
 		}
@@ -643,6 +544,23 @@ getChatMessageFirebase() {
 
 			_onClickedFile = () => {
 				this.popupDialog.show()
+			}
+
+			_onClickedEmoji = () => {
+				console.log('_onClickedEmoji');
+			}
+
+			_onClickedGif = () => {
+				console.log('_onClickedGif');
+			}
+
+			_onClickedAdd = () => {
+				console.log('_onClickedAdd');
+			}
+
+			_onGiphyPicked= (url) => {
+				console.log('_onGiphyPicked',url);
+				this.sendGIFMessageFirebase(url)
 			}
 
 			showPicker() {
@@ -710,6 +628,105 @@ getChatMessageFirebase() {
 						}
 					});
 				}
+			}
+
+			sendMessageFirebase(text) {
+				console.log("Send message tapped...");
+
+				var updates = {};
+				var newKey = firebase.database().ref().child('chats').push().key;
+
+				var {params} = this.props.navigation.state
+
+				var milliseconds = (new Date).getTime()/1000|0;
+				console.log(milliseconds);
+
+				var date = new Date();
+				console.log(date.toISOString());
+
+
+				var chatdict = {
+		      "_id" : newKey,
+		      "chat_dialog_id" : params.Dialog._id,
+		      "created_at" : date,
+		      "date_sent" : milliseconds,
+		      "delivered_ids" : [],
+		      "latitude" : "",
+		      "longitude" : "",
+		      "message" : text,
+		      "read" : 0,
+		      "read_ids" : [],
+		      "recipient_id" : "",
+		      "send_to_chat" : "1",
+		      "sender_id" : currentUserid,
+		      "updated_at" : date,
+					"last_message_date_sent" : date,
+		    }
+
+				updates['/chats/' + newKey] = chatdict;
+				firebase.database().ref().update(updates)
+
+				//TODO: update chat dialog
+				var diloagDict = {
+					"last_message" : text,
+					"last_message_date_sent" : date,
+					"last_message_user_id" : currentUserid,
+					"updated_at" : date,
+				}
+
+				firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+
+				this.updateChats()
+			}
+
+			sendGIFMessageFirebase(url) {
+				console.log("Send message tapped...");
+
+				var updates = {};
+				var newKey = firebase.database().ref().child('chats').push().key;
+
+				var {params} = this.props.navigation.state
+
+				var milliseconds = (new Date).getTime()/1000|0;
+				console.log(milliseconds);
+
+				var date = new Date();
+				console.log(date.toISOString());
+
+
+				var chatdict = {
+					"_id" : newKey,
+					"STICKER": url,
+					"chat_dialog_id" : params.Dialog._id,
+					"created_at" : date,
+					"date_sent" : milliseconds,
+					"delivered_ids" : [],
+					"latitude" : "",
+					"longitude" : "",
+					"message" : 'sticker',
+					"read" : 0,
+					"read_ids" : [],
+					"recipient_id" : "",
+					"send_to_chat" : "1",
+					"sender_id" : currentUserid,
+					"updated_at" : date,
+					"last_message_date_sent" : date,
+				}
+
+				updates['/chats/' + newKey] = chatdict;
+				firebase.database().ref().update(updates)
+
+				//TODO: update chat dialog
+				var diloagDict = {
+					"last_message" : 'sticker',
+					"last_message_date_sent" : date,
+					"last_message_user_id" : currentUserid,
+					"updated_at" : date,
+				}
+
+				firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+
+				this.updateChats()
 			}
 
 			sendPhotoMessage(source, fileName) {

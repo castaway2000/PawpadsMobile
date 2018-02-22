@@ -210,8 +210,6 @@ class TabChannels extends Component {
             }
             this.setState({ loading: false })
             this.setState({dialogs:this.state.dialogs})
-            console.log(z);
-
           }
         })
       }

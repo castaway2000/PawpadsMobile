@@ -22,6 +22,7 @@ MERGED from [com.google.android.gms:play-services-base:11.4.0] /Users/3rddigital
 MERGED from [com.google.firebase:firebase-core:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/firebase-core-11.4.0.aar/e63457b84726da8a182cb0521280e8c9/AndroidManifest.xml:2:1-6:12
 MERGED from [com.google.firebase:firebase-database:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/firebase-database-11.4.0.aar/78ccfa79f0a60ad62401292af9597fde/AndroidManifest.xml:2:1-4:12
 MERGED from [com.google.firebase:firebase-storage:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/firebase-storage-11.4.0.aar/99b46a37370d29b544b3873cc801503a/AndroidManifest.xml:2:1-4:12
+MERGED from [com.facebook.fresco:animated-gif:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/animated-gif-1.3.0.aar/931bdccd1c27241e31435abbbe1f2e2b/AndroidManifest.xml:2:1-9:12
 MERGED from [com.android.support:multidex:1.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/multidex-1.0.2.aar/a0395810a7b38da46332851ae0258f35/AndroidManifest.xml:17:1-22:12
 MERGED from [com.twitter.sdk.android:twitter-core:3.0.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/twitter-core-3.0.0.aar/e2a5734f3fcfbafc0844ee968167bb51/AndroidManifest.xml:18:1-35:12
 MERGED from [com.google.firebase:firebase-analytics:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/firebase-analytics-11.4.0.aar/8ed161b9bc8c4084ac337dff2ad56de2/AndroidManifest.xml:16:1-35:12
@@ -32,20 +33,21 @@ MERGED from [com.google.firebase:firebase-common:11.4.0] /Users/3rddigital-001/.
 MERGED from [com.google.android.gms:play-services-tasks:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/play-services-tasks-11.4.0.aar/49feb32540ff5d322a12c5a4596ae613/AndroidManifest.xml:2:1-5:12
 MERGED from [com.google.firebase:firebase-storage-common:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/firebase-storage-common-11.4.0.aar/767b4aeba5adda24a746236827c48fb5/AndroidManifest.xml:2:1-4:12
 MERGED from [com.google.android.gms:play-services-basement:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/play-services-basement-11.4.0.aar/e521457a20059ec2b3a56b032246800c/AndroidManifest.xml:16:1-23:12
-MERGED from [com.facebook.fbui.textlayoutbuilder:textlayoutbuilder:1.0.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/textlayoutbuilder-1.0.0.aar/9e9e72c8818c3271bd1eb6df9cbba47c/AndroidManifest.xml:10:1-18:12
+MERGED from [com.facebook.fresco:animated-base:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/animated-base-1.3.0.aar/ba7291d32a4363164e711a8ad66125b3/AndroidManifest.xml:2:1-9:12
 MERGED from [com.facebook.fresco:fresco:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/fresco-1.3.0.aar/9e5a4af6a5a08e5b074b9e83dd1a4ba0/AndroidManifest.xml:2:1-9:12
 MERGED from [com.facebook.fresco:imagepipeline-okhttp3:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-okhttp3-1.3.0.aar/63ef8fe693fd1b523bb34dd8ca69e844/AndroidManifest.xml:2:1-9:12
-MERGED from [com.facebook.soloader:soloader:0.1.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/soloader-0.1.0.aar/e8125bbf4ff058c9f2e2e5a5b5933116/AndroidManifest.xml:1:1-4:12
-MERGED from [org.webkit:android-jsc:r174650] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/android-jsc-r174650.aar/ddfffdc5839576b6af77476fb8e2c460/AndroidManifest.xml:1:1-3:12
+MERGED from [com.facebook.fresco:imagepipeline:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-1.3.0.aar/dfbee40248546ac5954b68a726f519cf/AndroidManifest.xml:2:1-9:12
+MERGED from [com.facebook.fresco:imagepipeline-base:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-base-1.3.0.aar/48431a8d852188a5d3efb89678fc6299/AndroidManifest.xml:2:1-9:12
 MERGED from [com.facebook.android:facebook-places:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-places-4.30.0.aar/d184dff55d6fcf828f1b581eb91f17ca/AndroidManifest.xml:21:1-31:12
 MERGED from [com.facebook.android:facebook-applinks:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-applinks-4.30.0.aar/5e3d26f6c283f04ff8c4278c4a415eed/AndroidManifest.xml:21:1-31:12
 MERGED from [com.facebook.android:facebook-messenger:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-messenger-4.30.0.aar/b90a0d13d6f3dff2c1d6fd482da85f41/AndroidManifest.xml:21:1-31:12
 MERGED from [com.facebook.android:facebook-core:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-core-4.30.0.aar/68331c8742f6ea0d3277a260a5908068/AndroidManifest.xml:21:1-45:12
-MERGED from [com.android.support:support-v4:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/support-v4-27.0.2.aar/57fe5ca69a21e0e626b02bc2833cb17b/AndroidManifest.xml:17:1-22:12
 MERGED from [com.facebook.fresco:drawee:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/drawee-1.3.0.aar/6edb9e513062bdb6ebc4b2caadb8d443/AndroidManifest.xml:2:1-9:12
-MERGED from [com.facebook.fresco:imagepipeline:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-1.3.0.aar/dfbee40248546ac5954b68a726f519cf/AndroidManifest.xml:2:1-9:12
-MERGED from [com.facebook.fresco:imagepipeline-base:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-base-1.3.0.aar/48431a8d852188a5d3efb89678fc6299/AndroidManifest.xml:2:1-9:12
 MERGED from [com.facebook.fresco:fbcore:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/fbcore-1.3.0.aar/c6629227ea4f3c5c3588d4c0afd6e6ef/AndroidManifest.xml:2:1-9:12
+MERGED from [com.facebook.fbui.textlayoutbuilder:textlayoutbuilder:1.0.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/textlayoutbuilder-1.0.0.aar/9e9e72c8818c3271bd1eb6df9cbba47c/AndroidManifest.xml:10:1-18:12
+MERGED from [com.facebook.soloader:soloader:0.1.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/soloader-0.1.0.aar/e8125bbf4ff058c9f2e2e5a5b5933116/AndroidManifest.xml:1:1-4:12
+MERGED from [org.webkit:android-jsc:r174650] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/android-jsc-r174650.aar/ddfffdc5839576b6af77476fb8e2c460/AndroidManifest.xml:1:1-3:12
+MERGED from [com.android.support:support-v4:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/support-v4-27.0.2.aar/57fe5ca69a21e0e626b02bc2833cb17b/AndroidManifest.xml:17:1-22:12
 MERGED from [com.android.support:support-fragment:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/support-fragment-27.0.2.aar/16dfa7c1c6c7308090c3c28d2e2f7160/AndroidManifest.xml:17:1-22:12
 MERGED from [com.android.support:support-core-utils:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/support-core-utils-27.0.2.aar/5f19884acd5d1a31db1f03969509484f/AndroidManifest.xml:17:1-22:12
 MERGED from [com.android.support:cardview-v7:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/cardview-v7-27.0.2.aar/848fd9cd6b753b719ee6e6df922f701c/AndroidManifest.xml:17:1-22:12
@@ -149,6 +151,8 @@ MERGED from [com.google.firebase:firebase-database:11.4.0] /Users/3rddigital-001
 MERGED from [com.google.firebase:firebase-database:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/firebase-database-11.4.0.aar/78ccfa79f0a60ad62401292af9597fde/AndroidManifest.xml:3:5-43
 MERGED from [com.google.firebase:firebase-storage:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/firebase-storage-11.4.0.aar/99b46a37370d29b544b3873cc801503a/AndroidManifest.xml:3:5-43
 MERGED from [com.google.firebase:firebase-storage:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/firebase-storage-11.4.0.aar/99b46a37370d29b544b3873cc801503a/AndroidManifest.xml:3:5-43
+MERGED from [com.facebook.fresco:animated-gif:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/animated-gif-1.3.0.aar/931bdccd1c27241e31435abbbe1f2e2b/AndroidManifest.xml:5:5-7:41
+MERGED from [com.facebook.fresco:animated-gif:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/animated-gif-1.3.0.aar/931bdccd1c27241e31435abbbe1f2e2b/AndroidManifest.xml:5:5-7:41
 MERGED from [com.android.support:multidex:1.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/multidex-1.0.2.aar/a0395810a7b38da46332851ae0258f35/AndroidManifest.xml:20:5-43
 MERGED from [com.android.support:multidex:1.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/multidex-1.0.2.aar/a0395810a7b38da46332851ae0258f35/AndroidManifest.xml:20:5-43
 MERGED from [com.twitter.sdk.android:twitter-core:3.0.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/twitter-core-3.0.0.aar/e2a5734f3fcfbafc0844ee968167bb51/AndroidManifest.xml:23:5-44
@@ -169,14 +173,16 @@ MERGED from [com.google.firebase:firebase-storage-common:11.4.0] /Users/3rddigit
 MERGED from [com.google.firebase:firebase-storage-common:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/firebase-storage-common-11.4.0.aar/767b4aeba5adda24a746236827c48fb5/AndroidManifest.xml:3:5-43
 MERGED from [com.google.android.gms:play-services-basement:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/play-services-basement-11.4.0.aar/e521457a20059ec2b3a56b032246800c/AndroidManifest.xml:17:5-43
 MERGED from [com.google.android.gms:play-services-basement:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/play-services-basement-11.4.0.aar/e521457a20059ec2b3a56b032246800c/AndroidManifest.xml:17:5-43
-MERGED from [com.facebook.fbui.textlayoutbuilder:textlayoutbuilder:1.0.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/textlayoutbuilder-1.0.0.aar/9e9e72c8818c3271bd1eb6df9cbba47c/AndroidManifest.xml:14:5-16:41
-MERGED from [com.facebook.fbui.textlayoutbuilder:textlayoutbuilder:1.0.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/textlayoutbuilder-1.0.0.aar/9e9e72c8818c3271bd1eb6df9cbba47c/AndroidManifest.xml:14:5-16:41
+MERGED from [com.facebook.fresco:animated-base:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/animated-base-1.3.0.aar/ba7291d32a4363164e711a8ad66125b3/AndroidManifest.xml:5:5-7:41
+MERGED from [com.facebook.fresco:animated-base:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/animated-base-1.3.0.aar/ba7291d32a4363164e711a8ad66125b3/AndroidManifest.xml:5:5-7:41
 MERGED from [com.facebook.fresco:fresco:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/fresco-1.3.0.aar/9e5a4af6a5a08e5b074b9e83dd1a4ba0/AndroidManifest.xml:5:5-7:41
 MERGED from [com.facebook.fresco:fresco:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/fresco-1.3.0.aar/9e5a4af6a5a08e5b074b9e83dd1a4ba0/AndroidManifest.xml:5:5-7:41
 MERGED from [com.facebook.fresco:imagepipeline-okhttp3:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-okhttp3-1.3.0.aar/63ef8fe693fd1b523bb34dd8ca69e844/AndroidManifest.xml:5:5-7:41
 MERGED from [com.facebook.fresco:imagepipeline-okhttp3:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-okhttp3-1.3.0.aar/63ef8fe693fd1b523bb34dd8ca69e844/AndroidManifest.xml:5:5-7:41
-MERGED from [com.facebook.soloader:soloader:0.1.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/soloader-0.1.0.aar/e8125bbf4ff058c9f2e2e5a5b5933116/AndroidManifest.xml:2:3-70
-MERGED from [com.facebook.soloader:soloader:0.1.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/soloader-0.1.0.aar/e8125bbf4ff058c9f2e2e5a5b5933116/AndroidManifest.xml:2:3-70
+MERGED from [com.facebook.fresco:imagepipeline:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-1.3.0.aar/dfbee40248546ac5954b68a726f519cf/AndroidManifest.xml:5:5-7:41
+MERGED from [com.facebook.fresco:imagepipeline:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-1.3.0.aar/dfbee40248546ac5954b68a726f519cf/AndroidManifest.xml:5:5-7:41
+MERGED from [com.facebook.fresco:imagepipeline-base:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-base-1.3.0.aar/48431a8d852188a5d3efb89678fc6299/AndroidManifest.xml:5:5-7:41
+MERGED from [com.facebook.fresco:imagepipeline-base:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-base-1.3.0.aar/48431a8d852188a5d3efb89678fc6299/AndroidManifest.xml:5:5-7:41
 MERGED from [com.facebook.android:facebook-places:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-places-4.30.0.aar/d184dff55d6fcf828f1b581eb91f17ca/AndroidManifest.xml:24:5-26:41
 MERGED from [com.facebook.android:facebook-places:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-places-4.30.0.aar/d184dff55d6fcf828f1b581eb91f17ca/AndroidManifest.xml:24:5-26:41
 MERGED from [com.facebook.android:facebook-applinks:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-applinks-4.30.0.aar/5e3d26f6c283f04ff8c4278c4a415eed/AndroidManifest.xml:24:5-26:41
@@ -185,16 +191,16 @@ MERGED from [com.facebook.android:facebook-messenger:4.30.0] /Users/3rddigital-0
 MERGED from [com.facebook.android:facebook-messenger:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-messenger-4.30.0.aar/b90a0d13d6f3dff2c1d6fd482da85f41/AndroidManifest.xml:24:5-26:41
 MERGED from [com.facebook.android:facebook-core:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-core-4.30.0.aar/68331c8742f6ea0d3277a260a5908068/AndroidManifest.xml:24:5-26:41
 MERGED from [com.facebook.android:facebook-core:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-core-4.30.0.aar/68331c8742f6ea0d3277a260a5908068/AndroidManifest.xml:24:5-26:41
-MERGED from [com.android.support:support-v4:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/support-v4-27.0.2.aar/57fe5ca69a21e0e626b02bc2833cb17b/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-v4:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/support-v4-27.0.2.aar/57fe5ca69a21e0e626b02bc2833cb17b/AndroidManifest.xml:20:5-44
 MERGED from [com.facebook.fresco:drawee:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/drawee-1.3.0.aar/6edb9e513062bdb6ebc4b2caadb8d443/AndroidManifest.xml:5:5-7:41
 MERGED from [com.facebook.fresco:drawee:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/drawee-1.3.0.aar/6edb9e513062bdb6ebc4b2caadb8d443/AndroidManifest.xml:5:5-7:41
-MERGED from [com.facebook.fresco:imagepipeline:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-1.3.0.aar/dfbee40248546ac5954b68a726f519cf/AndroidManifest.xml:5:5-7:41
-MERGED from [com.facebook.fresco:imagepipeline:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-1.3.0.aar/dfbee40248546ac5954b68a726f519cf/AndroidManifest.xml:5:5-7:41
-MERGED from [com.facebook.fresco:imagepipeline-base:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-base-1.3.0.aar/48431a8d852188a5d3efb89678fc6299/AndroidManifest.xml:5:5-7:41
-MERGED from [com.facebook.fresco:imagepipeline-base:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/imagepipeline-base-1.3.0.aar/48431a8d852188a5d3efb89678fc6299/AndroidManifest.xml:5:5-7:41
 MERGED from [com.facebook.fresco:fbcore:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/fbcore-1.3.0.aar/c6629227ea4f3c5c3588d4c0afd6e6ef/AndroidManifest.xml:5:5-7:41
 MERGED from [com.facebook.fresco:fbcore:1.3.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/fbcore-1.3.0.aar/c6629227ea4f3c5c3588d4c0afd6e6ef/AndroidManifest.xml:5:5-7:41
+MERGED from [com.facebook.fbui.textlayoutbuilder:textlayoutbuilder:1.0.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/textlayoutbuilder-1.0.0.aar/9e9e72c8818c3271bd1eb6df9cbba47c/AndroidManifest.xml:14:5-16:41
+MERGED from [com.facebook.fbui.textlayoutbuilder:textlayoutbuilder:1.0.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/textlayoutbuilder-1.0.0.aar/9e9e72c8818c3271bd1eb6df9cbba47c/AndroidManifest.xml:14:5-16:41
+MERGED from [com.facebook.soloader:soloader:0.1.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/soloader-0.1.0.aar/e8125bbf4ff058c9f2e2e5a5b5933116/AndroidManifest.xml:2:3-70
+MERGED from [com.facebook.soloader:soloader:0.1.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/soloader-0.1.0.aar/e8125bbf4ff058c9f2e2e5a5b5933116/AndroidManifest.xml:2:3-70
+MERGED from [com.android.support:support-v4:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/support-v4-27.0.2.aar/57fe5ca69a21e0e626b02bc2833cb17b/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-v4:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/support-v4-27.0.2.aar/57fe5ca69a21e0e626b02bc2833cb17b/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support:support-fragment:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/support-fragment-27.0.2.aar/16dfa7c1c6c7308090c3c28d2e2f7160/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support:support-fragment:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/support-fragment-27.0.2.aar/16dfa7c1c6c7308090c3c28d2e2f7160/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support:support-core-utils:27.0.2] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/support-core-utils-27.0.2.aar/5f19884acd5d1a31db1f03969509484f/AndroidManifest.xml:20:5-44
@@ -261,10 +267,6 @@ MERGED from [com.google.android.gms:play-services-tasks:11.4.0] /Users/3rddigita
 MERGED from [com.google.android.gms:play-services-tasks:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/play-services-tasks-11.4.0.aar/49feb32540ff5d322a12c5a4596ae613/AndroidManifest.xml:4:5-19
 MERGED from [com.google.android.gms:play-services-basement:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/play-services-basement-11.4.0.aar/e521457a20059ec2b3a56b032246800c/AndroidManifest.xml:19:5-21:19
 MERGED from [com.google.android.gms:play-services-basement:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/play-services-basement-11.4.0.aar/e521457a20059ec2b3a56b032246800c/AndroidManifest.xml:19:5-21:19
-MERGED from [com.facebook.soloader:soloader:0.1.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/soloader-0.1.0.aar/e8125bbf4ff058c9f2e2e5a5b5933116/AndroidManifest.xml:3:3-17
-MERGED from [com.facebook.soloader:soloader:0.1.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/soloader-0.1.0.aar/e8125bbf4ff058c9f2e2e5a5b5933116/AndroidManifest.xml:3:3-17
-MERGED from [org.webkit:android-jsc:r174650] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/android-jsc-r174650.aar/ddfffdc5839576b6af77476fb8e2c460/AndroidManifest.xml:2:3-17
-MERGED from [org.webkit:android-jsc:r174650] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/android-jsc-r174650.aar/ddfffdc5839576b6af77476fb8e2c460/AndroidManifest.xml:2:3-17
 MERGED from [com.facebook.android:facebook-places:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-places-4.30.0.aar/d184dff55d6fcf828f1b581eb91f17ca/AndroidManifest.xml:28:5-29:19
 MERGED from [com.facebook.android:facebook-places:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-places-4.30.0.aar/d184dff55d6fcf828f1b581eb91f17ca/AndroidManifest.xml:28:5-29:19
 MERGED from [com.facebook.android:facebook-applinks:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-applinks-4.30.0.aar/5e3d26f6c283f04ff8c4278c4a415eed/AndroidManifest.xml:28:5-29:19
@@ -273,6 +275,10 @@ MERGED from [com.facebook.android:facebook-messenger:4.30.0] /Users/3rddigital-0
 MERGED from [com.facebook.android:facebook-messenger:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-messenger-4.30.0.aar/b90a0d13d6f3dff2c1d6fd482da85f41/AndroidManifest.xml:28:5-29:19
 MERGED from [com.facebook.android:facebook-core:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-core-4.30.0.aar/68331c8742f6ea0d3277a260a5908068/AndroidManifest.xml:28:5-43:19
 MERGED from [com.facebook.android:facebook-core:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-core-4.30.0.aar/68331c8742f6ea0d3277a260a5908068/AndroidManifest.xml:28:5-43:19
+MERGED from [com.facebook.soloader:soloader:0.1.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/soloader-0.1.0.aar/e8125bbf4ff058c9f2e2e5a5b5933116/AndroidManifest.xml:3:3-17
+MERGED from [com.facebook.soloader:soloader:0.1.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/soloader-0.1.0.aar/e8125bbf4ff058c9f2e2e5a5b5933116/AndroidManifest.xml:3:3-17
+MERGED from [org.webkit:android-jsc:r174650] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/android-jsc-r174650.aar/ddfffdc5839576b6af77476fb8e2c460/AndroidManifest.xml:2:3-17
+MERGED from [org.webkit:android-jsc:r174650] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/android-jsc-r174650.aar/ddfffdc5839576b6af77476fb8e2c460/AndroidManifest.xml:2:3-17
 	android:supportsRtl
 		ADDED from [com.facebook.android:facebook-android-sdk:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-android-sdk-4.30.0.aar/da5071581bf87161f944069a05496d80/AndroidManifest.xml:28:18-44
 	android:label
@@ -547,10 +553,6 @@ ADDED from [com.google.android.gms:play-services-basement:11.4.0] /Users/3rddigi
 		ADDED from [com.google.android.gms:play-services-basement:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/play-services-basement-11.4.0.aar/e521457a20059ec2b3a56b032246800c/AndroidManifest.xml:20:66-119
 	android:name
 		ADDED from [com.google.android.gms:play-services-basement:11.4.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/play-services-basement-11.4.0.aar/e521457a20059ec2b3a56b032246800c/AndroidManifest.xml:20:20-65
-uses-permission#android.permission.READ_PHONE_STATE
-IMPLIED from /Projects/PawpadsMobile 2/android/app/src/main/AndroidManifest.xml:1:1-53:12 reason: org.webkit.android_jsc has a targetSdkVersion < 4
-uses-permission#android.permission.READ_EXTERNAL_STORAGE
-IMPLIED from /Projects/PawpadsMobile 2/android/app/src/main/AndroidManifest.xml:1:1-53:12 reason: org.webkit.android_jsc requested WRITE_EXTERNAL_STORAGE
 provider#com.facebook.internal.FacebookInitProvider
 ADDED from [com.facebook.android:facebook-core:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-core-4.30.0.aar/68331c8742f6ea0d3277a260a5908068/AndroidManifest.xml:39:9-42:40
 	android:authorities
@@ -559,3 +561,7 @@ ADDED from [com.facebook.android:facebook-core:4.30.0] /Users/3rddigital-001/.gr
 		ADDED from [com.facebook.android:facebook-core:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-core-4.30.0.aar/68331c8742f6ea0d3277a260a5908068/AndroidManifest.xml:42:13-37
 	android:name
 		ADDED from [com.facebook.android:facebook-core:4.30.0] /Users/3rddigital-001/.gradle/caches/transforms-1/files-1.1/facebook-core-4.30.0.aar/68331c8742f6ea0d3277a260a5908068/AndroidManifest.xml:40:13-70
+uses-permission#android.permission.READ_PHONE_STATE
+IMPLIED from /Projects/PawpadsMobile 2/android/app/src/main/AndroidManifest.xml:1:1-53:12 reason: org.webkit.android_jsc has a targetSdkVersion < 4
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+IMPLIED from /Projects/PawpadsMobile 2/android/app/src/main/AndroidManifest.xml:1:1-53:12 reason: org.webkit.android_jsc requested WRITE_EXTERNAL_STORAGE
