@@ -234,6 +234,7 @@ class TabNearBy extends Component {
 
                          datamigrationobj.state.nearByUsers.push(profile)
                          datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
+                         datamigrationobj.props.NearByUsers(datamigrationobj.state.nearByUsers)
 
                        })
                      }
@@ -317,7 +318,6 @@ class TabNearBy extends Component {
         }, 2000)
     }
 
-
     renderNearBy() {
         if(this.state.loading) {
             return (
@@ -326,7 +326,7 @@ class TabNearBy extends Component {
 				</View>
 			);
         } else{
-            if(this.state.nearByUsers){
+            if(this.state.nearByUsers.length > 0){
                 return(
                     <List
                         refreshControl={
@@ -347,8 +347,8 @@ class TabNearBy extends Component {
                                     <Text style = {styles.menuItem}>{data.full_name}</Text> :
                                     <Text style = {styles.menuItem}>{data.login}</Text> }
                                 {this.state.distance_unit == 'km' ?
-                                    <Text style = {styles.distance}>{parseInt(geofire.distance([this.state.latitude, this.state.longitude], [data.latitude,data.longitude]))} {this.state.distance_unit}</Text> :
-                                    <Text style = {styles.distance} numberOfLines = {1}>{parseInt((geofire.distance([this.state.latitude, this.state.longitude], [data.latitude,data.longitude]))/1.60934)} {this.state.distance_unit}</Text>}
+                                    <Text style = {styles.distance}>{this.calculateDistance(data)} {this.state.distance_unit}</Text> :
+                                    <Text style = {styles.distance} numberOfLines = {1}>{this.calculateDistance(data)/1.60934} {this.state.distance_unit}</Text>}
                             </ListItem>
                         }
                     >
@@ -363,6 +363,13 @@ class TabNearBy extends Component {
             }
 
         }
+    }
+
+    calculateDistance(data) {
+      let distance = parseInt(geofire.distance([this.state.latitude, this.state.longitude], [data.latitude,data.longitude]))
+      data.distance = distance
+      return distance
+
     }
 
     render() {

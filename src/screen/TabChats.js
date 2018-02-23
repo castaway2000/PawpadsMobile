@@ -21,6 +21,7 @@ import Constant from '../common/Constant'
 import { connect } from 'react-redux'
 import {sendRequest} from '../actions/http';
 import RNFirebase from 'react-native-firebase';
+
 import {CachedImage} from 'react-native-img-cache';
 
 const datas = []
@@ -182,15 +183,16 @@ class TabChats extends Component {
                             console.log("url IS a a:",url);
                             for(var i = 0;i < this.state.dialogs.length; i++){
                                 if(this.state.dialogs[i].last_message_user_id == profile["id"]){
-                                    this.state.dialogs[i]['blob_id'] = url;
+                                    this.state.dialogs[i]['profileurl'] = url;
                                     console.log("url IS a a:",url);
                                 }
                             }
+
                             this.setState({
                                 refresh: true
                             });
 
-                            this.props.ChannelsUsers(this.state.dialogs)
+                            this.props.ChatsUsers(this.state.dialogs)
 
                           })
                         }
@@ -224,11 +226,12 @@ class TabChats extends Component {
         .then((response) => response.json())
         .then((responseData) => {
 
-            for(var i = 0;i < this.state.dialogs.length; i++){
-                if(this.state.dialogs[i].name == responseData.user.login || this.state.dialogs[i].name == responseData.user.full_name){
+            for(var i = 0; i < this.state.dialogs.length; i++) {
+                if(this.state.dialogs[i].name == responseData.user.login || this.state.dialogs[i].name == responseData.user.full_name) {
                     this.state.dialogs[i]['blob_id'] = responseData.user.blob_id;
                 }
             }
+
             this.setState({
                 refresh: true
             });
@@ -241,21 +244,20 @@ class TabChats extends Component {
     }
 
     renderChats() {
-        if(this.state.loading){
+        if(this.state.loading) {
             return (
 				<View style={styles.loadingView}>
 					<ActivityIndicator color={'black'} size={'large'}/>
 				</View>
 			);
-        }
-        else{
+    } else {
             return(
                 this.state.dialogs.map((data, index) => {
                     return(
                       <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('Chat', {GroupName: data.name, GroupChatting: true, Dialog: data, Token: this.state.token})} key = {index}>
                         {this.state.refresh == false? this.downloadLastUserFirebase(data.occupants_ids) : null}
                         <View style = {styles.menuIcon} >
-                          <CachedImage source = {{ uri: data.blob_id }}
+                          <CachedImage source = {{ uri: data.profileurl }}
                           defaultSource = {require('../assets/img/user_placeholder.png')}
                           style = {styles.menuIcon} />
                         </View>
@@ -318,7 +320,7 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
-        backgroundColor: 'white',
+        backgroundColor: '#f1eff0',
 
     },
     chatBtn: {

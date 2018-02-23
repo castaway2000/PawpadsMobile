@@ -5,12 +5,14 @@ import Constant from '../common/Constant'
 
 // create a component
 class About extends Component {
+
     constructor(props) {
         super(props);
         this.state = {
 
         };
     }
+    
     render() {
         return (
             <View style={styles.container}>
