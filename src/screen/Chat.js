@@ -29,8 +29,10 @@ import {Actions} from 'react-native-router-flux';
 import {getChatMessage, sendMessage} from '../actions';
 import {colors} from '../actions/const';
 import {ChatMessageBox, ChatBoxUser, ChatBoxDoctor} from './common';
+
 import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
 
 import GifScroller from '../components/ThirdParty/GifScroller.js';
@@ -289,7 +291,7 @@ getChatMessageFirebase() {
 				console.log(e)
 			})
 		})
-    }
+	}
 
 		downloadLastUserFirebase() {
 

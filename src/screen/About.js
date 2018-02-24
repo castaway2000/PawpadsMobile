@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView } from 'react-native';
 import Constant from '../common/Constant'
+import { Linking } from 'react-native'
 
 // create a component
 class About extends Component {
@@ -12,7 +13,11 @@ class About extends Component {
 
         };
     }
-    
+
+    onEmail() {
+      Linking.openURL('mailto:feedback@pawpadsapp.com.com&subject=feedback&body=Hello')
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -35,7 +40,7 @@ class About extends Component {
                         </View>
                         <Text style = {styles.icondesign}>Icon design: Riverbreak</Text>
                         <Image source = {require('../assets/img/fa_logo.png')} style = {{width: 50, height: 28, resizeMode:'contain', marginTop: 20}}/>
-                        <TouchableOpacity style = {styles.sendBtn}>
+                        <TouchableOpacity style = {styles.sendBtn} onPress = {this.onEmail} >
                             <Image source = {require('../assets/img/transparent_button.png')} style = {styles.loginButtonImg}/>
                             <Text style = {{color: 'white',backgroundColor: 'transparent'}}>Send feedback</Text>
                         </TouchableOpacity>

@@ -1,14 +1,18 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight, AsyncStorage } from 'react-native';
+import { Alert, View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight, AsyncStorage } from 'react-native';
 import Constant from '../common/Constant'
 // import CheckBox from 'react-native-icon-checkbox';
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
 import {Button} from 'native-base';
 import {colors} from '../actions/const';
 
+import RNFirebase from 'react-native-firebase';
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
 // create a component
 class Settings extends Component {
+
     constructor(props) {
         super(props);
         this.state = {
@@ -22,9 +26,17 @@ class Settings extends Component {
             isTogglepushSelected: false,
             isToggleMessagingSelected: true,
             searchRange: '60',
+			      tableId:'',
         };
     }
+
     componentWillMount() {
+
+      AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+        console.log("tableId is:",value);
+        this.setState({tableId: value })
+      })
+
         AsyncStorage.getItem(Constant.SETTINGS_DISTANCE_UNIT).then((value) => {
             if(value == 'km'){
                 this.setState({
@@ -38,12 +50,16 @@ class Settings extends Component {
                 })
             }
         })
+
         AsyncStorage.getItem(Constant.SETTINGS_RANGE).then((value) => {
+
             if(value){
                 this.setState({ searchRange: value })
             }
         })
+
         AsyncStorage.getItem(Constant.SETTINGS_GPS_ACCURACY).then((value) => {
+
             if(value == 'High'){
                 this.setState({
                     isHighSelected: true,
@@ -56,7 +72,7 @@ class Settings extends Component {
                     isMediumSelected: true,
                     isLowSelected: false,
                 })
-            }else{
+            } else {
                 this.setState({
                     isHighSelected: false,
                     isMediumSelected: false,
@@ -65,18 +81,21 @@ class Settings extends Component {
             }
         })
     }
+
     handleSelectedKilometers = (checked) => {
         this.setState({
             isKilometerSelected: true,
             isMilesSelected: false
         });
     }
+
     handleSelectedMiles = (checked) => {
         this.setState({
             isKilometerSelected: false,
             isMilesSelected: true
         });
     }
+
     handleSelectedHigh = (checked) => {
         this.setState({
             isHighSelected: true,
@@ -84,6 +103,7 @@ class Settings extends Component {
             isLowSelected: false
         })
     }
+
     handleSelectedMedium = (checked) => {
         this.setState({
             isHighSelected: false,
@@ -91,6 +111,7 @@ class Settings extends Component {
             isLowSelected: false
         })
     }
+
     handleSelectedLow = (checked) => {
         this.setState({
             isHighSelected: false,
@@ -98,6 +119,7 @@ class Settings extends Component {
             isLowSelected: true
         })
     }
+
     handleSelectedPush = (checked) => {
       if (this.state.isTogglepushSelected == false) {
         this.setState({
@@ -108,10 +130,9 @@ class Settings extends Component {
             isTogglepushSelected: false,
         })
       }
-
     }
-    handleSelectedMessaging = (checked) => {
 
+    handleSelectedMessaging = (checked) => {
 
         if (this.state.isToggleMessagingSelected == false) {
           this.setState({
@@ -119,7 +140,7 @@ class Settings extends Component {
           })
         } else {
           this.setState({
-              isTogglepushSelected: false,
+              isToggleMessagingSelected: false,
           })
         }
     }
@@ -157,6 +178,22 @@ class Settings extends Component {
 
         this.props.navigation.goBack()
     }
+
+    deleteAccount = () => {
+      this.popupDialog.dismiss()
+
+      var updatescontent2 = {};
+      updatescontent2['/users/' + this.state.tableId + '/' + "isDeleted"] = 'true'
+      firebase.database().ref().update(updatescontent2)
+
+      Alert.alert('Your account deleted successfully.','',
+      [
+        {text: 'OK', onPress: () => this.props.navigation.navigate('Logout')},
+      ],
+  {cancelable: false}
+)
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -239,7 +276,7 @@ class Settings extends Component {
                         <Text style = {{textAlign:'center', fontWeight:'bold', marginTop: 10}}>Are you sure you want to delete your account?</Text>
                         <Text style = {{textAlign:'center', color:'#545454', fontSize: 13, marginTop: 10}}>if you delete your account you will permanently loose your profile, photos and messages.</Text>
                         <View style = {{width:Constant.WIDTH_SCREEN*0.7, height:1, backgroundColor:'#e4e4e4', marginTop: 15}}/>
-                        <TouchableOpacity style = {{marginTop: 12}}>
+                        <TouchableOpacity style = {{marginTop: 12}} onPress = {() => this.deleteAccount()}>
                             <Text style = {{textAlign:'center', color:'#fb5e33'}}>Delete</Text>
                         </TouchableOpacity>
                     </View>

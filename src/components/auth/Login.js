@@ -12,6 +12,7 @@ import RNFirebase from 'react-native-firebase';
 import { LoginManager } from 'react-native-fbsdk'
 import { LoginButton, AccessToken, GraphRequestManager, GraphRequest } from 'react-native-fbsdk';
 
+
 import {
     EMAIL_CHANGED,
     PASSWORD_CHANGED,
@@ -40,8 +41,8 @@ class Login extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            name: 'test001', //cris 1BITJAY_1875640410  howsonanna stad blaze test001
-            password: '12345678', //
+            name: '', //cris 1BITJAY_1875640410  howsonanna stad blaze test001
+            password: '', //
             qb_token: '',
             loading: this.props.loading,
             isname: true,
@@ -308,48 +309,53 @@ class Login extends Component {
                     let updated_at = response[tableId]["updated_at"]
                     let password = response[tableId]["password"]
                     let isDataMigrated = response[tableId]["isDataMigrated"]
+                    let isAccountDeleted = response[tableId]["isDeleted"]
 
                     console.log("User password found on firebase. Password is:" ,password);
                     this.setState({ loading: false })
 
-                    //Decrypt password
-                    var plaintextpassword  = CryptoJS.AES.decrypt(password.toString(), Constant.FIREBASE_PASS_SECRET).toString(CryptoJS.enc.Utf8);
-
-                    if (plaintextpassword == this.state.password) {
-                      console.log("User entered correct password");
-
-                      //save pref
-                      AsyncStorage.setItem(Constant.USER_TABEL_ID, tableId);
-
-                      if (qbID) {
-                        AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
-                      }
-
-                      if (this.state.password) {
-                        AsyncStorage.setItem(Constant.USER_PASSWORD, this.state.password);
-                      }
-
-                      if (login) {
-                        AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
-                      }
-
-                      if (email) {
-                        AsyncStorage.setItem(Constant.USER_EMAIL, email);
-                      }
-
-                      if (blob_id) {
-                        AsyncStorage.setItem(Constant.USER_BLOBID, blob_id.toString());
-                      }
-
-                      if (isDataMigrated == "true") {
-                        this._checkDataMigration("true")
-                      } else {
-                        this.getQB_Token_User(this.state.name, this.state.password)
-                      }
-
+                    if (isAccountDeleted) {
+                      alert('Account is deleted.')
                     } else {
-                      console.log("User entered wrong password");
-                      alert("Please enter correct password.")
+                      //Decrypt password
+                      var plaintextpassword  = CryptoJS.AES.decrypt(password.toString(), Constant.FIREBASE_PASS_SECRET).toString(CryptoJS.enc.Utf8);
+
+                      if (plaintextpassword == this.state.password) {
+                        console.log("User entered correct password");
+
+                        //save pref
+                        AsyncStorage.setItem(Constant.USER_TABEL_ID, tableId);
+
+                        if (qbID) {
+                          AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
+                        }
+
+                        if (this.state.password) {
+                          AsyncStorage.setItem(Constant.USER_PASSWORD, this.state.password);
+                        }
+
+                        if (login) {
+                          AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                        }
+
+                        if (email) {
+                          AsyncStorage.setItem(Constant.USER_EMAIL, email);
+                        }
+
+                        if (blob_id) {
+                          AsyncStorage.setItem(Constant.USER_BLOBID, blob_id.toString());
+                        }
+
+                        if (isDataMigrated == "true") {
+                          this._checkDataMigration("true")
+                        } else {
+                          this.getQB_Token_User(this.state.name, this.state.password)
+                        }
+
+                      } else {
+                        console.log("User entered wrong password");
+                        alert("Please enter correct password.")
+                      }
                     }
                   } else {
                     console.log("User Not found on Firebase.")
@@ -408,33 +414,38 @@ class Login extends Component {
                       let updated_at = response[tableId]["updated_at"]
                       let password = response[tableId]["password"]
                       let isDataMigrated = response[tableId]["isDataMigrated"]
+                      let isAccountDeleted = response[tableId]["isDeleted"]
 
-                      //save pref
-                      AsyncStorage.setItem(Constant.USER_TABEL_ID, tableId);
-
-                      if (qbID) {
-                        AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
-                      }
-
-                      if (login) {
-                        AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
-                      }
-
-                      if (email) {
-                        AsyncStorage.setItem(Constant.USER_EMAIL, email);
-                      }
-
-                      if(blob_id) {
-                          AsyncStorage.setItem(Constant.USER_BLOBID, blob_id.toString());
-                      }
-
-                      //Go to home
-                      if (isDataMigrated == "true") {
-                        this._checkDataMigration(isDataMigrated)
+                      if (isAccountDeleted) {
+                        alert('Account is deleted.')
                       } else {
-                        this.getQB_Token_User_Twitter(authToken,authTokenSecret)
-                      }
+                        //save pref
+                        AsyncStorage.setItem(Constant.USER_TABEL_ID, tableId);
 
+                        if (qbID) {
+                          AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
+                        }
+
+                        if (login) {
+                          AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                        }
+
+                        if (email) {
+                          AsyncStorage.setItem(Constant.USER_EMAIL, email);
+                        }
+
+                        if(blob_id) {
+                            AsyncStorage.setItem(Constant.USER_BLOBID, blob_id.toString());
+                        }
+
+                        //Go to home
+                        if (isDataMigrated == "true") {
+                          this._checkDataMigration(isDataMigrated)
+                        } else {
+                          this.getQB_Token_User_Twitter(authToken,authTokenSecret)
+                        }
+
+                      }
                     } else {
                       //Check quickblox for twitter data
                       this._loginWithQuickbloxTwitter(authToken,authTokenSecret,loginData)
@@ -506,31 +517,36 @@ class Login extends Component {
                              let updated_at = response[tableId]["updated_at"]
                              let password = response[tableId]["password"]
                              let isDataMigrated = response[tableId]["isDataMigrated"]
+                             let isAccountDeleted = response[tableId]["isDeleted"]
 
-                             //save pref
-                             AsyncStorage.setItem(Constant.USER_TABEL_ID, tableId);
-
-                             if (qbID) {
-                               AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
-                             }
-
-                             if (login) {
-                               AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
-                             }
-
-                             if (email) {
-                               AsyncStorage.setItem(Constant.USER_EMAIL, email);
-                             }
-
-                             if(blob_id) {
-                                 AsyncStorage.setItem(Constant.USER_BLOBID, blob_id.toString());
-                             }
-
-                             //Go to home
-                             if (isDataMigrated = "true") {
-                               tmp._checkDataMigration(isDataMigrated)
+                             if (isAccountDeleted) {
+                               alert('Account is deleted.')
                              } else {
-                               tmp.getQB_Token_User_Facebook(accessToken)
+                               //save pref
+                               AsyncStorage.setItem(Constant.USER_TABEL_ID, tableId);
+
+                               if (qbID) {
+                                 AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
+                               }
+
+                               if (login) {
+                                 AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                               }
+
+                               if (email) {
+                                 AsyncStorage.setItem(Constant.USER_EMAIL, email);
+                               }
+
+                               if(blob_id) {
+                                   AsyncStorage.setItem(Constant.USER_BLOBID, blob_id.toString());
+                               }
+
+                               //Go to home
+                               if (isDataMigrated = "true") {
+                                 tmp._checkDataMigration(isDataMigrated)
+                               } else {
+                                 tmp.getQB_Token_User_Facebook(accessToken)
+                               }
                              }
 
                            } else {

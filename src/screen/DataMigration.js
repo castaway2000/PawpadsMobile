@@ -161,6 +161,11 @@ class DataMigration extends Component {
         var updates = {};
         var newKey = firebase.database().ref().child('friendlist').push().key;
         updates = responseData["items"][index]
+
+        responseData["items"][index].user1 = responseData["items"][index].user1.toString()
+        responseData["items"][index].user2 = responseData["items"][index].user2.toString()
+        responseData["items"][index].user_id = responseData["items"][index].user_id.toString()
+
         firebase.database().ref().child('/friendlist/' + responseData["items"][index]["_id"]).set(updates)
       }
 

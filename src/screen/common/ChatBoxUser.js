@@ -8,9 +8,10 @@ import {
 	TouchableOpacity,
 } from 'react-native';
 import Constant from '../../common/Constant'
-import RNFirebase from 'react-native-firebase';
 
+import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
 import {CachedImage} from 'react-native-img-cache';
 
 class ChatBoxUser extends Component {

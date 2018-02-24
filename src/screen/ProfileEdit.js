@@ -362,7 +362,7 @@ class ProfileEdit extends Component {
               });
             alert("Profile Updated Successfully!")
           }
-});
+        });
       } else {
         isCoverphotoUpdated = true
       }

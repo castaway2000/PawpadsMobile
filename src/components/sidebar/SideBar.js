@@ -66,7 +66,6 @@ class SideBar extends Component {
     componentWillMount() {
         this.loadUserData()
 
-
         const defaultGetStateForAction = Drawer.router.getStateForAction;
 
         Drawer.router.getStateForAction = (action, state) => {
@@ -187,7 +186,6 @@ class SideBar extends Component {
                                     defaultSource = {require('../../assets/img/user_placeholder.png')}
                                     style = {styles.userPhoto} />
                             </TouchableOpacity>
-
 
                             <Text style = {styles.name}>{this.state.fullname}</Text>
                             <TouchableOpacity style = {styles.editBtn} onPress = {this._onEdit}>

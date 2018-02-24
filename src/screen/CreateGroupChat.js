@@ -191,7 +191,7 @@ class CreateGroupChat extends Component {
             )
         }
     }
-    
+
     render() {
         var { filteredData } = this.props;
         <StatusBar
