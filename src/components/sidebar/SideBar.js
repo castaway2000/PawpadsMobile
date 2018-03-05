@@ -86,13 +86,13 @@ class SideBar extends Component {
 
     loadUserData(){
 
-      AsyncStorage.getItem(Constant.USER_BLOBID).then((value2) => {
+      AsyncStorage.getItem(Constant.USER_BLOBID).then((value1) => {
           this.setState({
               name: value1,
           })
       })
 
-        AsyncStorage.getItem(Constant.USER_FULL_NAME).then((value1) => {
+        AsyncStorage.getItem(Constant.USER_FULL_NAME).then((value2) => {
           this.setState({
               blob_id: value2,
           })

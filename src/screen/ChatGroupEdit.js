@@ -14,6 +14,7 @@ var ImagePicker = require("react-native-image-picker");
 
 import {CachedImage} from 'react-native-img-cache';
 
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
 
 var isCamera = false;
 var isGallery = false;
@@ -426,13 +427,14 @@ class ChatGroupEdit extends Component {
 
           //Update custom_data
           var updatescontent2 = {};
-          updatescontent2['/dialog/' + params.Dialog._id + '/photo' ] = milliseconds.toString()
+          updatescontent2['/dialog/' + params.Dialog._id + '/photo'] = milliseconds.toString()
           firebase.database().ref().update(updatescontent2)
 
           params.Dialog.name = this.state.groupName
 
           this.setState({ loading: false })
-          alert("Profile Updated Successfully!")
+
+          alert("Group Updated Successfully!")
         });
       } else {
 
@@ -444,7 +446,7 @@ class ChatGroupEdit extends Component {
         params.Dialog.name = this.state.groupName
 
         this.setState({ loading: false })
-        alert("Profile Updated Successfully!")
+        alert("Group Updated Successfully!")
       }
     }
 

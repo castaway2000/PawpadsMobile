@@ -141,7 +141,7 @@ class TabChats extends Component {
         }, 2000)
     }
 
-    downloadLastUserFirebase(data) {
+    downloadLastUserFirebase(data,index) {
 
       //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
       if (data.type == 2) {
@@ -176,13 +176,16 @@ class TabChats extends Component {
                         if (blobid == data.photo) {
 
                           firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
-                            console.log("url IS a a:",url);
+
+                            this.state.dialogs[index].profileurl = url;
+
+                            /*
                             for(var i = 0;i < this.state.dialogs.length; i++){
                                 if(this.state.dialogs[i].user_id == data.user_id){
                                     this.state.dialogs[i]['profileurl'] = url;
                                     console.log("url IS a a:",url);
                                 }
-                            }
+                            }*/
 
                             this.setState({
                                 refresh: true
@@ -201,70 +204,76 @@ class TabChats extends Component {
       } else if (data.type == 3) {
         //PRIVATE
 
-              let occupants_ids = data.occupants_ids
+        if (data.occupants_ids) {
+          let occupants_ids = data.occupants_ids
 
-                var last_message_userid = ''
-                for(var j=0; j<occupants_ids.length; j++){
-                    if(occupants_ids[j] != this.state.userID){
-                        last_message_userid = occupants_ids[j].toString()
-                    }
+          var last_message_userid = ''
+          for(var j=0; j<occupants_ids.length; j++) {
+            if(occupants_ids[j] != this.state.userID){
+              last_message_userid = occupants_ids[j].toString()
+            }
+          }
+
+          firebase.database()
+          .ref(`/users`)
+          .orderByChild("id")
+          .equalTo(last_message_userid)
+          .once("value")
+          .then(snapshot => {
+
+            if (snapshot.val()) {
+              var profileObj = snapshot.val();
+
+              if (profileObj) {
+
+                let keys = Object.keys(profileObj);
+                var profile = null;
+
+                if (keys.length > 0) {
+                  profile = profileObj[keys[0]]
                 }
 
-                firebase.database()
-                    .ref(`/users`)
-                    .orderByChild("id")
-                    .equalTo(last_message_userid)
-                    .once("value")
-                    .then(snapshot => {
+                if (profile) {
+                  this.state.dialogs[index]['name'] = profile.full_name?profile.full_name:profile.login;
 
-                      if (snapshot.val()) {
-                        var profileObj = snapshot.val();
+                  this.setState({ refresh: true});
 
-                        if (profileObj) {
-                          let keys = Object.keys(profileObj);
+                  if (profile["content"]) {
 
-                          console.log("profileObj IS a a:",profileObj);
+                    for (let item in profile["content"]) {
+                      let content = profile["content"][item]
+                      let blobid =  content["id"]
 
-                          var profile = null;
-                          if (keys.length > 0) {
-                            profile = profileObj[keys[0]]
-                          }
+                      if (blobid == profile["blob_id"]) {
+                        firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
+                          this.state.dialogs[index].profileurl = url;
 
-                          if (profile) {
-                            if (profile["content"]) {
-
-                              for (let item in profile["content"]) {
-                                let content = profile["content"][item]
-                                let blobid =  content["id"]
-
-                                if (blobid == profile["blob_id"]) {
-
-                                  firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
-                                    console.log("url IS a a:",url);
-                                    for(var i = 0;i < this.state.dialogs.length; i++){
-                                        if(this.state.dialogs[i].last_message_user_id == profile["id"]){
-                                            this.state.dialogs[i]['profileurl'] = url;
-                                            console.log("url IS a a:",url);
-                                        }
+                                /*
+                                console.log("url IS a a:",url);
+                                for(var i = 0;i < this.state.dialogs.length; i++){
+                                    if(this.state.dialogs[i].last_message_user_id == profile["id"]){
+                                        this.state.dialogs[i]['profileurl'] = url;
+                                        console.log("url IS a a:",url);
                                     }
+                                }*/
 
-                                    this.setState({
-                                        refresh: true
-                                    });
+                                this.setState({
+                                  refresh: true
+                                });
 
-                                    this.props.ChatsUsers(this.state.dialogs)
+                                this.props.ChatsUsers(this.state.dialogs)
 
-                                  })
-                                }
-                              }
+                              })
                             }
                           }
                         }
                       }
-                    })
-      }
-
-    }
+                    }
+                  }
+                })
+              }
+            }
+          }
 
     downloadLastUser(occupants_ids) {
 
@@ -317,9 +326,6 @@ class TabChats extends Component {
       }
     }
 
-
-
-
     renderChats() {
         if(this.state.loading) {
             return (
@@ -332,7 +338,7 @@ class TabChats extends Component {
                 this.state.dialogs.map((data, index) => {
                     return(
                       <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.checkAndNavigate(data)} key = {index}>
-                        {this.state.refresh == false? this.downloadLastUserFirebase(data) : null}
+                        {this.state.refresh == false? this.downloadLastUserFirebase(data,index) : null}
                         <View style = {styles.menuIcon} >
                           <CachedImage source = {{ uri: data.profileurl }}
                           defaultSource = {require('../assets/img/user_placeholder.png')}

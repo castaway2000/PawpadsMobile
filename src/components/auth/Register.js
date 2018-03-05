@@ -213,6 +213,7 @@ class Register extends Component {
                           AsyncStorage.setItem(Constant.USER_TABEL_ID, newKey);
                           AsyncStorage.setItem(Constant.QB_USERID, newKey);
                           AsyncStorage.setItem(Constant.USER_FULL_NAME, this.state.name);
+                          AsyncStorage.setItem(Constant.USER_LOGIN, this.state.name);
                           AsyncStorage.setItem(Constant.USER_EMAIL, this.state.email);
 
                           this.props.navigation.goBack()

@@ -12,7 +12,6 @@ import RNFirebase from 'react-native-firebase';
 import { LoginManager } from 'react-native-fbsdk'
 import { LoginButton, AccessToken, GraphRequestManager, GraphRequest } from 'react-native-fbsdk';
 
-
 import {
     EMAIL_CHANGED,
     PASSWORD_CHANGED,
@@ -41,8 +40,8 @@ class Login extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            name: '', //cris 1BITJAY_1875640410  howsonanna stad blaze test001
-            password: '', //
+            name: 'test001', //cris 1BITJAY_1875640410  howsonanna stad blaze
+            password: '12345678', //
             qb_token: '',
             loading: this.props.loading,
             isname: true,
@@ -334,8 +333,12 @@ class Login extends Component {
                           AsyncStorage.setItem(Constant.USER_PASSWORD, this.state.password);
                         }
 
+                        if (full_name) {
+                          AsyncStorage.setItem(Constant.USER_FULL_NAME, full_name);
+                        }
+
                         if (login) {
-                          AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                          AsyncStorage.setItem(Constant.USER_LOGIN, login);
                         }
 
                         if (email) {
@@ -426,8 +429,12 @@ class Login extends Component {
                           AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
                         }
 
+                        if (full_name) {
+                          AsyncStorage.setItem(Constant.USER_FULL_NAME, full_name);
+                        }
+
                         if (login) {
-                          AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                          AsyncStorage.setItem(Constant.USER_LOGIN, login);
                         }
 
                         if (email) {
@@ -529,8 +536,12 @@ class Login extends Component {
                                  AsyncStorage.setItem(Constant.QB_USERID, qbID.toString());
                                }
 
+                               if (full_name) {
+                                 AsyncStorage.setItem(Constant.USER_FULL_NAME, full_name);
+                               }
+
                                if (login) {
-                                 AsyncStorage.setItem(Constant.USER_FULL_NAME, login);
+                                 AsyncStorage.setItem(Constant.USER_LOGIN, login);
                                }
 
                                if (email) {

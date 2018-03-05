@@ -4,6 +4,8 @@ import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, 
 import Constant from '../common/Constant'
 import { Linking } from 'react-native'
 
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
 // create a component
 class About extends Component {
 

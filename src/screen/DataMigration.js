@@ -12,6 +12,8 @@ const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 import { initializeApp } from 'firebase'
 const geofire = require('geofire');
 
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
 const firebaseApp = initializeApp({
   apiKey: Constant.FIREBASE_API_KEY,
   authDomain: Constant.FIREBASE_AUTH_DOMAIN,
@@ -280,11 +282,30 @@ class DataMigration extends Component {
 
         })
       }
+
       _saveUserDialogtoFirebase = (responseData,index) => {
+
+        let dialog = responseData["items"][index];
+
+        if (dialog.user_id) {
+          dialog.user_id = dialog.user_id.toString()
+        }
+
+        if (dialog.last_message_user_id) {
+          dialog.last_message_user_id = dialog.last_message_user_id.toString()
+        }
+
+        if (dialog.occupants_ids) {
+          dialog.occupants_ids = dialog.occupants_ids.map(String)
+        }
+
         var updates = {};
         var newKey = firebase.database().ref().child('dialog').push().key;
-        updates = responseData["items"][index]
-        firebase.database().ref().child('/dialog/' + responseData["items"][index]["_id"]).set(updates)
+        updates = dialog
+        firebase.database().ref().child('/dialog/' + dialog._id).set(updates)
+
+        //save dialog to user noBorder
+        //firebase.database().ref().child('/users/' + this.state.tableId + '/dialog/'+ dialog._id).set(updates)
       }
 
       /**

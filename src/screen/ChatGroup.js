@@ -37,6 +37,8 @@ var ImagePicker = require("react-native-image-picker");
 import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
 var messages = []
 var currentUserid = ''
 var isCamera = false;

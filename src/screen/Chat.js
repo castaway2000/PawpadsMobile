@@ -29,18 +29,15 @@ import {Actions} from 'react-native-router-flux';
 import {getChatMessage, sendMessage} from '../actions';
 import {colors} from '../actions/const';
 import {ChatMessageBox, ChatBoxUser, ChatBoxDoctor} from './common';
-
 import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
-
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
-
 import GifScroller from '../components/ThirdParty/GifScroller.js';
-
-var ImagePicker = require("react-native-image-picker");
-
 import {CachedImage} from 'react-native-img-cache';
 
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
+var ImagePicker = require("react-native-image-picker");
 var messages = []
 var currentUserid = ''
 var firbaseChatObserver = null

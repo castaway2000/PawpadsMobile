@@ -7,6 +7,8 @@ import TabChannels from './TabChannels'
 import TabChats from './TabChats'
 import TabNearBy from './TabNearBy'
 
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
 // create a component
 class Dashboard extends Component {
     static navigationOptions = {
