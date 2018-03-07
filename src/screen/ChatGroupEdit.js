@@ -26,6 +26,7 @@ var groupParticipants = '';
 var adminName = '';
 var userPhotoURL = ''
 var currentUserid = '';
+var isGroupUpdated = false
 
 // create a component
 class ChatGroupEdit extends Component {
@@ -51,6 +52,7 @@ class ChatGroupEdit extends Component {
             loading: false,
             participants_datas:[],
             tableId:'',
+            isGroupUpdated:false,
         }
     }
     componentWillMount() {
@@ -74,11 +76,12 @@ class ChatGroupEdit extends Component {
         AsyncStorage.getItem(Constant.QB_USERID).then((currentUserId) => {
 
             if(params.Dialog != null && params.Dialog.type == 1) {
-                this.setState({ isparticipantsLayout: false, token: token })
+                this.setState({ isparticipantsLayout: false })
                 if(params.Dialog.user_id != currentUserId){
                     this.setState({ isleaveAndDeleteBtn: false,})
                 }
             }
+
             if(params.Dialog != null && currentUserId != params.Dialog.user_id){
                 this.setState({
                     isgroundAvatar: false,
@@ -88,6 +91,7 @@ class ChatGroupEdit extends Component {
                     token: token
                 })
             }
+
             this.loadData()
         })
       }
@@ -286,7 +290,21 @@ class ChatGroupEdit extends Component {
   }
 
     _onback = () => {
-        this.props.navigation.goBack('')
+      const { navigation } = this.props;
+
+      if (navigation.state.params.forcerefresh) {
+        if (navigation.state.params.forcerefresh == true) {
+          navigation.goBack();
+          navigation.state.params.onRefresh({ isRefresh: true });
+        }
+      } else {
+        if (this.state.isGroupUpdated) {
+          navigation.goBack();
+          navigation.state.params.onRefresh({ isRefresh: true });
+        } else {
+          navigation.goBack();
+        }
+      }
     }
 
     _onChooseProfilePicture = () => {
@@ -432,7 +450,8 @@ class ChatGroupEdit extends Component {
 
           params.Dialog.name = this.state.groupName
 
-          this.setState({ loading: false })
+          this.setState({ loading: false,isGroupUpdated:true})
+
 
           alert("Group Updated Successfully!")
         });
@@ -445,7 +464,9 @@ class ChatGroupEdit extends Component {
 
         params.Dialog.name = this.state.groupName
 
-        this.setState({ loading: false })
+        this.setState({ loading: false, isGroupUpdated:true})
+
+
         alert("Group Updated Successfully!")
       }
     }

@@ -62,8 +62,19 @@ class TabChats extends Component {
         if (result) {
           for (key in result) {
             this.state.dialogs.push(result[key])
-            this.setState({dialogs:this.state.dialogs})
+            //this.setState({dialogs:this.state.dialogs})
           }
+
+          this.state.dialogs.sort(function(a, b) {
+              var keyA = a.last_message_date_sent,
+                  keyB = b.last_message_date_sent;
+              if(keyA > keyB) return -1;
+              if(keyA < keyB) return 1;
+              return 0;
+          });
+
+          this.setState({dialogs:this.state.dialogs})
+
         }
 
         this.loadGroupUsingID(3)
@@ -73,8 +84,18 @@ class TabChats extends Component {
           if (result1) {
             for (key in result1) {
               this.state.dialogs.push(result1[key])
-              this.setState({dialogs:this.state.dialogs})
+              //this.setState({dialogs:this.state.dialogs})
             }
+
+            this.state.dialogs.sort(function(a, b) {
+                var keyA = a.last_message_date_sent,
+                    keyB = b.last_message_date_sent;
+                if(keyA > keyB) return -1;
+                if(keyA < keyB) return 1;
+                return 0;
+            });
+
+            this.setState({dialogs:this.state.dialogs})
           }
         })
       })
@@ -235,6 +256,7 @@ class TabChats extends Component {
 
                 if (profile) {
                   this.state.dialogs[index]['name'] = profile.full_name?profile.full_name:profile.login;
+                  this.state.dialogs[index]['userid'] = profile.id;
 
                   this.setState({ refresh: true});
 
@@ -369,12 +391,28 @@ class TabChats extends Component {
                         {this.renderChats()}
                     </ScrollView>
                 </Content>
-                <TouchableOpacity style = {styles.chatBtn} onPress = {() => this.props.navigation.navigate('CreateGroupChat')}>
+                <TouchableOpacity style = {styles.chatBtn} onPress = {() => this.props.navigation.navigate('CreateGroupChat',{ onRefresh: this.onRefresh, Dialog: this.state.dialogs })}>
                     <Image source = {require('../assets/img/chat_button_new.png')} style = {{width: 70, height: 70}}/>
                 </TouchableOpacity>
             </Container>
         );
     }
+
+    onRefresh = (isRefresh) => {
+
+      if (isRefresh) {
+        this.state.dialogs = []
+        currentPage = 0
+        datas = []
+        this.setState({
+          refreshing: false,
+          loading: true,
+          dialogs: [],
+          token: '',
+          refresh: false})
+      }
+      this.loadDataFromFirebase()
+    };
 }
 
 // define your styles

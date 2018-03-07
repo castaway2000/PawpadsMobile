@@ -34,7 +34,6 @@ var datas = []
 var filteredData = []
 
 // create a component
-
 class CreateGroupChat extends Component {
     constructor(props) {
         super(props)
@@ -56,9 +55,17 @@ class CreateGroupChat extends Component {
         datas = []
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
             this.setState({ userID: value })
-            this.loadDataFirebase()
-        })
+            //this.loadDataFirebase()
 
+            var {params} = this.props.navigation.state
+
+            let dialogs = params.Dialog.filter(e => (e.type !== 1) && e.type !== 2)
+
+            this.setState({
+                dialogs: dialogs,
+                loading: false
+            })
+        })
     }
 
     loadDataFirebase() {
@@ -85,6 +92,7 @@ class CreateGroupChat extends Component {
                datas.push(dialogs)
 
                currentPage ++
+
                this.setState({
                    dialogs: JSON.parse(JSON.stringify(datas[0])),
                    loading: false
@@ -105,7 +113,7 @@ class CreateGroupChat extends Component {
             })
             .then((response) => response.json())
             .then((responseData) => {
-                if(responseData.limit > 0){
+                if(responseData.limit > 0) {
                     datas.push(responseData.items)
                     console.log(datas)
                     currentPage ++
@@ -132,32 +140,71 @@ class CreateGroupChat extends Component {
 
     _onCreateGroup = () => {
 
-      var updates = {};
-
-      var milliseconds = (new Date).getTime();
-      var date = new Date();
-
-      var updatescontent = {};
-      var newKey = firebase.database().ref().child('dialog').push().key;
-
-      //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
-      let dialog =  {
-        _id :  newKey,
-        created_at : date.toISOString(),
-        last_message : "",
-        last_message_date_sent : milliseconds,
-        last_message_user_id : "",
-        name : "",
-        occupants_ids : [],
-        photo : "",
-        type : 3, //PRIVATE
-        unread_messages_count : 0,
-        updated_at : date.toISOString(),
-        user_id : this.state.userID.toString()
+      let isGroup = false
+      let isCheckedCount = 0
+      let userDialogsSelected = []
+      for (var i = 0; i < this.state.dialogs.length; i++) {
+        if (this.state.dialogs[i].ischecked) {
+          if (this.state.dialogs[i].ischecked == true) {
+            isCheckedCount = isCheckedCount + 1
+            userDialogsSelected.push(this.state.dialogs[i])
+          }
+        }
       }
 
-      updates['/dialog/' + newKey] = dialog;
-      firebase.database().ref().update(updates)
+      if (isCheckedCount< 1) {
+        alert('Please select at least two member to create group.')
+        return
+      }
+
+      if (isCheckedCount > 1) {
+        isGroup = true
+      }
+
+      if (!isGroup) {
+
+        //Personal chat
+        this.props.navigation.navigate('Chat', {GroupName: userDialogsSelected[0].name, GroupChatting: false, Dialog: userDialogsSelected[0], Token: this.state.token})
+
+      } else {
+
+        //Group Chat
+        var updates = {};
+
+        var milliseconds = (new Date).getTime();
+        var date = new Date();
+
+        var updatescontent = {};
+        var newKey = firebase.database().ref().child('dialog').push().key;
+
+        var occupantsids = []
+        for (var i = 0; i < userDialogsSelected.length; i++) {
+          occupantsids.push(userDialogsSelected[i].userid)
+        }
+
+        //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+        let dialog =  {
+          _id :  newKey,
+          created_at : date.toISOString(),
+          last_message : "",
+          last_message_date_sent : milliseconds,
+          last_message_user_id : this.state.userID.toString(),
+          name : "New Group3",
+          occupants_ids : occupantsids,
+          photo : "",
+          type : 2, //GROUP
+          unread_messages_count : 0,
+          updated_at : date.toISOString(),
+          user_id : this.state.userID.toString()
+        }
+
+        updates['/dialog/' + newKey] = dialog;
+        firebase.database().ref().update(updates)
+
+        const { navigation } = this.props;
+        navigation.goBack();
+        navigation.state.params.onRefresh({ isRefresh: true });
+      }
     }
 
     _onRefresh() {
@@ -274,17 +321,21 @@ class CreateGroupChat extends Component {
               }
 
             })
-      }
-    }
+          }
+        }
 
     handleSelectUser(flag) {
         for(var i = 0;i < this.state.dialogs.length; i++){
             if(flag==i){
+              if (this.state.dialogs[i]['ischecked']) {
                 if (this.state.dialogs[i]['ischecked'] == false) {
                     this.state.dialogs[i]['ischecked'] = true
                 } else {
                     this.state.dialogs[i]['ischecked'] = false
                 }
+              } else {
+                this.state.dialogs[i]['ischecked'] = true
+              }
             }
         }
         this.setState({
@@ -305,7 +356,7 @@ class CreateGroupChat extends Component {
                 List.map((data, index) => {
                     console.log(data)
                     return(
-                      <TouchableOpacity style = {styles.tabChannelListCell} key = {index} onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})}>
+                      <TouchableOpacity style = {styles.tabChannelListCell} key = {index} onPress={() => this.handleSelectUser(index)}>
                         {this.state.refresh == false? this.downloadLastUserFirebase(data,index) : null}
                         <TouchableOpacity onPress = {()=>this.handleSelectUser(index)}>
                             <Image source = {data.ischecked? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>

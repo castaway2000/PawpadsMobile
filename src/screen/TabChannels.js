@@ -89,6 +89,7 @@ class TabChannels extends Component {
             refresh1:false,
             pagekey:null,
             pagetimestamp:null,
+            userID: '',
         }
         this.onPullRelease = this.onPullRelease.bind(this);
         this.topIndicatorRender = this.topIndicatorRender.bind(this);
@@ -114,6 +115,10 @@ class TabChannels extends Component {
         datas = []
         this.loadDataFromFirebase(null,null)
         tmpThis  = this
+
+        AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
+            this.setState({ userID: value })
+        })
     }
 
     loadData() {
@@ -155,6 +160,7 @@ class TabChannels extends Component {
 
       console.log("pagekey:",pagekey);
       console.log("pagetimestamp:",pagetimestamp);
+
       if (pagekey && pagetimestamp) {
         this.loadGroupUsingIDPage(1,pagekey,pagetimestamp)
         .then((result) => {
@@ -163,7 +169,9 @@ class TabChannels extends Component {
             for (key in result) {
               let obj = result[key]
               obj["pagekey"] = key
-              this.state.dialogs.push(obj)
+              if (obj.type == 1) {
+                this.state.dialogs.push(obj)
+              }
             }
 
             if (this.state.dialogs.length > 0) {
@@ -192,7 +200,10 @@ class TabChannels extends Component {
             for (key in result) {
               let obj = result[key]
               obj["pagekey"] = key
-              this.state.dialogs.push(obj)
+
+              if (obj.type == 1) {
+                this.state.dialogs.push(obj)
+              }
             }
 
             if (this.state.dialogs.length > 0) {
@@ -309,18 +320,16 @@ class TabChannels extends Component {
                               console.log("downloadGroupPhotoFirebase:",url);
                           }
                       }
-                      this.setState({
-                          refresh: true
-                      });
-                      this.setState({dialogs:this.state.dialogs})
+
+
+                      this.setState({refresh1: true});
+
+                      this.setState({dialogs:JSON.parse(JSON.stringify(this.state.dialogs))})
                       this.props.ChannelsUsers(this.state.dialogs)
+
                     })
                   }
                 }
-
-                this.setState({
-                    refresh1: true
-                });
               }
             })
           }
@@ -359,13 +368,10 @@ class TabChannels extends Component {
                               for(var i = 0;i < this.state.dialogs.length; i++){
                                   if(this.state.dialogs[i].last_message_user_id == profile["id"]) {
                                       this.state.dialogs[i]['blob_id'] = url;
-                                      console.log("downloadLastUserFirebase:",url);
-                                      this.setState({dialogs:this.state.dialogs})
                                   }
                               }
-                              this.setState({refresh: false});
-                              this.setState({dialogs:this.state.dialogs})
-
+                              this.setState({refresh: true});
+                              this.setState({dialogs:JSON.parse(JSON.stringify(this.state.dialogs))})
                               this.props.ChannelsUsers(this.state.dialogs)
                             })
                           }
@@ -499,7 +505,7 @@ class TabChannels extends Component {
                   />
 
                 </Content>
-                <TouchableOpacity style = {styles.chatBtn} onPress={() => this.props.navigation.navigate('ChatGroupEdit')}>
+                <TouchableOpacity style = {styles.chatBtn} onPress={this.createGroup}>
                     <Image source = {require('../assets/img/chat_button_new.png')} style = {{width: 70, height: 70}}/>
                 </TouchableOpacity>
             </Container>
@@ -516,7 +522,64 @@ class TabChannels extends Component {
       }, 3000)
     }
 
-    _renderItem = ({ item, index }) => ( <MyListItem
+    createGroup = () => {
+
+      //Group Chat
+      var updates = {};
+
+      var milliseconds = (new Date).getTime();
+      var date = new Date();
+
+      var updatescontent = {};
+      var newKey = firebase.database().ref().child('dialog').push().key;
+
+      var occupantsids = [parseInt(this.state.userID)]
+
+      //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+      let dialog =  {
+        _id :  newKey,
+        created_at : date.toISOString(),
+        last_message : "",
+        last_message_date_sent : milliseconds,
+        last_message_user_id : this.state.userID.toString(),
+        name : "New Channel",
+        occupants_ids : occupantsids,
+        photo : "",
+        type : 1, //CHANNEL
+        unread_messages_count : 0,
+        updated_at : date.toISOString(),
+        user_id : this.state.userID.toString()
+      }
+
+      updates['/dialog/' + newKey] = dialog;
+      firebase.database().ref().update(updates)
+
+      this.props.navigation.navigate('ChatGroupEdit', {forcerefresh:true, onRefresh: this.onRefresh, Dialog: dialog})
+    }
+
+    onRefresh = (isRefresh) => {
+
+      if (isRefresh) {
+
+        this.setState({
+          refreshing: false,
+          loading: true,
+          dialogs: [],
+          last_message_user_id: 0,
+          refresh:false,
+          refresh1:false,
+          pagekey:null,
+          pagetimestamp:null,
+        })
+
+        currentPage = 0
+        datas = []
+        this.loadDataFromFirebase(null,null)
+
+      }
+    };
+
+    _renderItem = ({ item, index}) => ( <MyListItem
         index = { index }
         item = { item }
         onPressItem = { this._onPressItem }/>

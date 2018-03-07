@@ -18,6 +18,7 @@ import {
 	RefreshControl,
 	Alert
 } from 'react-native';
+
 import {
 	START_LOAD_CHAT_MESSAGE,
 	LOAD_CHAT_MESSAGE_SUCCESS,
@@ -46,6 +47,7 @@ var isGallery = false;
 var firbaseChatObserver = null
 
 class ChatGroup extends Component {
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -151,9 +153,6 @@ class ChatGroup extends Component {
 											this.setState({ loading: false })
 										}
 									})*/
-
-
-
 
 					firebase.database()
 							.ref(`/chats`)
@@ -318,7 +317,6 @@ class ChatGroup extends Component {
 
 		var date = new Date();
 		console.log(date.toISOString());
-
 
 		var chatdict = {
 			"_id" : newKey,
@@ -535,7 +533,7 @@ class ChatGroup extends Component {
 		var {params} = this.props.navigation.state
 		if(params.GroupChatting){
 			return(
-				<TouchableOpacity style = {styles.backButton} onPress = {() => this.props.navigation.navigate('ChatGroupEdit', {Dialog: params.Dialog})}>
+				<TouchableOpacity style = {styles.backButton} onPress = {() => this.props.navigation.navigate('ChatGroupEdit', {onRefresh: this.onRefresh,Dialog: params.Dialog})}>
 					<Image source = {require('../assets/img/edit_white.png')} style = {{width: 18, height: 18, resizeMode:'contain'}}/>
 				</TouchableOpacity>
 			);
@@ -762,6 +760,12 @@ class ChatGroup extends Component {
 		return v.toString(16);
 	});
 }
+
+onRefresh = (isRefresh) => {
+	if (isRefresh) {
+		console.log("isRefresh",isRefresh);
+	}
+};
 
 	render() {
 		var {params} = this.props.navigation.state
