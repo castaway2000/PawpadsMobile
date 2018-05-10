@@ -18,6 +18,8 @@ import ChatGroupEdit from './screen/ChatGroupEdit'
 import CreateGroupChat from './screen/CreateGroupChat'
 import Search from './screen/Search'
 import DataMigration from './screen/DataMigration'
+import EnterPasscode from './components/auth/EnterPasscode'
+import EnterNewPassword from './components/auth/EnterNewPassword'
 
 const AppNavigators = StackNavigator(
     {
@@ -36,7 +38,14 @@ const LoginStack = StackNavigator(
         DataMigration: { screen: DataMigration},
         Register: { screen: Register},
         Passwordrecovery: { screen: Passwordrecovery },
-        Drawer: { screen: Drawer },
+        EnterPasscode: { screen: EnterPasscode },
+        EnterNewPassword: { screen: EnterNewPassword },
+        Drawer: {
+          screen: Drawer ,
+          navigationOptions: {
+            gesturesEnabled: false,
+          }
+        },
         Profile: { screen: Profile },
         Chat: { screen: Chat },
         ChatGroup: { screen: ChatGroup },

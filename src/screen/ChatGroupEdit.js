@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, Switch,AsyncStorage, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, Alert, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, Switch, AsyncStorage, ActivityIndicator } from 'react-native';
 import { Container, Header, Content, Button, List, ListItem, } from 'native-base';
 import Constant from '../common/Constant'
 import reactNativeKeyboardAwareScrollView from 'react-native-keyboard-aware-scroll-view';
@@ -13,20 +13,11 @@ const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 var ImagePicker = require("react-native-image-picker");
 
 import {CachedImage} from 'react-native-img-cache';
-
+import { NavigationActions } from 'react-navigation';
 //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
 
 var isCamera = false;
 var isGallery = false;
-
-var isBusy = false;
-var groupName = '';
-var groupType = '';
-var groupParticipants = '';
-var adminName = '';
-var userPhotoURL = ''
-var currentUserid = '';
-var isGroupUpdated = false
 
 // create a component
 class ChatGroupEdit extends Component {
@@ -36,7 +27,6 @@ class ChatGroupEdit extends Component {
             groupName : '',
             groupType : '',
             groupParticipants : '',
-            adminName : '',
             userPhotoURL: '',
             userPhotoPath:'',
             token: '',
@@ -55,40 +45,43 @@ class ChatGroupEdit extends Component {
             isGroupUpdated:false,
         }
     }
+
     componentWillMount() {
         this.init()
         // StatusBar.setHidden(true);
     }
 
     init(){
-        this.setState({ loading: true })
+
+      this.state.userPhotoURL = ""
+
+        this.setState({userPhotoURL: "" })
+
         var {params} = this.props.navigation.state
 
         AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
-          this.setState({tableId: value })
+          this.setState({tableId: value})
         })
 
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
-            this.setState({ userid: value })
-            currentUserid = value
-        })
 
-        AsyncStorage.getItem(Constant.QB_USERID).then((currentUserId) => {
+          this.setState({ userid: value})
 
             if(params.Dialog != null && params.Dialog.type == 1) {
                 this.setState({ isparticipantsLayout: false })
-                if(params.Dialog.user_id != currentUserId){
-                    this.setState({ isleaveAndDeleteBtn: false,})
+                if(params.Dialog.user_id == value){
+                    this.setState({ isleaveAndDeleteBtn: true,})
+                } else {
+                  this.setState({ isleaveAndDeleteBtn: false,})
                 }
             }
 
-            if(params.Dialog != null && currentUserId != params.Dialog.user_id){
+            if(params.Dialog != null && value != params.Dialog.user_id){
                 this.setState({
                     isgroundAvatar: false,
                     isphotoAvatarIcon: false,
                     isgroupTitleText: false,
                     isSaveBtn: false,
-                    token: token
                 })
             }
 
@@ -100,29 +93,38 @@ class ChatGroupEdit extends Component {
         var {params} = this.props.navigation.state
         this.loadQBUserProfileFirebase(params.Dialog.user_id)
         if(params.Dialog == null) return null
-        isBusy = true
-        groupName = params.Dialog.name
-        if(params.Dialog.type == 2){
-            groupType = 'Private Group'
-        }else{
-            groupType = 'Channel'
+
+        this.setState({groupName:params.Dialog.name})
+
+        if(params.Dialog.type == 2) {
+            this.setState({groupType:'Private Group'})
+        } else {
+            this.setState({groupType:'Channel'})
         }
-        var ocupantsSize = params.Dialog.occupants_ids.length
-        if(ocupantsSize == 0){
-            groupParticipants = 'Participants (0)'
-        }else{
-            groupParticipants = 'Participants (' + (ocupantsSize-1) + ')'
+
+        
+        var ocupants = params.Dialog.occupants_ids
+        if (ocupants) {
+            var ocupantsSize = params.Dialog.occupants_ids.length
+            if (ocupantsSize == 0) {
+                this.setState({groupParticipants: 'Participants (0)'})
+            } else {
+                this.setState({groupParticipants: 'Participants (' + (ocupantsSize-1) + ')'})
+            }
+        } else {
+            this.setState({groupParticipants: 'Participants (0)'})
         }
+
 
         this.getUsersFirebase(params.Dialog.occupants_ids)
         if(params.Dialog.profileurl != null){
             userPhotoURL = params.Dialog.profileurl
+            this.setState({userPhotoURL: userPhotoURL})
         }
         this.setState({
-            groupName : groupName,
-            groupType : groupType,
-            groupParticipants : groupParticipants,
-            userPhotoURL: userPhotoURL,
+            groupName : this.state.groupName,
+            groupType : this.state.groupType,
+            groupParticipants : this.state.groupParticipants,
         })
     }
 
@@ -221,7 +223,7 @@ class ChatGroupEdit extends Component {
         }
         var index = userIdsList.indexOf(params.Dialog.user_id)
         userIdsList.splice(index, 1)
-        isBusy = false
+
         userIdsList.map((item, index) => {
             var REQUEST_URL = Constant.USERS_URL +  item.blob_id + '.json'
             fetch(REQUEST_URL, {
@@ -248,7 +250,7 @@ class ChatGroupEdit extends Component {
 
         var index = userIdsList.indexOf(params.Dialog.user_id)
         userIdsList.splice(index, 1)
-        isBusy = false
+
         userIdsList.map((item, index) => {
           firebase.database()
     					.ref('/users')
@@ -292,19 +294,19 @@ class ChatGroupEdit extends Component {
     _onback = () => {
       const { navigation } = this.props;
 
-      if (navigation.state.params.forcerefresh) {
-        if (navigation.state.params.forcerefresh == true) {
-          navigation.goBack();
-          navigation.state.params.onRefresh({ isRefresh: true });
-        }
-      } else {
-        if (this.state.isGroupUpdated) {
-          navigation.goBack();
-          navigation.state.params.onRefresh({ isRefresh: true });
-        } else {
-          navigation.goBack();
-        }
+    	if (this.props.navigation.state.params.TabChannelsRef) {
+    		this.props.navigation.state.params.TabChannelsRef.onRefresh()
+    	}
+
+      if (this.props.navigation.state.params.ChatGroupVC) {
+        let vc = this.props.navigation.state.params.ChatGroupVC
+
+        vc.onRefresh()
+
+        //vc.props.navigation.state.params.GroupName = "test test"
       }
+
+    	this.props.navigation.goBack()
     }
 
     _onChooseProfilePicture = () => {
@@ -361,7 +363,7 @@ class ChatGroupEdit extends Component {
             }
             console.log(source)
 
-            this.setState ({ userPhotoURL: source, userPhotoPath:source})
+            this.setState ({ userPhotoURL: source, userPhotoPath: source})
           }
         });
       } else {
@@ -386,7 +388,7 @@ class ChatGroupEdit extends Component {
               source = response.uri;
             }
             console.log(source)
-            this.setState ({ userPhotoURL: source, userPhotoPath:source})
+            this.setState ({ userPhotoURL: source, userPhotoPath: source})
 
           }
         });
@@ -398,6 +400,35 @@ class ChatGroupEdit extends Component {
     }
 
     _onSaveProfile = () => {
+
+      this.setState({ loading: true })
+
+      var {params} = this.props.navigation.state
+
+      if (params.IsCreated) {
+        if (params.IsCreated == true) {
+
+          var updates = {};
+
+          updates['/dialog/group-chat-public/' + params.Dialog._id] = params.Dialog;
+
+          var ref = firebase.database().ref().update(updates).then( () => {
+
+            params.IsCreated = false
+
+            console.log("Write completed")
+
+            this.updateGroup()
+
+          }).catch(function(error) {
+            console.error("Write failed: "+error)
+          });
+        }
+      } else {
+        this.updateGroup()
+      }
+
+      /*
 
       var {params} = this.props.navigation.state
       this.setState({ loading: true })
@@ -428,7 +459,7 @@ class ChatGroupEdit extends Component {
             "tableId" : this.state.tableId,
             "uid" : this.uidString(),
             "updated_at" : date.toISOString(),
-            "userid" : currentUserid
+            "userid" : this.state.userid
           }
 
           backgroundId = milliseconds;
@@ -450,7 +481,7 @@ class ChatGroupEdit extends Component {
 
           params.Dialog.name = this.state.groupName
 
-          this.setState({ loading: false,isGroupUpdated:true})
+          this.setState({ loading: false, isGroupUpdated:true})
 
 
           alert("Group Updated Successfully!")
@@ -468,14 +499,133 @@ class ChatGroupEdit extends Component {
 
 
         alert("Group Updated Successfully!")
-      }
+      }*/
     }
+
+    updateGroup = () => {
+      var {params} = this.props.navigation.state
+      this.setState({ loading: true })
+
+      if (this.state.userPhotoPath != '') {
+        let imagename = "groutphoto_" + params.Dialog._id +".jpg"
+
+        firebase.storage().ref("content/" + this.state.tableId + "/" + imagename).putFile(this.state.userPhotoURL).then(file => {
+
+          console.log("Image uploaded successfully.",file);
+
+          //Update content
+          var milliseconds = (new Date).getTime();
+          var date = new Date();
+
+          var updatescontent = {};
+          var newKeycontent = firebase.database().ref().child('content').push().key;
+
+          let content = {
+            "blob_status" : "complete",
+            "content_type" : "image/jpeg",
+            "created_at" : date.toISOString(),
+            "id" : milliseconds,
+            "name" : imagename,
+            "public" : false,
+            "set_completed_at" : date.toISOString(),
+            "size" : 0,
+            "tableId" : this.state.tableId,
+            "uid" : this.uidString(),
+            "updated_at" : date.toISOString(),
+            "userid" : this.state.userid
+          }
+
+          backgroundId = milliseconds;
+
+            //Update User content
+          updatescontent['/content/' + newKeycontent] = content;
+          firebase.database().ref().update(updatescontent)
+
+          var newKeyUsercontent = firebase.database().ref().child('users').child('content').push().key;
+
+          var updatescontent1 = {};
+          updatescontent1['/users/' + this.state.tableId  + '/content/'+ newKeyUsercontent] = content;
+          firebase.database().ref().update(updatescontent1)
+
+          //Update custom_data
+          var updatescontent2 = {};
+          updatescontent2['/dialog/group-chat-public/' + params.Dialog._id + '/photo'] = milliseconds.toString()
+          firebase.database().ref().update(updatescontent2)
+
+          params.Dialog.name = this.state.groupName
+
+          this.setState({ loading: false, isGroupUpdated:true})
+
+
+          alert("Group Updated Successfully!")
+        });
+      } else {
+
+        //Update custom_data
+        var updatescontent2 = {};
+        updatescontent2['/dialog/group-chat-public/' + params.Dialog._id + '/name' ] = this.state.groupName
+        firebase.database().ref().update(updatescontent2)
+
+        params.Dialog.name = this.state.groupName
+
+        this.setState({ loading: false, isGroupUpdated:true})
+
+
+        alert("Group Updated Successfully!")
+    }
+  }
 
     uidString() {
       return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
+  }
+
+  onRemoveChannel = () => {
+    Alert.alert(
+      'Alert',
+      'Are you seure you want to delete this group?',
+      [
+        {text: 'Delete', onPress: () => {
+          this.deleteGroup()
+        }},
+        {text: 'Cancel', onPress: () => {
+
+        }, style: 'cancel'},
+      ],
+      { cancelable: false }
+    )
+  }
+
+  deleteGroup = () => {
+
+    this.setState({ loading: true })
+
+    var {params} = this.props.navigation.state
+
+    var ref = firebase.database().ref(`/dialog/group-chat-private`)
+
+    ref.child(params.Dialog._id).remove();
+
+    setTimeout(()=>{
+      this.setState({ loading: false })
+      alert("Channel deleted successfully")
+      this.props.navigation.goBack("Login")
+
+
+      const navigateAction = NavigationActions.navigate({
+        routeName: 'Dashboard',
+
+        params: {},
+
+        action: NavigationActions.navigate({ routeName: 'Dashboard' }),
+      });
+
+      this.props.navigation.dispatch(navigateAction);
+
+    }, 500)
+
   }
 
     render() {
@@ -499,6 +649,7 @@ class ChatGroupEdit extends Component {
                         </View>
 
                         <View style = {styles.bodyView}>
+
                             {this.state.isphotoAvatarIcon?
                                 <TouchableOpacity  style = {{marginTop: 60}} onPress = {this._onChooseProfilePicture}>
                                     <Image source = {require('../assets/img/camera_grey_icon.png')} style = {{width: 24, height: 17,}}/>
@@ -523,8 +674,8 @@ class ChatGroupEdit extends Component {
                                     <Image source = {require('../assets/img/pencil_icon.png')} style = {styles.icon}/>:
                                     null
                                 }
-
                             </View>
+
                             <View style = {styles.cellView}>
                                 <Text style = {{fontSize: 18, color:'#515151'}}>{this.state.groupType}</Text>
                                 {/*<Switch
@@ -549,7 +700,6 @@ class ChatGroupEdit extends Component {
                                 <Text style = {styles.menuItem}>{this.state.qbusername}</Text>
                             </View>
 
-
                             {this.state.isparticipantsLayout?
                                 <View style = {styles.cellCategoryView}>
                                     <Text style = {styles.chatText}>{this.state.groupParticipants}</Text>
@@ -569,21 +719,32 @@ class ChatGroupEdit extends Component {
                                 }
                             >
                             </List>
+                            
+                            { this.state.isleaveAndDeleteBtn?
+                            <View style = {styles.buttonView}>
+                                {/*<TouchableOpacity style = {styles.removeBtn}>
+                                    <Text style = {{color: Constant.APP_COLOR}}>Remove from friends</Text>
+                                </TouchableOpacity>*/}
+                                <TouchableOpacity style = {styles.blockBtn} onPress = {this.onRemoveChannel}>
+                                    <Text style = {{color: '#de380a'}}>Leave and delete</Text>
+                                </TouchableOpacity>
+                            </View> : null
+                          }
                         </View>
 
-                        <CachedImage source = {{
+                        <TouchableOpacity onPress = {this._onChooseProfilePicture} style = {styles.userphotoTouch} >
+
+                        <Image source = {{
                             uri: this.state.userPhotoURL ,
                             }}
                             defaultSource = {require('../assets/img/user_placeholder.png')}
                             style = {styles.userphoto} />
-                            <Image source = {{
-                                uri: this.state.userPhotoURL ,
-                                }}
-                                defaultSource = {require('../assets/img/user_placeholder.png')}
-                                style = {styles.userphoto} />
+                            </TouchableOpacity>
+
                     </View>
                 </ScrollView>
                 {this.showLoading()}
+                
                 <PopupDialog
                             ref={(popupDialog) => { this.popupDialogCamera = popupDialog; }}
                             //dialogStyle = {styles.dialogView}
@@ -712,7 +873,14 @@ const styles = StyleSheet.create({
         height: 100,
         borderRadius: 50,
         position: 'absolute',
-        top: 30
+        top: 0
+    },
+    userphotoTouch: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      position: 'absolute',
+      top: 30,
     },
     cellView: {
         flexDirection: 'row',
@@ -815,7 +983,29 @@ const styles = StyleSheet.create({
         flex: 1,
         position: 'absolute',
         top: Constant.HEIGHT_SCREEN/2
-    }
+    },
+    removeBtn: {
+        width: Constant.WIDTH_SCREEN,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: '#f4f4f4'
+    },
+    buttonView: {
+        marginTop: 60
+    },
+    blockBtn: {
+        width: Constant.WIDTH_SCREEN,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: '#f4f4f4',
+        marginTop: 20
+    },
 });
 
 //make this component available to the app

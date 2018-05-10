@@ -164,9 +164,10 @@ class ChatMessageBox extends Component {
 					<TouchableOpacity onPress={() => this.onGifButtonPress()}>
 						<Image source = {require('../../assets/img/giphy.png')} style = {graphicIcon}/>
 					</TouchableOpacity>
+					{/*
 					<TouchableOpacity onPress= {this.props.onPressAdd}>
 						<Image source = {require('../../assets/img/add_imoji.png')} style = {graphicIcon}/>
-					</TouchableOpacity>
+					</TouchableOpacity>*/}
 				</View>
 
 			</View>

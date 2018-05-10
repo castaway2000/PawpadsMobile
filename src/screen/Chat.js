@@ -10,6 +10,7 @@ import {
 	Keyboard,
 	ScrollView,
     TouchableOpacity,
+	Button,
     Image,
     Text,
 	StatusBar,
@@ -17,12 +18,18 @@ import {
     AsyncStorage,
 	RefreshControl
 } from 'react-native';
+
+import FCM, {NotificationActionType} from "react-native-fcm";
+import {registerKilledListener, registerAppListener} from '../common/Listeners'
+import firebaseClient from '../common/FirebaseClient'
+
 import {
 	START_LOAD_CHAT_MESSAGE,
 	LOAD_CHAT_MESSAGE_SUCCESS,
 	LOAD_CHAT_MESSAGE_FAIL,
 	CHANGE_MESSAGE_LIST
 } from '../actions/types';
+
 import {connect} from 'react-redux';
 import Constant from '../common/Constant'
 import {Actions} from 'react-native-router-flux';
@@ -56,8 +63,18 @@ class Chat extends Component {
 			userprofile: [],
 			tableId:'',
 			showGif: false,
+			isblockedByMe: false,
+			isblockedByOp: false,
+			blockTableKey: "",
+			latitude: "",
+			longitude: "",
+			isUserFound: true,
 		};
 	}
+
+update = () => {
+	this.getBlockList()
+}
 
 	componentWillMount() {
 		console.log("getChatMessageFirebase");
@@ -67,11 +84,22 @@ class Chat extends Component {
 			currentUserid = value
 			console.log("USER ID IS:",currentUserid);
 			this.downloadLastUserFirebase()
+			this.getBlockList()
 		})
 
 		AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
 			console.log("tableId is:",value);
-			this.setState({tableId: value })
+			this.setState({tableId: value})
+		})
+
+		AsyncStorage.getItem(Constant.USER_LATITUDE).then((value) => {
+			console.log("USER_LATITUDE is:",value);
+			this.setState({latitude: value})
+		})
+
+		AsyncStorage.getItem(Constant.USER_LONGITUDE).then((value) => {
+			console.log("USER_LONGITUDE is:",value);
+			this.setState({longitude: value})
 		})
 	}
 
@@ -88,11 +116,11 @@ class Chat extends Component {
 		console.log("componentWillUnmount");
 	}
 
-
 getChatMessage() {
 		var {params} = this.props.navigation.state
         messages = []
         AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
+
             var REQUEST_URL = Constant.GROUPCHAT_MESSAGE_URL + '?chat_dialog_id=' + params.Dialog._id + '&sort_desc=date_sent'+'&limit=50'
 
 						console.log("URL:",REQUEST_URL);
@@ -110,9 +138,8 @@ getChatMessage() {
                 if(responseData.limit > 0) {
                     responseData.items.map((item, index) => {
                         messages.push(item)
-                    })
-
-										console.log("messages :",messages);
+					})
+					console.log("messages :",messages);
 
                     this.setState({
 											messages: messages,
@@ -128,13 +155,105 @@ getChatMessage() {
         })
     }
 
+		onPressUnblock = () =>  {
+			console.log("Unblock");
+			if (this.state.blockTableKey) {
+				var ref = firebase.database().ref(`/blocklist`)
+				ref.child(this.state.blockTableKey).remove();
+			}
 
-getChatMessageFirebase() {
+			this.setState({"isblockedByMe":false})
+		}
+
+		getBlockList() {
+
+			var {params} = this.props.navigation.state
+			var last_message_userid = ''
+					for(var j=0; j<params.Dialog.occupants_ids.length; j++){
+							if(params.Dialog.occupants_ids[j] != currentUserid){
+									last_message_userid = params.Dialog.occupants_ids[j].toString()
+							}
+					}
+
+			firebase.database()
+			.ref(`/blocklist`)
+			.orderByChild("source_user")
+			.equalTo(currentUserid.toString())
+			.once("value")
+			.then(snapshot => {
+
+					if (snapshot.val()) {
+
+						let blocklists =  snapshot.val();
+
+						let keys = Object.keys(blocklists);
+
+						if (keys.length > 0) {
+
+							for (var i = 0; i < keys.length; i++) {
+								let blockobj = blocklists[keys[i]]
+
+								if (blockobj.blocked_user == last_message_userid) {
+									console.log("I have blocked someone.");
+
+									this.setState({isblockedByMe: true})
+									this.setState({blockTableKey: keys[i]})
+								}
+							}
+						}
+
+						console.log("blockTableKey is:",this.state.blockTableKey);
+
+						} else {
+							console.log("error is:");
+							this.setState({isblockedByMe:false})
+						}
+					})
+
+					firebase.database()
+					.ref(`/blocklist`)
+					.orderByChild("blocked_user")
+					.equalTo(currentUserid.toString())
+					.once("value")
+					.then(snapshot => {
+
+						console.log("block list:",snapshot.val());
+						
+							if (snapshot.val()) {
+
+								let blocklists =  snapshot.val();
+
+								let keys = Object.keys(blocklists);
+
+								if (keys.length > 0) {
+
+									for (var i = 0; i < keys.length; i++) {
+										let blockobj = blocklists[keys[i]]
+
+										if (blockobj.source_user == last_message_userid) {
+											console.log("Some one blocked me!");
+
+											this.setState({isblockedByOp:true})
+
+										}
+									}
+								}
+
+								console.log("blocklist is:",blocklist);
+
+								} else {
+									console.log("error is:");
+									this.setState({isblockedByOp:false})
+								}
+							})
+				}
+
+    getChatMessageFirebase() {
 			var {params} = this.props.navigation.state
 			messages = []
 
-
 			console.log("Dialog id is:",params.Dialog._id);
+			
 			/*
 			if (firbaseChatObserver) {
 				if (firbaseChatObserver) firbaseChatObserver.off();
@@ -177,6 +296,7 @@ getChatMessageFirebase() {
 			firebase.database()
 					.ref(`/chats`)
 					.orderByChild("chat_dialog_id")
+					.limitToLast(10)
 					.equalTo(params.Dialog._id)
 					.once("value")
 					.then(snapshot => {
@@ -248,17 +368,18 @@ getChatMessageFirebase() {
 
 								if (!isFound) {
 									messages.unshift(chatobj)
-								}
-
 									console.log("messages :",messages);
 
 									this.setState({messages:messages,loading: false})
+									console.log("renderrenderrenderrenderrender 372");
+								}
 
 								} else {
 									this.setState({ loading: false })
 								}
-								})
 							}
+						)
+					}
 
 	downloadLastUser() {
 
@@ -322,9 +443,9 @@ getChatMessageFirebase() {
 
 												if (profile) {
 
-													this.setState({
-														userprofile: profile,
-													});
+													console.log("profile  is:",profile);
+
+													this.setState({userprofile: profile,});
 
 													if (profile["content"]) {
 														for (let item in profile["content"]) {
@@ -335,9 +456,7 @@ getChatMessageFirebase() {
 
 																firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
 																	this.state.userprofile["profileurl"] = url;
-																	this.setState({
-																		userprofile: profile,
-																	});
+																	this.setState({userprofile: profile,});
 																})
 															}
 
@@ -351,9 +470,7 @@ getChatMessageFirebase() {
 																	firebase.storage().ref(path).getDownloadURL().then((url) => {
 																		console.log("coverPictureURL IS a a:",url);
 																		this.state.userprofile["coverPictureURL"] = url;
-																		this.setState({
-																			userprofile: profile,
-																		});
+																		this.setState({userprofile: profile,});
 																	})
 																}
 															}
@@ -361,6 +478,8 @@ getChatMessageFirebase() {
 													}
 												}
 											}
+										} else {
+											this.setState({isUserFound:false})
 										}
 									})
 								}
@@ -379,13 +498,12 @@ getChatMessageFirebase() {
 		).start();
 	}
 
-
-
 	componentWillUnmount() {
 		Keyboard.dismiss();
 	}
 
 	renderListMessages(item, index) {
+
 		var {params} = this.props.navigation.state
 		if (item.sender_id != currentUserid) {
 			if(item.STICKER){
@@ -425,8 +543,7 @@ getChatMessageFirebase() {
 				);
 			}
 
-		}
-		else {
+		} else {
 			if(item.STICKER){
 				return (
 					<ChatBoxUser
@@ -440,7 +557,7 @@ getChatMessageFirebase() {
 							minute: '2-digit'
 						})}/>
 				);
-			}else{
+			} else {
 				return (
 					<ChatBoxUser
 						key={index}
@@ -453,11 +570,11 @@ getChatMessageFirebase() {
 						})}/>
 				);
 			}
-
 		}
 	}
 
 	renderChatMessage() {
+
 		if (this.state.loading) {
 			return <ActivityIndicator style={{margin: 200}} color={colors.primaryOrange} size={'large'}/>;
 		}
@@ -466,6 +583,7 @@ getChatMessageFirebase() {
 			for(var i = this.state.messages.length-1; i > -1 ;i--){
 				newArray.push(this.state.messages[i])
 			}
+
 			return newArray.map((item, index) => {
 				return this.renderListMessages(item, index);
 			});
@@ -490,28 +608,55 @@ getChatMessageFirebase() {
 	}
 
 	renderChat() {
-		if (Platform.OS === 'ios') {
-			return (
-				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
-					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile} onPressEmoji = {this._onClickedEmoji} onPressGif = {this._onClickedGif} onPressAdd = {this._onClickedAdd} giphyPicked = {this._onGiphyPicked}/>
-				</KeyboardAvoidingView>
-			);
-		} else {
-			return (
-				<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
-					{this.renderScrollView()}
-					<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)} onPressFile = {this._onClickedFile} onPressEmoji = {this._onClickedEmoji} onPressGif = {this._onClickedGif} onPressAdd = {this._onClickedAdd} giphyPicked = {this._onGiphyPicked}/>
-				</KeyboardAvoidingView>
-			);
-		}
 
-	}
+				if (this.state.isblockedByMe)  {
+					return (
+						<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
+						{this.renderScrollView()}
+						<TouchableOpacity
+						style={styles.loginScreenButton}
+						onPress={this.onPressUnblock}
+						underlayColor='#ffff00'>
+						<Text style={styles.loginText}>Unblock</Text></TouchableOpacity>
+						</KeyboardAvoidingView>
+					);
+				} else if (this.state.isblockedByOp) {
+					return (
+						<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
+						{this.renderScrollView()}
+						<TouchableOpacity
+						style={styles.loginScreenButton}
+						underlayColor='#ffff00'>
+						<Text style={styles.loginText}>You are blocked.</Text></TouchableOpacity>
+						</KeyboardAvoidingView>
+					);
+				} else if (!this.state.isUserFound) {
+					return (
+						<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
+						{this.renderScrollView()}
+						<View style={styles.loginScreenButton}>
+						<Text style={styles.loginText}>User not found.</Text></View>
+						</KeyboardAvoidingView>
+					);
+				} else {
+					return (
+						<KeyboardAvoidingView behavior='padding' style={{flex: 1}} keyboardVerticalOffset={80}>
+						{this.renderScrollView()}
+						<ChatMessageBox sendMessage={(text) => this.sendMessageFirebase(text)}
+						onPressFile = {this._onClickedFile}
+						onPressEmoji = {this._onClickedEmoji}
+						onPressGif = {this._onClickedGif}
+						onPressAdd = {this._onClickedAdd}
+						giphyPicked = {this._onGiphyPicked}/>
+						</KeyboardAvoidingView>
+					);
+				}
+			}
 
-	createGroup(){
+	createGroup() {
 		var {params} = this.props.navigation.state
 		return(
-			<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('Profile', {UserInfo: this.state.userprofile})}>
+			<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('Profile', {UserInfo: this.state.userprofile, ChatVC: this})}>
 				<CachedImage source = {{
 					uri: this.state.userprofile["profileurl"],
 					}}
@@ -649,9 +794,9 @@ getChatMessageFirebase() {
 		      "chat_dialog_id" : params.Dialog._id,
 		      "created_at" : date,
 		      "date_sent" : milliseconds,
-		      "delivered_ids" : [],
-		      "latitude" : "",
-		      "longitude" : "",
+			  "delivered_ids" : [],
+			  "latitude" : this.state.latitude,
+			  "longitude" : this.state.longitude,
 		      "message" : text,
 		      "read" : 0,
 		      "read_ids" : [],
@@ -659,7 +804,6 @@ getChatMessageFirebase() {
 		      "send_to_chat" : "1",
 		      "sender_id" : currentUserid,
 		      "updated_at" : date,
-					"last_message_date_sent" : date,
 		    }
 
 				updates['/chats/' + newKey] = chatdict;
@@ -668,14 +812,18 @@ getChatMessageFirebase() {
 				//TODO: update chat dialog
 				var diloagDict = {
 					"last_message" : text,
-					"last_message_date_sent" : date,
+					"last_message_date_sent" : milliseconds,
 					"last_message_user_id" : currentUserid,
 					"updated_at" : date,
 				}
 
-				firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+				firebase.database().ref('/dialog/group-chat-private/' + params.Dialog._id).update(diloagDict)
 
 				this.updateChats()
+
+				if (this.state.userprofile.FCMToken && this.state.userprofile.isTogglepushSelected == "true") {
+					this.sendRemoteNotification(this.state.userprofile.FCMToken)
+				}
 			}
 
 			sendGIFMessageFirebase(url) {
@@ -692,7 +840,6 @@ getChatMessageFirebase() {
 				var date = new Date();
 				console.log(date.toISOString());
 
-
 				var chatdict = {
 					"_id" : newKey,
 					"STICKER": url,
@@ -700,8 +847,8 @@ getChatMessageFirebase() {
 					"created_at" : date,
 					"date_sent" : milliseconds,
 					"delivered_ids" : [],
-					"latitude" : "",
-					"longitude" : "",
+					"latitude" : this.state.latitude,
+					"longitude" : this.state.longitude,
 					"message" : 'sticker',
 					"read" : 0,
 					"read_ids" : [],
@@ -709,7 +856,6 @@ getChatMessageFirebase() {
 					"send_to_chat" : "1",
 					"sender_id" : currentUserid,
 					"updated_at" : date,
-					"last_message_date_sent" : date,
 				}
 
 				updates['/chats/' + newKey] = chatdict;
@@ -718,22 +864,26 @@ getChatMessageFirebase() {
 				//TODO: update chat dialog
 				var diloagDict = {
 					"last_message" : 'sticker',
-					"last_message_date_sent" : date,
+					"last_message_date_sent" : milliseconds,
 					"last_message_user_id" : currentUserid,
 					"updated_at" : date,
 				}
 
-				firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+				firebase.database().ref('/dialog/group-chat-private/' + params.Dialog._id).update(diloagDict)
 
 				this.updateChats()
+
+				if (this.state.userprofile.FCMToken && this.state.userprofile.isTogglepushSelected == "true") {
+					this.sendRemoteNotification(this.state.userprofile.FCMToken)
+				}
 			}
 
 			sendPhotoMessage(source, fileName) {
 				//Upload Image to firebase
 
 				firebase.storage().ref("content/" + this.state.tableId + "/" + fileName).putFile(source).then(uploadedFile => {
-
-          console.log('Uploaded to firebase:', uploadedFile)
+					
+					console.log('Uploaded to firebase:', uploadedFile)
 
 					var updates = {};
 					var newKey = firebase.database().ref().child('chats').push().key;
@@ -762,7 +912,9 @@ getChatMessageFirebase() {
 						"read_ids" : [ ],
 						"recipient_id" : "",
 						"sender_id" : currentUserid,
-						"updated_at" : date.toISOString()
+						"updated_at" : date.toISOString(),
+						"latitude" : this.state.latitude,
+						"longitude" : this.state.longitude,
 					}
 
 					updates['/chats/' + newKey] = chatdict;
@@ -799,23 +951,65 @@ getChatMessageFirebase() {
 					//TODO: update chat dialog
 					var diloagDict = {
 						"last_message" : 'photo',
-						"last_message_date_sent" : date,
+						"last_message_date_sent" : milliseconds,
 						"last_message_user_id" : currentUserid,
 						"updated_at" : date,
 					}
 
-					firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+					firebase.database().ref('/dialog/group-chat-private/' + params.Dialog._id).update(diloagDict)
 
 					this.updateChats()
-        })
+				})
+
+				if (this.state.userprofile.FCMToken && this.state.userprofile.isTogglepushSelected == "true") {
+					this.sendRemoteNotification(this.state.userprofile.FCMToken)
+				}
 			}
 
 			uidString() {
-	  		return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    		var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    		return v.toString(16);
+				return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+					var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+					return v.toString(16);
 			});
-}
+		}
+
+		sendRemoteNotification(token) {
+
+			let platform = this.state.userprofile.Platform
+
+			var {params} = this.props.navigation.state
+
+			let body;
+			
+			if(platform === 'android') {
+				body = {
+					"to": token,
+					"notification": {
+						"title": "Pawpads",
+						"body": "You have a new message.",
+					},
+					"data": {
+						"type":"1",
+						"data": params.Dialog
+					}
+			}
+		} else {
+			body = {
+				"to": token,
+				"notification":{
+					"title": "Pawpads",
+					"body": "You have a new message.",
+					"sound": "default"
+				},
+				"data": {
+					"type":"1",
+					"data": params.Dialog
+				},
+					"priority": 10
+				}
+			}
+			firebaseClient.send(JSON.stringify(body), "notification");
+		}
 
 	render() {
 
@@ -895,7 +1089,21 @@ const styles = {
 		width: 30,
 		height: 30,
 		borderRadius: 15,
-		resizeMode:'contain'
+		resizeMode: 'stretch'
+	},
+
+	loginScreenButton: {
+		alignItems: 'center',
+		backgroundColor: '#ff0000',
+		padding: 10,
+		justifyContent: 'center',
+		height: 50,
+		marginBottom: (Platform.OS == 'ios')? 0 : 26,
+	},
+
+	loginText:{
+		color: '#FFFFFF',
+		fontSize: 20
 	}
 };
 

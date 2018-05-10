@@ -55,8 +55,7 @@ class CreateGroupChat extends Component {
         datas = []
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
             this.setState({ userID: value })
-            //this.loadDataFirebase()
-
+            
             var {params} = this.props.navigation.state
 
             let dialogs = params.Dialog.filter(e => (e.type !== 1) && e.type !== 2)
@@ -171,11 +170,11 @@ class CreateGroupChat extends Component {
         //Group Chat
         var updates = {};
 
-        var milliseconds = (new Date).getTime();
+        var milliseconds = (new Date).getTime()/1000|0;
         var date = new Date();
 
         var updatescontent = {};
-        var newKey = firebase.database().ref().child('dialog').push().key;
+        var newKey = firebase.database().ref().child('dialog/group-chat-private').push().key;
 
         var occupantsids = []
         for (var i = 0; i < userDialogsSelected.length; i++) {
@@ -189,7 +188,7 @@ class CreateGroupChat extends Component {
           last_message : "",
           last_message_date_sent : milliseconds,
           last_message_user_id : this.state.userID.toString(),
-          name : "New Group3",
+          name : "New Group",
           occupants_ids : occupantsids,
           photo : "",
           type : 2, //GROUP
@@ -198,7 +197,7 @@ class CreateGroupChat extends Component {
           user_id : this.state.userID.toString()
         }
 
-        updates['/dialog/' + newKey] = dialog;
+        updates['/dialog/group-chat-private/' + newKey] = dialog;
         firebase.database().ref().update(updates)
 
         const { navigation } = this.props;

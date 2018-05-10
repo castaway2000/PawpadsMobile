@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, NativeModules,  StyleSheet,Text, Image, TextInput, ScrollView, TouchableOpacity, KeyboardAvoidingView, ActivityIndicator, Keyboard, AsyncStorage } from 'react-native';
+import { View, NativeModules,  StyleSheet,Text, Image,Platform, TextInput, ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, ActivityIndicator, Keyboard, AsyncStorage } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { connect } from 'react-redux';
 import { loginUser, passwordChanged } from '../../actions';
@@ -11,6 +11,11 @@ import {formatDate} from '../../actions/const';
 import RNFirebase from 'react-native-firebase';
 import { LoginManager } from 'react-native-fbsdk'
 import { LoginButton, AccessToken, GraphRequestManager, GraphRequest } from 'react-native-fbsdk';
+
+import FCM, {NotificationActionType} from "react-native-fcm";
+import {registerKilledListener, registerAppListener} from '../../common/Listeners'
+
+import firebaseClient from '../../common/FirebaseClient'
 
 import {
     EMAIL_CHANGED,
@@ -23,7 +28,6 @@ import {
 let nextInput;
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 const { RNTwitterSignIn } = NativeModules;
-
 
 var CryptoJS = require("crypto-js");
 firebase.database().goOnline()
@@ -40,8 +44,8 @@ class Login extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            name: 'test001', //cris 1BITJAY_1875640410  howsonanna stad blaze
-            password: '12345678', //
+            name: '', //cris 1BITJAY_1875640410  howsonanna stad //blaze - blaze2000
+            password: '', //
             qb_token: '',
             loading: this.props.loading,
             isname: true,
@@ -51,9 +55,39 @@ class Login extends Component {
     }
 
     componentWillMount() {
-        tmp = this
-
         this.getQB_Token()
+    }
+
+    async componentDidMount() {
+      registerAppListener(this.props.navigation);
+
+      FCM.getInitialNotification().then(notif => {
+
+        if(notif && notif.targetScreen === 'detail'){
+          setTimeout(()=>{
+            this.props.navigation.navigate('Detail')
+          }, 500)
+        }
+      });
+
+      try{
+        let result = await FCM.requestPermissions({badge: false, sound: true, alert: true});
+      } catch(e){
+        console.error(e);
+      }
+
+      FCM.getFCMToken().then(token => {
+        console.log("TOKEN (getFCMToken)", token);
+        if (Constant.FCM_TOKEN) {
+          AsyncStorage.setItem(Constant.FCM_TOKEN, token);
+        }
+      });
+
+      if(Platform.OS === 'ios'){
+        FCM.getAPNSToken().then(token => {
+          console.log("APNS TOKEN (getFCMToken)", token);
+        });
+      }
     }
 
     getQB_Token() {
@@ -96,7 +130,7 @@ class Login extends Component {
         })
     }
 
-    getQB_Token_User(username,password) {
+    getQB_Token_User(username, password) {
 
       console.log("Getting user session token.");
 
@@ -113,6 +147,7 @@ class Login extends Component {
           "signature":signature,
           "user": {"login": this.state.name, "password": this.state.password}
         }
+
         console.log("user params is:",params);
 
         var REQUEST_URL = Constant.SESSION_URL
@@ -283,7 +318,7 @@ class Login extends Component {
         firebase.database()
             .ref(`/users`)
             .orderByChild("login")
-            .equalTo(this.state.name)
+            .equalTo(this.state.name.toLowerCase())
             .once("value")
             .then(snapshot => {
               this.setState({ loading: false })
@@ -303,7 +338,7 @@ class Login extends Component {
                     let full_name = response[tableId]["full_name"]
                     let qbID = response[tableId]["id"]
                     let last_request_at = response[tableId]["last_request_at"]
-                    let login = response[tableId]["login"]
+                    let login = response[tableId]["login"].toLowerCase()
                     let owner_id = response[tableId]["owner_id"]
                     let updated_at = response[tableId]["updated_at"]
                     let password = response[tableId]["password"]
@@ -317,7 +352,7 @@ class Login extends Component {
                       alert('Account is deleted.')
                     } else {
                       //Decrypt password
-                      var plaintextpassword  = CryptoJS.AES.decrypt(password.toString(), Constant.FIREBASE_PASS_SECRET).toString(CryptoJS.enc.Utf8);
+                      var plaintextpassword = CryptoJS.AES.decrypt(password.toString(), Constant.FIREBASE_PASS_SECRET).toString(CryptoJS.enc.Utf8);
 
                       if (plaintextpassword == this.state.password) {
                         console.log("User entered correct password");
@@ -412,7 +447,7 @@ class Login extends Component {
                       let full_name = response[tableId]["full_name"]
                       let qbID = response[tableId]["id"]
                       let last_request_at = response[tableId]["last_request_at"]
-                      let login = response[tableId]["login"]
+                      let login = response[tableId]["login"].toLowerCase()
                       let owner_id = response[tableId]["owner_id"]
                       let updated_at = response[tableId]["updated_at"]
                       let password = response[tableId]["password"]
@@ -519,7 +554,7 @@ class Login extends Component {
                              let full_name = response[tableId]["full_name"]
                              let qbID = response[tableId]["id"]
                              let last_request_at = response[tableId]["last_request_at"]
-                             let login = response[tableId]["login"]
+                             let login = response[tableId]["login"].toLowerCase()
                              let owner_id = response[tableId]["owner_id"]
                              let updated_at = response[tableId]["updated_at"]
                              let password = response[tableId]["password"]
@@ -624,6 +659,8 @@ class Login extends Component {
               var updates = {};
               var newKey = firebase.database().ref().child('users').push().key;
               responseData.user.password = ciphertext
+              responseData.user.login = responseData.user.login.toLowerCase()
+              responseData.user.isTogglepushSelected = "true"
               responseData.user.id = responseData.user.id.toString()
               responseData.user["firid"] = newKey
               updates['/users/' + newKey] = responseData.user;
@@ -663,6 +700,7 @@ class Login extends Component {
     }
 
     _loginWithQuickbloxFacebook = (token,result) => {
+
       console.log("Validating Facebook user from Quickblox...");
 
       var REQUEST_URL = Constant.LOGIN_URL
@@ -695,6 +733,8 @@ class Login extends Component {
                   var newKey = firebase.database().ref().child('users').push().key;
                   responseData.user.password = ciphertext
                   responseData.user.id = responseData.user.id.toString()
+                  responseData.user.login = responseData.user.login.toLowerCase()
+                  responseData.user.isTogglepushSelected = "true"
                   responseData.user["firid"] = newKey
                   updates['/users/' + newKey] = responseData.user;
                   firebase.database().ref().update(updates)
@@ -721,6 +761,7 @@ class Login extends Component {
                   this.getQB_Token_User_Facebook(token)
 
                 } else {
+
                   console.log("Facebook: User Not found on Firebase. Registering on firebase...")
 
                   //Get current date
@@ -745,9 +786,11 @@ class Login extends Component {
                                   "updated_at":dateString,
                                   "isDataMigrated":isDataMigrated,
                                   "firid": newKey,
+                                  "isTogglepushSelected":"true",
                                 }
 
                   updates['/users/' + newKey] = user;
+
                   firebase.database().ref().update(updates)
 
                   //save pref
@@ -807,6 +850,8 @@ class Login extends Component {
             responseData.user.password = ciphertext
             responseData.user.id = responseData.user.id.toString()
             responseData.user["firid"] = newKey
+            responseData.user.login = responseData.user.login.toLowerCase()
+            responseData.user.isTogglepushSelected = "true"
             updates['/users/' + newKey] = responseData.user;
             firebase.database().ref().update(updates)
 
@@ -848,16 +893,17 @@ class Login extends Component {
 
             var user =  {
               "blob_id": 0,
-              "created_at":dateString,
-              "full_name":"",
-              "id":newKey,
-              "last_request_at":dateString,
-              "login":login,
-              "owner_id":0,
-              "twitter_id":twitterId,
-              "updated_at":dateString,
-              "isDataMigrated":isDataMigrated,
+              "created_at": dateString,
+              "full_name": "",
+              "id": newKey,
+              "last_request_at": dateString,
+              "login": login,
+              "owner_id": 0,
+              "twitter_id": twitterId,
+              "updated_at": dateString,
+              "isDataMigrated": isDataMigrated,
               "firid": newKey,
+              "isTogglepushSelected": "true",
             }
 
             updates['/users/' + newKey] = user;
@@ -908,11 +954,13 @@ class Login extends Component {
     }
 
     setUserName(text){
-        this.setState({ name: text })
+        this.setState({ name: text})
     }
+
     setPassword(text){
         this.setState({ password: text })
     }
+
     getNextInput(data) {
 		nextInput = data;
 	}
@@ -942,7 +990,7 @@ class Login extends Component {
                                 autoCorrect = {false}
                                 spellCheck = {false}
                                 returnKeyType = 'next'
-                                placeholder = {this.state.isname == true ? 'Login': 'Name is required'}
+                                placeholder = {this.state.isname == true ? 'Username': 'Username is required'}
                                 placeholderTextColor = { this.state.isname == true ? 'black': 'red' }
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.name}
@@ -958,7 +1006,7 @@ class Login extends Component {
                                 spellCheck = {false}
                                 style = {styles.passwordInput}
                                 returnKeyType = 'done'
-                                placeholder = {this.state.ispassword == true ? 'Password': 'Passowrd is required'}
+                                placeholder = {this.state.ispassword == true ? 'Password': 'Password is required'}
                                 placeholderTextColor = { this.state.ispassword == true ? 'black': 'red' }
                                 secureTextEntry = {true}
                                 underlineColorAndroid = 'transparent'
@@ -976,7 +1024,7 @@ class Login extends Component {
                         </TouchableOpacity>
 
                         <View style = {styles.registerView}>
-                            <Text style = {styles.txt1}>Dont have an account? </Text>
+                            <Text style = {styles.txt1}>Don't have an account? </Text>
                             <TouchableOpacity onPress = {this._onRegister}>
                                 <Text style = {styles.register}>  Register </Text>
                             </TouchableOpacity>
@@ -1028,7 +1076,7 @@ const styles = StyleSheet.create({
     logoView: {
         width: Constant.WIDTH_SCREEN - 100,
         height: 40,
-        marginTop: Constant.HEIGHT_SCREEN*0.3
+        marginTop: (Constant.HEIGHT_SCREEN < 600) ?  Constant.HEIGHT_SCREEN*0.19 : Constant.HEIGHT_SCREEN*0.3
     },
     logotitle: {
         fontSize: 30,
@@ -1100,7 +1148,7 @@ const styles = StyleSheet.create({
         opacity: 0.8
     },
     registerView: {
-        marginTop: 50,
+        marginTop: 30,
         flexDirection: 'row',
         justifyContent:'center',
         alignItems:'center',

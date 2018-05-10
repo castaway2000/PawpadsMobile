@@ -123,21 +123,26 @@ class Register extends Component {
             isConfirm = true
         }
 
-        if(!this.validateEmail(this.state.email)){
+        if (this.state.email.length > 0) {
+
+          if (!this.validateEmail(this.state.email)) {
             alert('Wrong email format')
-        }else{
-            if(this.state.password.length < 8){
-                alert('Password is to short (mimimum 8 characters).')
-            }else{
-                if(this.state.password == this.state.confirm){
-                    // const { navigate } = this.props.navigation
-                    // navigate ('Register')
-                    this._signupWithFirebase()
-                }
-                else{
-                    alert('Passwords do not match')
-                }
+          } else {
+
+            if ((this.state.password.length > 0)) {
+              if (this.state.password.length < 8) {
+                  alert('Password is to short (mimimum 8 characters).')
+              } else {
+                  if(this.state.password == this.state.confirm){
+                      // const { navigate } = this.props.navigation
+                      // navigate ('Register')
+                      this._signupWithFirebase()
+                  } else {
+                      alert('Passwords do not match')
+                  }
+              }
             }
+          }
         }
 
         if(isAlert == true){
@@ -149,7 +154,9 @@ class Register extends Component {
                 isConfirm: isConfirm,
             })
         }
+
         Keyboard.dismiss();
+
     }
 
     _signupWithFirebase = () => {
@@ -204,17 +211,20 @@ class Register extends Component {
                                           "updated_at":dateString,
                                           "password":ciphertext,
                                           "email": this.state.email,
-                                          "isDataMigrated":"true",}
+                                          "isDataMigrated":"true",
+                                          "isTogglepushSelected":"true"}
 
                           updates['/users/' + newKey] = user;
                           firebase.database().ref().update(updates)
 
                           //Save to local storage
-                          AsyncStorage.setItem(Constant.USER_TABEL_ID, newKey);
-                          AsyncStorage.setItem(Constant.QB_USERID, newKey);
-                          AsyncStorage.setItem(Constant.USER_FULL_NAME, this.state.name);
-                          AsyncStorage.setItem(Constant.USER_LOGIN, this.state.name);
-                          AsyncStorage.setItem(Constant.USER_EMAIL, this.state.email);
+                          //AsyncStorage.setItem(Constant.USER_TABEL_ID, newKey);
+                          //AsyncStorage.setItem(Constant.QB_USERID, newKey);
+                          //AsyncStorage.setItem(Constant.USER_FULL_NAME, this.state.name);
+                          //AsyncStorage.setItem(Constant.USER_LOGIN, this.state.name);
+                          //AsyncStorage.setItem(Constant.USER_EMAIL, this.state.email);
+
+                          alert('Registration Successful.')
 
                           this.props.navigation.goBack()
                         }
@@ -250,6 +260,7 @@ class Register extends Component {
             console.log(e)
         })
     }
+
     validateEmail = (email) => {
         var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return re.test(email);
@@ -264,7 +275,7 @@ class Register extends Component {
                     </TouchableOpacity>
                     <Text style = {styles.title}>Registration</Text>
                 </View>
-                <ScrollView style = {styles.mScrollView}>
+                <KeyboardAwareScrollView style = {styles.mScrollView}>
                     <View style = {styles.mainView}>
                         <View style = {styles.nameView}>
                             <TextInput
@@ -273,7 +284,7 @@ class Register extends Component {
                                 autoCorrect = {false}
                                 spellCheck = {false}
                                 returnKeyType = 'next'
-                                placeholder = 'Name'
+                                placeholder = {this.state.isName == false? 'Username': 'Username is required.'}
                                 placeholderTextColor = {this.state.isName == false? 'black': '#f94746'}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.name}
@@ -289,7 +300,7 @@ class Register extends Component {
                                 autoCorrect = {false}
                                 spellCheck = {false}
                                 returnKeyType = 'next'
-                                placeholder = 'Email'
+                                placeholder = {this.state.isEmail == false? 'Email': 'Email is required.'}
                                 keyboardType = 'email-address'
                                 placeholderTextColor = {this.state.isEmail == false? 'black': '#f94746'}
                                 underlineColorAndroid = 'transparent'
@@ -306,7 +317,7 @@ class Register extends Component {
                                 autoCorrect = {false}
                                 spellCheck = {false}
                                 returnKeyType = 'next'
-                                placeholder = 'Password'
+                                placeholder = {this.state.isPassword == false? 'Password': 'Password is required.'}
                                 placeholderTextColor = {this.state.isPassword == false? 'black': '#f94746'}
                                 secureTextEntry = {true}
                                 underlineColorAndroid = 'transparent'
@@ -323,7 +334,7 @@ class Register extends Component {
                                 autoCorrect = {false}
                                 spellCheck = {false}
                                 returnKeyType = 'go'
-                                placeholder = 'Confirm password'
+                                placeholder = {this.state.isConfirm == false? 'Confirm password': 'Confirm password is required.'}
                                 placeholderTextColor = {this.state.isConfirm == false? 'black': '#f94746'}
                                 secureTextEntry = {true}
                                 underlineColorAndroid = 'transparent'
@@ -342,7 +353,7 @@ class Register extends Component {
                             <Text style = {styles.signup}>Sign up</Text>
                         </TouchableOpacity>
                     </View>
-                </ScrollView>
+                </KeyboardAwareScrollView>
             </View>
         );
     }

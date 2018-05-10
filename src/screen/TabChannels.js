@@ -42,7 +42,7 @@ render() {
   console.log("data:",data);
 
   return(
-            <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => tmpThis.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})} key = {this.props.index}>
+            <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => tmpThis.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: false, Dialog: data, IsPublicGroup: true, TabChannelsRef:tmpThis})} key = {this.props.index}>
               {tmpThis.state.refresh == false? tmpThis.downloadLastUserFirebase(data.last_message_user_id) : null}
               {tmpThis.state.refresh1 == false? tmpThis.downloadGroupPhotoFirebase(data.photo,data._id) : null}
               <View style = {styles.menuIcon} >
@@ -50,7 +50,7 @@ render() {
                   uri: data.photo
                   }}
                   defaultSource = {require('../assets/img/user_placeholder.png')}
-                  style = {styles.menuIcon} />
+                  style = {styles.menuIcon1} />
                   </View>
               <View style = {{flex: 1, marginLeft: 15}}>
                   <Text style = {styles.menuItem}>{data.name}</Text>
@@ -253,7 +253,7 @@ class TabChannels extends Component {
     loadGroupUsingID = (groupid) => {
       return new Promise((resolve, reject) => {
       firebase.database()
-          .ref(`/dialog`)
+          .ref(`/dialog/group-chat-public`)
           .orderByChild("last_message_date_sent")
 
           .limitToLast(15)
@@ -271,7 +271,7 @@ class TabChannels extends Component {
     loadGroupUsingIDPage = (groupid,pagekey,pagetimestamp) => {
       return new Promise((resolve, reject) => {
       firebase.database()
-          .ref(`/dialog`)
+          .ref(`/dialog/group-chat-public`)
           .orderByChild("last_message_date_sent")
           .endAt(pagetimestamp-1, pagekey)
           .limitToLast(20)
@@ -317,6 +317,8 @@ class TabChannels extends Component {
                       for(var i = 0;i < this.state.dialogs.length; i++){
                           if(this.state.dialogs[i]._id == id){
                               this.state.dialogs[i]['photo'] = url;
+                              this.state.dialogs[i]['profileurl'] = url;
+
                               console.log("downloadGroupPhotoFirebase:",url);
                           }
                       }
@@ -425,7 +427,7 @@ class TabChannels extends Component {
             return(
                 this.state.dialogs.map((data, index) => {
                     return(
-                      <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})} key = {index}>
+                      <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('ChatGroup', {GroupName: data.name, IsPriveteGroup: false, Dialog: data, IsPublicGroup: true, TabChannelsRef:tmpThis})} key = {index}>
                         {this.state.refresh == false? this.downloadLastUserFirebase(data.last_message_user_id) : null}
 
                         {this.state.refresh1 == false? this.downloadGroupPhotoFirebase(data.photo,data._id) : null}
@@ -439,7 +441,6 @@ class TabChannels extends Component {
                         <View style = {{flex: 1, marginLeft: 15}}>
                             <Text style = {styles.menuItem}>{data.name}</Text>
                             <View style = {{flexDirection:'row',marginTop: 5}}>
-
                                 <Image source = {{
                                     uri: data.blob_id
                                     }}
@@ -513,6 +514,7 @@ class TabChannels extends Component {
     }
 
     onRefresh() {
+      console.log("onRefresh called.");
       this.setState({refreshing: true});
       setTimeout(() => {
           this.setState({
@@ -551,15 +553,14 @@ class TabChannels extends Component {
         user_id : this.state.userID.toString()
       }
 
-      updates['/dialog/' + newKey] = dialog;
-      firebase.database().ref().update(updates)
+      //updates['/dialog/' + newKey] = dialog;
 
-      this.props.navigation.navigate('ChatGroupEdit', {forcerefresh:true, onRefresh: this.onRefresh, Dialog: dialog})
+      //firebase.database().ref().update(updates)
+
+      this.props.navigation.navigate('ChatGroupEdit', {onRefresh: this.onRefresh, Dialog: dialog, TabChannelsRef:tmpThis, IsCreated: true})
     }
 
-    onRefresh = (isRefresh) => {
-
-      if (isRefresh) {
+    onRefresh = () => {
 
         this.setState({
           refreshing: false,
@@ -576,7 +577,6 @@ class TabChannels extends Component {
         datas = []
         this.loadDataFromFirebase(null,null)
 
-      }
     };
 
     _renderItem = ({ item, index}) => ( <MyListItem
@@ -610,6 +610,12 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         backgroundColor: '#f1eff0',
+    },
+    menuIcon1: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'transparent',
     },
     chatBtn: {
         position:'absolute',

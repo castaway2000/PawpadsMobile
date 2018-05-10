@@ -23,7 +23,7 @@ class Settings extends Component {
             isHighSelected: false,
             isMediumSelected: true,
             isLowSelected: false,
-            isTogglepushSelected: false,
+            isTogglepushSelected: true,
             isToggleMessagingSelected: true,
             searchRange: '60',
 			      tableId:'',
@@ -80,6 +80,31 @@ class Settings extends Component {
                 })
             }
         })
+
+        AsyncStorage.getItem(Constant.SETTINGS_TOGGLE_PUSH_NOTIFICATIONS).then((value) => {
+          if (value) {
+            if(value == "true"){
+                this.setState({ isTogglepushSelected: true })
+            } else {
+              this.setState({ isTogglepushSelected: false })
+            }
+          } else {
+              this.setState({ isTogglepushSelected: true })
+          }
+        })
+
+        AsyncStorage.getItem(Constant.SETTINGS_TOGGLE_MESSAGING_POPUPS).then((value) => {
+
+          if (value) {
+            if(value == "true" ){
+                this.setState({ isToggleMessagingSelected: true })
+            } else {
+              this.setState({ isToggleMessagingSelected: false })
+            }
+          } else {
+            this.setState({ isToggleMessagingSelected: true })
+          }
+        })
     }
 
     handleSelectedKilometers = (checked) => {
@@ -125,10 +150,19 @@ class Settings extends Component {
         this.setState({
             isTogglepushSelected: true,
         })
+
+        var updatescontent2 = {};
+        updatescontent2['/users/' + this.state.tableId + '/' + "isTogglepushSelected"] = 'true'
+        firebase.database().ref().update(updatescontent2)
+
       } else {
         this.setState({
             isTogglepushSelected: false,
         })
+
+        var updatescontent2 = {};
+        updatescontent2['/users/' + this.state.tableId + '/' + "isTogglepushSelected"] = 'false'
+        firebase.database().ref().update(updatescontent2)
       }
     }
 
@@ -169,11 +203,15 @@ class Settings extends Component {
         }
 
         if(this.state.isTogglepushSelected){
-            AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_PUSH_NOTIFICATIONS, 'push_notification');
+            AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_PUSH_NOTIFICATIONS, "true");
+        } else {
+          AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_PUSH_NOTIFICATIONS, "false");
         }
 
         if(this.state.isToggleMessagingSelected){
-            AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_MESSAGING_POPUPS, 'messaging_popups')
+            AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_MESSAGING_POPUPS, "true");
+        } else {
+          AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_MESSAGING_POPUPS, "false");
         }
 
         this.props.navigation.goBack()

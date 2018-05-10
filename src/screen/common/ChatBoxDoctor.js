@@ -16,6 +16,8 @@ const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 import {CachedImage} from 'react-native-img-cache';
 
+const geofire = require('geofire');
+
 class ChatBoxDoctor extends Component {
 	constructor(props) {
         super(props)
@@ -181,44 +183,39 @@ class ChatBoxDoctor extends Component {
 			</Text>
 		)
 	}
-	degreesToRadians(degrees){
-		return degrees * Math.PI/180
-	}
-	distanceInKmBetweenEarthCoordinates(lat1, lon1, lat2, lon2){
-		var earthRadiusKm = 6371
-		var dLat = this.degreesToRadians(lat2 - lat1)
-		var dLon = this.degreesToRadians(lon2 - lon1)
-		lat1 = this.degreesToRadians(lat1)
-		lat2 = this.degreesToRadians(lat2)
 
-		var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2)
-		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-		return earthRadiusKm * c
+	calculateDistance = (lat1, lon1, lat2, lon2) => {
+		let distance = 6371
+		if (lat1 && lon1 && lat2 && lon2) {
+			distance = parseInt(geofire.distance([lat1, lon1], [lat2, lon2]))
+		}
+
+		return distance
 	}
 
-	showUserDistance(){
+	showUserDistance() {
 
 		{this.state.distancerefresh == false?
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
-					var distance = this.distanceInKmBetweenEarthCoordinates(Math.round(this.props.latitude), Math.round(position.coords.latitude), Math.round(this.props.longitude), Math.round(position.coords.longitude))
+
+					var distance = this.calculateDistance(Math.round(parseFloat(this.props.latitude)), Math.round(parseFloat(this.props.longitude)), Math.round(position.coords.latitude), Math.round(position.coords.longitude))
 
 					AsyncStorage.getItem(Constant.SETTINGS_DISTANCE_UNIT).then((value) => {
 	            if(value){
-	                this.setState({ distance_unit: value })
+	                //this.setState({ distance_unit: value })
 
 									if (this.state.distance_unit == 'miles') {
 										distance = distance/1.60934
 									}
 
-									this.setState({
-										distance: distance.toFixed(2),
-										distancerefresh: true,
-									})
-	            }
+									//this.setState({distance: distance.toFixed(2),})
+	            } else {
+								//this.setState({ distance_unit: "miles" })
+								distance = distance/1.60934
+							//	this.setState({distance: distance.toFixed(2),})
+							}
 	        })
-
-
 				},
 				(error) => this.setState({error: error.message}),
             	{enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
@@ -231,7 +228,7 @@ class ChatBoxDoctor extends Component {
 		)
 	}
 
-	showMessageBody(){
+	showMessageBody() {
 
 		console.log("Doctor : this.props.messageImage.length",this.props.messageImage);
 
@@ -266,17 +263,17 @@ class ChatBoxDoctor extends Component {
 					/>
 				</View>
 			)
-		}
-		else{
+		} else {
 			return(
-				<View style={styles.doctorMessageContainer}>
-					<Text style={styles.messageText}>{this.props.messageBody}</Text>
+				<View style = {styles.doctorMessageContainer}>
+					<Text style = {styles.messageText}>{this.props.messageBody}</Text>
 				</View>
 			)
 		}
-
 	}
+
 	render() {
+
 		const {doctorMessageContainer, messagesContainer, messageTime, messageText, messagePhoto} = styles;
 		return (
 			<View style = {messagesContainer}>

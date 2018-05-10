@@ -14,6 +14,8 @@ module.exports = {
 
     FIREBASE_PASS_SECRET : "S6mqpsBsKxfbSqZxGY4X",
 
+    FCM_TOKEN: 'fcm_token',
+
     TWITTER_COMSUMER_KEY: 'd0OQD2OeO77QLYMPROTteJRMi',
     TWITTER_CONSUMER_SECRET: '8ZdXAvVlHzJWjGwZSeQm9MaLtJ1Ra9kx6eg5nqCLFh3NBfMzkf',
 
@@ -53,4 +55,8 @@ module.exports = {
     SETTINGS_GPS_ACCURACY: 'settings_gps_accuracy',
     SETTINGS_TOGGLE_PUSH_NOTIFICATIONS: 'settings_toggle_push_notification',
     SETTINGS_TOGGLE_MESSAGING_POPUPS: 'settings_toggle_messaging_popups',
+
+    USER_LATITUDE: 'user_lat',
+    USER_LONGITUDE: 'user_long',
+
 }

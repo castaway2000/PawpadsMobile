@@ -20,6 +20,10 @@ class About extends Component {
       Linking.openURL('mailto:feedback@pawpadsapp.com.com&subject=feedback&body=Hello')
     }
 
+    onPrivacyPolicy() {
+        Linking.openURL('http://www.pawpadsapp.com/p/t-and-privacy-policy.html?m=1')
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -47,9 +51,9 @@ class About extends Component {
                             <Text style = {{color: 'white',backgroundColor: 'transparent'}}>Send feedback</Text>
                         </TouchableOpacity>
                     </View>
-
-                    <Text style = {styles.privacy}>@2016 PawPads<Text style = {{fontWeight:'bold'}}>  Privacy Policy</Text></Text>
-
+                    <TouchableOpacity style = {styles.sendBtn} onPress = {this.onPrivacyPolicy} >
+                    <Text style = {styles.privacy}>@2018 PawPads<Text style = {{fontWeight:'bold'}}>  Privacy Policy</Text></Text>
+                    </TouchableOpacity>
                 </View>
 
             </View>

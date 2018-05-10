@@ -28,10 +28,12 @@ const datas = []
 var currentPage = 0
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
 
 // create a component
 class TabChats extends Component {
-    constructor(props){
+
+    constructor(props) {
         super(props)
         this.state = {
             refreshing: false,
@@ -40,6 +42,7 @@ class TabChats extends Component {
             token: '',
             refresh: false,
             userID: '',
+            tableId: '',
         }
     }
 
@@ -49,20 +52,99 @@ class TabChats extends Component {
         datas = []
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
             this.setState({ userID: value })
+            AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+                this.setState({tableId: value })
+                this.loadcData()
+              })
         })
-        //this.loadData()
-        this.loadDataFromFirebase()
+    }
+
+    loadcData() {
+        firebase.database()
+        .ref(`/users/` + this.state.tableId + "/dialog")
+        .once("value")
+        .then(snapshot => {
+            if (snapshot.val()) {
+
+                let chatids = snapshot.val();
+
+                var dialogs = [];
+
+                for (var x in chatids) {
+                    let d = snapshot.val()[x];
+                    if ((d.type == 2) || (d.type == 3)) {
+                        dialogs.push(d.id)
+                    }
+                }
+
+                const videoPromises = dialogs.map(id => {
+                    return firebase.database()
+                    .ref(`/dialog/group-chat-private/` + id)
+                    .once("value")
+                    .then(snapshot => {
+                        console.log('snapshot.val()')
+                        return snapshot.val()
+                    })
+                  })
+
+                  Promise.all(videoPromises)
+                  .then(snapshots => {
+
+                    let dlg = []
+                    // do something with the data
+                    for (let i = 0; i < snapshots.length; i++) {
+
+                        const element = snapshots[i];
+                        if (element) {
+                            dlg.push(element)
+                        }
+                    }
+                    
+                    this.setState({dialogs: dlg})
+
+                    this.state.dialogs.sort(function(a, b) {
+                        var keyA = a.last_message_date_sent,
+                            keyB = b.last_message_date_sent;
+                        if(keyA > keyB) return -1;
+                        if(keyA < keyB) return 1;
+                        return 0;
+                    });
+
+                    this.setState({ loading: false })
+        
+                    this.setState({dialogs:this.state.dialogs})
+
+                  })
+                  .catch(err => {
+                    // handle error
+                  })
+
+            } else {
+   
+            }
+        });
     }
 
     loadDataFromFirebase() {
 
+      this.state.dialogs = []
+
       this.loadGroupUsingID(2)
+
       .then((result) => {
+
         console.log("this.state.dialogs2",result);
+
         if (result) {
           for (key in result) {
-            this.state.dialogs.push(result[key])
-            //this.setState({dialogs:this.state.dialogs})
+
+            let dialog = result[key]
+
+            var isMyDialog = (dialog.occupants_ids.indexOf(this.state.userID) > -1);
+
+            if (isMyDialog) {
+              this.state.dialogs.push(result[key])
+            }
           }
 
           this.state.dialogs.sort(function(a, b) {
@@ -74,7 +156,6 @@ class TabChats extends Component {
           });
 
           this.setState({dialogs:this.state.dialogs})
-
         }
 
         this.loadGroupUsingID(3)
@@ -83,8 +164,16 @@ class TabChats extends Component {
           this.setState({ loading: false })
           if (result1) {
             for (key in result1) {
-              this.state.dialogs.push(result1[key])
-              //this.setState({dialogs:this.state.dialogs})
+
+              let dialog = result1[key]
+
+              console.log("dialog.occupants_ids:",dialog.occupants_ids);
+
+              var isMyDialog = (dialog.occupants_ids.indexOf(this.state.userID) > -1);
+
+              if (isMyDialog) {
+                this.state.dialogs.push(result1[key])
+              }
             }
 
             this.state.dialogs.sort(function(a, b) {
@@ -155,17 +244,20 @@ class TabChats extends Component {
         this.loadData()
         this.setState({refreshing: true});
         setTimeout(() => {
-            this.loadData()
+
+            this.loadDataFromFirebase()
             this.setState({
-                refreshing: false
+                refreshing: false,
+                refresh: false
             })
         }, 2000)
     }
 
-    downloadLastUserFirebase(data,index) {
+    downloadLastUserFirebase(data, index) {
 
       //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
       if (data.type == 2) {
+
         //GROUP
         firebase.database()
             .ref(`/users`)
@@ -341,10 +433,10 @@ class TabChats extends Component {
       //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
       if (data.type == 2) {
         //GROUP
-        this.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})
+        this.props.navigation.navigate('ChatGroup', {GroupName: data.name, IsPriveteGroup: true, Dialog: data, IsPublicGroup: false})
       } else if (data.type == 3) {
         //PRIVATE
-        this.props.navigation.navigate('Chat', {GroupName: data.name, GroupChatting: true, Dialog: data, Token: this.state.token})
+        this.props.navigation.navigate('Chat', {GroupName: data.name, IsPriveteGroup: true, Dialog: data, Token: this.state.token})
       }
     }
 
@@ -356,26 +448,36 @@ class TabChats extends Component {
 				</View>
 			);
     } else {
-            return(
-                this.state.dialogs.map((data, index) => {
-                    return(
-                      <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.checkAndNavigate(data)} key = {index}>
-                        {this.state.refresh == false? this.downloadLastUserFirebase(data,index) : null}
-                        <View style = {styles.menuIcon} >
-                          <CachedImage source = {{ uri: data.profileurl }}
-                          defaultSource = {require('../assets/img/user_placeholder.png')}
-                          style = {styles.menuIcon} />
-                        </View>
-                        <View style = {{flex: 1, marginLeft: 15, justifyContent:'center'}}>
-                          <Text style = {styles.menuItem}>{data.name}</Text>
-                          <Text style = {styles.lastmessage} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
-                        </View>
-                        </TouchableOpacity>
-                    )
-                })
-            )
+      if (this.state.dialogs.length > 0) {
+        return(
+            this.state.dialogs.map((data, index) => {
+                return(
+                  <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.checkAndNavigate(data)} key = {index}>
+                    {this.state.refresh == false? this.downloadLastUserFirebase(data,index) : null}
+                    <View style = {styles.menuIcon} >
+                      <CachedImage source = {{ uri: data.profileurl }}
+                      defaultSource = {require('../assets/img/user_placeholder.png')}
+                      style = {styles.menuIcon1} />
+                    </View>
+                    <View style = {{flex: 1, marginLeft: 15, justifyContent:'center'}}>
+                      <Text style = {styles.menuItem}>{data.name}</Text>
+                      <Text style = {styles.lastmessage} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
+                    </View>
+                    </TouchableOpacity>
+                )
+            })
+        )
+      } else {
+          return(
+              <View style={styles.loadingView}>
+                  <Text style = {styles.placesText}>No chats found!</Text>
+              </View>
+          )
         }
     }
+}
+
+
     render() {
         return (
             <Container>
@@ -442,7 +544,12 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         backgroundColor: '#f1eff0',
-
+    },
+    menuIcon1: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'transparent',
     },
     chatBtn: {
         position:'absolute',

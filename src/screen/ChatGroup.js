@@ -40,6 +40,10 @@ const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
 
+import FCM, {NotificationActionType} from "react-native-fcm";
+import {registerKilledListener, registerAppListener} from '../common/Listeners'
+import firebaseClient from '../common/FirebaseClient'
+
 var messages = []
 var currentUserid = ''
 var isCamera = false;
@@ -56,7 +60,9 @@ class ChatGroup extends Component {
 			protected: this.props.profile,
 			token: '',
 			blob_id: '',
-			tableId:'',
+			profiles:[],
+			latitude: "",
+			longitude: ""
 		};
 	}
 
@@ -70,6 +76,18 @@ class ChatGroup extends Component {
 			console.log("tableId is:",value);
 			this.setState({tableId: value })
 		})
+
+		AsyncStorage.getItem(Constant.USER_LATITUDE).then((value) => {
+			console.log("USER_LATITUDE is:",value);
+			this.setState({latitude: value})
+		})
+
+		AsyncStorage.getItem(Constant.USER_LONGITUDE).then((value) => {
+			console.log("USER_LONGITUDE is:",value);
+			this.setState({longitude: value})
+		})
+
+		this.getFCMToken()
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -78,6 +96,53 @@ class ChatGroup extends Component {
 				messages: nextProps.chatMessages,
 				loading: false
 			});
+		}
+	}
+
+	refresh = () => {
+		console.log("Refresh..........");
+	}
+
+	getFCMToken = () => {
+
+		var { params } = this.props.navigation.state
+
+		if (params.Dialog.occupants_ids) {
+
+			for (var i = 0; i < params.Dialog.occupants_ids.length; i++) {
+
+				console.log("params.Dialog.occupants_ids[i]", params.Dialog.occupants_ids[i]);
+
+				firebase.database()
+					.ref(`/users`)
+					.orderByChild("id")
+					.equalTo(params.Dialog.occupants_ids[i])
+					.once("value")
+					.then(snapshot => {
+
+						if (snapshot.val()) {
+
+							let profileObj = snapshot.val()
+
+							let keys = Object.keys(profileObj);
+
+							var tableId = keys[keys.length - 1]
+
+							let profile = profileObj[tableId]
+
+							//profiles
+							if (profile.firid != this.state.tableId) {
+								if (profile.FCMToken && profile.isTogglepushSelected == "true") {
+									this.state.profiles.push(profile)
+									console.log("FCMToken  ", profile.FCMToken);
+								}
+							}
+
+						} else {
+							this.setState({ loading: false })
+						}
+					})
+			}
 		}
 	}
 
@@ -186,7 +251,7 @@ class ChatGroup extends Component {
 
 								  		console.log("messages :",messages);
 
-											this.setState({messages:messages,loading: false})
+											this.setState({messages:messages, loading: false})
 
 											this.updateChats()
 
@@ -228,11 +293,8 @@ class ChatGroup extends Component {
 
 										if (!isFound) {
 											messages.unshift(chatobj)
-										}
-
-											console.log("messages :",messages);
-
 											this.setState({messages:messages,loading: false})
+										}
 
 										} else {
 											this.setState({ loading: false })
@@ -256,6 +318,7 @@ class ChatGroup extends Component {
 	_onGiphyPicked= (url) => {
 		console.log('_onGiphyPicked',url);
 		this.sendGIFMessageFirebase(url)
+
 	}
 
 	sendMessageFirebase(text) {
@@ -278,14 +341,14 @@ class ChatGroup extends Component {
       "chat_dialog_id" : params.Dialog._id,
       "created_at" : date,
       "date_sent" : milliseconds,
-      "latitude" : "",
-      "longitude" : "",
+			"latitude" : this.state.latitude,
+			"longitude" : this.state.longitude,
       "message" : text,
       "read" : 0,
       "recipient_id" : "",
       "send_to_chat" : "1",
       "sender_id" : currentUserid,
-      "updated_at" : date
+      "updated_at" : date,
     }
 
 		updates['/chats/' + newKey] = chatdict;
@@ -294,14 +357,15 @@ class ChatGroup extends Component {
 		//TODO: update chat dialog
 		var diloagDict = {
 			"last_message" : text,
-			"last_message_date_sent" : date,
+			"last_message_date_sent" : milliseconds,
 			"last_message_user_id" : currentUserid,
 			"updated_at" : date,
 		}
 
-		firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+		firebase.database().ref('/dialog/group-chat-private/' + params.Dialog._id).update(diloagDict)
 
 		this.updateChats()
+		this.sendNotificationToAllUser()
 	}
 
 	sendGIFMessageFirebase(url) {
@@ -324,8 +388,8 @@ class ChatGroup extends Component {
 			"chat_dialog_id" : params.Dialog._id,
 			"created_at" : date,
 			"date_sent" : milliseconds,
-			"latitude" : "",
-			"longitude" : "",
+			"latitude" : this.state.latitude,
+			"longitude" : this.state.longitude,
 			"message" : 'sticker',
 			"read" : 0,
 			"recipient_id" : "",
@@ -345,9 +409,10 @@ class ChatGroup extends Component {
 			"updated_at" : date,
 		}
 
-		firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+		firebase.database().ref('/dialog/group-chat-private/' + params.Dialog._id).update(diloagDict)
 
 		this.updateChats()
+		this.sendNotificationToAllUser()
 	}
 
 	sendMessage(text) {
@@ -398,6 +463,8 @@ class ChatGroup extends Component {
 				payload: newArray,
 			})
 
+			this.sendNotificationToAllUser()
+
 		}).catch((e) => {
 			console.log(e)
 		})
@@ -405,6 +472,53 @@ class ChatGroup extends Component {
 
 	componentWillUnmount() {
 		Keyboard.dismiss();
+	}
+
+	sendNotificationToAllUser = () => {
+		for (var i = 0; i < this.state.profiles.length; i++) {
+			this.sendRemoteNotification(this.state.profiles[i])
+		}
+	}
+
+	sendRemoteNotification = (userprofile) => {
+
+		let platform = userprofile.Platform
+
+		var {params} = this.props.navigation.state
+
+		let body;
+
+		if (Platform.OS === 'android') {
+			body = {
+				"to": userprofile.FCMToken,
+				"content_available": true,
+				"notification": {
+					"title": "Pawpads",
+					"body": "You have a new message.",
+					"click_action": "fcm.ACTION.HELLO"
+				},
+				"data": {
+					"type":"2",
+					"data": params.Dialog
+				}
+			}
+		} else {
+			body = {
+				"to": userprofile.FCMToken,
+				"notification": {
+					"title": "Pawpads",
+					"body": "You have a new message.",
+					"sound": "default"
+				},
+				"data": {
+					"type":"2",
+					"data": params.Dialog
+				},
+				"priority": 10
+			}
+		}
+
+		firebaseClient.send(JSON.stringify(body), "notification");
 	}
 
 	renderListMessages(item, index) {
@@ -531,28 +645,26 @@ class ChatGroup extends Component {
 
 	chatEdit() {
 		var {params} = this.props.navigation.state
-		if(params.GroupChatting){
+		if(params.IsPriveteGroup || params.IsPublicGroup) {
 			return(
-				<TouchableOpacity style = {styles.backButton} onPress = {() => this.props.navigation.navigate('ChatGroupEdit', {onRefresh: this.onRefresh,Dialog: params.Dialog})}>
+				<TouchableOpacity style = {styles.backButton} onPress = {() => this.props.navigation.navigate('ChatGroupEdit', {Dialog: params.Dialog, ChatGroupVC:this})}>
 					<Image source = {require('../assets/img/edit_white.png')} style = {{width: 18, height: 18, resizeMode:'contain'}}/>
 				</TouchableOpacity>
 			);
-		}else{
+		} else {
 			return null
 		}
 	}
 
 	createGroup() {
 		var {params} = this.props.navigation.state
-		if(params.GroupChatting){
+		if(params.IsPriveteGroup){
 			return(
 				<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('CreateGroupChat')}>
 					<Image source = {require('../assets/img/add_participant.png')} style = {{width: 26, height: 26, resizeMode:'contain'}}/>
 				</TouchableOpacity>
 			)
-		}
-
-		else{
+		} else {
 			return null
 		}
 	}
@@ -577,7 +689,7 @@ class ChatGroup extends Component {
 		 this.popupDialog.dismiss()
 	 }
 
-	getAttachmentID(){
+	getAttachmentID() {
 		var today = new Date()
 		var yyyy = today.getFullYear().toString()
 		var MM = (today.getMonth()+1).toString()
@@ -671,6 +783,7 @@ class ChatGroup extends Component {
 	}
 
 	sendPhotoMessage(source, fileName) {
+		
 		//Upload Image to firebase
 
 		firebase.storage().ref("content/" + this.state.tableId + "/" + fileName).putFile(source) .then(uploadedFile => {
@@ -683,7 +796,7 @@ class ChatGroup extends Component {
 
 			var {params} = this.props.navigation.state
 
-			var milliseconds = (new Date).getTime();
+			var milliseconds = (new Date).getTime()/1000|0;;
 			console.log(milliseconds);
 
 			var date = new Date();
@@ -705,7 +818,9 @@ class ChatGroup extends Component {
 				"read_ids" : [ ],
 				"recipient_id" : "",
 				"sender_id" : currentUserid,
-				"updated_at" : date.toISOString()
+				"updated_at" : date.toISOString(),
+				"latitude" : this.state.latitude,
+				"longitude" : this.state.longitude,
 			}
 
 			updates['/chats/' + newKey] = chatdict;
@@ -740,6 +855,7 @@ class ChatGroup extends Component {
 			updatescontent1['/users/' + this.state.tableId  + '/content/'+ newKeyUsercontent] = content;
 			firebase.database().ref().update(updatescontent1)
 
+
 			//TODO: update chat dialog
 			var diloagDict = {
 				"last_message" : 'photo',
@@ -748,7 +864,9 @@ class ChatGroup extends Component {
 				"updated_at" : date,
 			}
 
-			firebase.database().ref('/dialog/' + params.Dialog._id).update(diloagDict)
+			this.sendNotificationToAllUser()
+
+			firebase.database().ref('/dialog/group-chat-private/' + params.Dialog._id).update(diloagDict)
 
 			this.updateChats()
 		})
@@ -761,29 +879,41 @@ class ChatGroup extends Component {
 	});
 }
 
-onRefresh = (isRefresh) => {
-	if (isRefresh) {
-		console.log("isRefresh",isRefresh);
+goBackHandler = () => {
+	const { navigation } = this.props;
+
+	if (this.props.navigation.state.params.TabChannelsRef) {
+		this.props.navigation.state.params.TabChannelsRef.onRefresh()
 	}
-};
+
+	this.props.navigation.goBack()
+}
+
+onRefresh = () => {
+	console.log("Updated.........");
+}
+
+
 
 	render() {
+
 		var {params} = this.props.navigation.state
+
 		return (
 			<View style={styles.container}>
 				<View style = {styles.tabView}>
-                    <TouchableOpacity style = {styles.backButton} onPress = {() => this.props.navigation.goBack()}>
-                        <Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
-                    </TouchableOpacity>
-                    <Text style = {styles.title} numberOfLines = {1} ellipsizeMode = 'tail'>{params.GroupName}</Text>
+					<TouchableOpacity style = {styles.backButton} onPress = {() => this.goBackHandler()}>
+						<Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
+					</TouchableOpacity>
+	  		<Text style = {styles.title} numberOfLines = {1} ellipsizeMode = 'tail'>{params.GroupName}</Text>
 
-					{this.chatEdit()}
+			{this.chatEdit()}
+			{this.createGroup()}
 
-					{this.createGroup()}
-                </View>
-                <View style = {styles.bodyView}>
-                    {this.renderChat()}
-                </View>
+			</View>
+			<View style = {styles.bodyView}>
+			{this.renderChat()}
+			</View>
 
 				<PopupDialog
                     ref={(popupDialog) => { this.popupDialog = popupDialog; }}

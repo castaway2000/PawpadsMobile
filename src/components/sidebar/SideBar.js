@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { StyleSheet, StatusBar, Image, TouchableOpacity,AsyncStorage } from 'react-native';
+import { StyleSheet, StatusBar, Image, TouchableOpacity, AsyncStorage, Alert } from 'react-native';
 import {
     Content,
 	Text,
@@ -17,6 +17,7 @@ import {
 	getTheme,
 	variables,
 } from 'native-base'
+
 import { Actions } from 'react-native-router-flux';
 import Constant from '../../common/Constant'
 
@@ -60,11 +61,18 @@ class SideBar extends Component {
             profileimage:'',
             coverPictureURL:'',
             fullname:'',
+            tableId:''
 		};
 	}
 
     componentWillMount() {
+
         this.loadUserData()
+
+        AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+          console.log("tableId is:",value);
+          this.setState({tableId: value})
+        })
 
         const defaultGetStateForAction = Drawer.router.getStateForAction;
 
@@ -80,14 +88,11 @@ class SideBar extends Component {
             }
             return defaultGetStateForAction(action, state);
         };
-
     }
 
-
     loadUserData(){
-
       AsyncStorage.getItem(Constant.USER_BLOBID).then((value1) => {
-          this.setState({
+        this.setState({
               name: value1,
           })
       })
@@ -165,6 +170,44 @@ class SideBar extends Component {
         this.props.navigation.navigate('ProfileEdit')
     }
 
+    didSelectRow = (route) => {
+
+      if (route == "Logout") {
+        Alert.alert(
+          'PawPads',
+          'Are you sure you want to logout?',
+          [
+            {text: 'Cancel', onPress: () => {
+
+            }, style: 'cancel'},
+            {text: 'Logout', onPress: () => {
+              this.clearCacheAndLogout(route)
+            }},
+          ],
+          { cancelable: false }
+        )
+      } else {
+        this.props.navigation.navigate(route)
+      }
+    }
+
+    clearCacheAndLogout = (route) => {
+        
+        "tabel"
+
+      let keys = [Constant.USER_TABEL_ID, Constant.QB_USERID, Constant.USER_PASSWORD, Constant.USER_FULL_NAME,
+                  Constant.USER_LOGIN, Constant.USER_EMAIL, Constant.USER_BLOBID, Constant.QB_USER_TOKEN,
+                  Constant.SETTINGS_DISTANCE_UNIT, Constant.SETTINGS_RANGE, Constant.SETTINGS_GPS_ACCURACY, Constant.SETTINGS_TOGGLE_PUSH_NOTIFICATIONS,
+                  Constant.SETTINGS_TOGGLE_MESSAGING_POPUPS];
+
+      AsyncStorage.multiRemove(keys, (err) => {
+
+        firebase.database().ref('/users').child(this.state.tableId).child('FCMToken').remove()
+
+        this.props.navigation.navigate(route)
+      });
+    }
+
     render() {
         return (
             <Container>
@@ -172,33 +215,41 @@ class SideBar extends Component {
                     <Content>
                         <View style = {styles.drawer}>
 
-                            <CachedImage source = {{
-                                uri: this.state.coverPictureURL,
-                                }}
-                                defaultSource = {require('../../assets/img/app_bar_bg.png')}
-                                style = {styles.drawerCover} />
+                        <Image
+                          source = {require('../../assets/img/app_bar_bg.png')}
+                          style = {styles.drawerCover}
+                        />
 
-
-                            <TouchableOpacity onPress={() => this.props.navigation.navigate('UserProfile')}>
-                                <CachedImage source = {{
-                                    uri: this.state.profileimage,
-                                    }}
-                                    defaultSource = {require('../../assets/img/user_placeholder.png')}
-                                    style = {styles.userPhoto} />
-                            </TouchableOpacity>
-
-                            <Text style = {styles.name}>{this.state.fullname}</Text>
-                            <TouchableOpacity style = {styles.editBtn} onPress = {this._onEdit}>
-                                <Text style = {styles.edit}>Edit</Text>
-                            </TouchableOpacity>
+                        <CachedImage source = {{uri: this.state.coverPictureURL,}}
+                          defaultSource = {require('../../assets/img/app_bar_bg.png')}
+                          style = {styles.drawerCover}
+                        />
+                        
+                        <View style = {styles.userPhoto}>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('UserProfile')}>   
+                        <CachedImage source = {{
+                            uri: this.state.profileimage,
+                        }}
+                        defaultSource = {require('../../assets/img/user_placeholder.png')}
+                        style = {styles.userPhoto1} />
+                        </TouchableOpacity>
                         </View>
+
+                        <Text style = {styles.name}>{this.state.fullname}</Text>
+
+                        <TouchableOpacity style = {styles.editBtn} onPress = {this._onEdit}>
+                        <Text style = {styles.edit}>Edit</Text>
+                        </TouchableOpacity>
+                        
+                        </View>
+
                     </Content>
                     <Content>
                         <List
                             style = {{marginTop:15, paddingBottom: 100, backgroundColor:'white', height: 400}}
                             dataArray={datas}
                             renderRow={data =>
-                                <ListItem button noBorder onPress={() => this.props.navigation.navigate(data.route)} style = {{height:50, padding:10}}>
+                                <ListItem button noBorder onPress={() => this.didSelectRow(data.route)} style = {{height:50, padding:10}}>
                                     <Image source = {data.icon} style = {styles.menuIcon}/>
                                     <Text style = {styles.menuItem}>{data.name}</Text>
                                 </ListItem>
@@ -266,11 +317,19 @@ const styles = StyleSheet.create({
         height: 60,
         borderRadius: 30,
         marginTop: 20,
+        backgroundColor: "lightgray"
+    },
+    userPhoto1: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        
     },
     name: {
         color: 'white',
         fontSize: 18,
-        marginTop: 10
+        marginTop: 10,
+
     },
     edit: {
         color: 'white'

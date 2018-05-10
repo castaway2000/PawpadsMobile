@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, AsyncStorage } from 'react-native';
 import Constant from '../common/Constant'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import {
@@ -18,31 +18,35 @@ import {
 	variables,
 } from 'native-base'
 
+import {CachedImage} from 'react-native-img-cache';
+
 import { FlatList } from "react-native";
+
+import RNFirebase from 'react-native-firebase';
+
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 class MyListItem extends React.PureComponent {
 
   _onPress = () => {
-    this.props.onPressItem(this.props.index);
+    const data = this.props.item;
+    this.props.onPressItem(this.props.index,data);
   };
 
   render() {
     const data = this.props.item;
 
-    console.log("data:",data);
-
     return (
-      <TouchableOpacity style = {styles.friendsListCell} key = {this.props.index}>
+      <TouchableOpacity onPress={this._onPress}  style = {styles.friendsListCell} key = {this.props.index}>
       <View style = {styles.menuIcon} >
-      <Image source = {{
-        uri: data.photo
+      <CachedImage source = {{
+        uri: data.profileurl
       }}
       defaultSource = {require('../assets/img/user_placeholder.png')}
       style = {styles.menuIcon} />
       </View>
-      <View style = {{flex: 1}}>
-      <Text style = {styles.menuItem}>{data}</Text>
-      </View>
+      <View style = {{flex: 1,justifyContent:'center'}}>
+      <Text style = {styles.menuItem}>{data.full_name? data.full_name : data.login}</Text></View>
       </TouchableOpacity>
     )
   }
@@ -54,9 +58,17 @@ class Friends extends Component {
   constructor(props) {
       super(props)
       this.state = {
-          friendList: ['Testuser1','Testuser2','Testuser3'],
+          friendList: [],
           refreshing: false,
+          userid:'',
       }
+  }
+
+  componentWillMount() {
+    AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
+        this.setState({ userid: value })
+        this.checkAlreadyFriend()
+    })
   }
 
     _onback = () => {
@@ -64,10 +76,17 @@ class Friends extends Component {
     }
 
     _renderItem = ({ item, index }) => ( <MyListItem
+        id = { item.id }
+        title = { item.title }
         index = { index }
         item = { item }
         onPressItem = { this._onPressItem }/>
     );
+
+    _onPressItem = (index, item) => {
+        console.log("Pressed row: ", index, item);
+        this.props.navigation.navigate('Profile', {UserInfo: item})
+    };
 
     _keyExtractor = (item, index) => index;
 
@@ -76,6 +95,79 @@ class Friends extends Component {
         //this.loadDataFromFirebase(this.state.pagekey,this.state.pagetimestamp);
       }
     }
+
+    checkAlreadyFriend = () => {
+      var {params} = this.props.navigation.state
+      firebase.database()
+          .ref(`/friendlist`)
+          .orderByChild("user_id")
+          .equalTo(this.state.userid)
+          .once("value")
+          .then(snapshot => {
+            if (snapshot.val()) {
+              let response = snapshot.val()
+              var keys = Object.keys(response);
+              for (var i = 0; i < keys.length; i++) {
+
+                //console.log("checkAlreadyFriend",response[keys[i]]);
+
+                let friendData = response[keys[i]]
+
+                firebase.database()
+                    .ref(`/users`)
+                    .orderByChild("id")
+                    .equalTo(friendData.friend_id.toString())
+                    .once("value")
+                    .then(snapshot => {
+
+                      if (snapshot.val()) {
+                        var profileObj = snapshot.val();
+
+                        if (profileObj) {
+                          let keys = Object.keys(profileObj);
+
+                          var profile = null;
+                          if (keys.length > 0) {
+                            profile = profileObj[keys[0]]
+                          }
+
+                          if (profile) {
+
+                            this.state.friendList.push(profile)
+
+                            this.setState({friendList: this.state.friendList})
+
+                            if (profile["content"]) {
+
+                              for (let item in profile["content"]) {
+                                let content = profile["content"][item]
+                                let blobid =  content["id"]
+
+                                if (blobid == profile["blob_id"]) {
+
+                                  firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
+
+                                    console.log("profile is:",profile);
+
+                                    for(var i = 0;i < this.state.friendList.length; i++){
+                                        if(this.state.friendList[i].id == profile.id){
+                                            this.state.friendList[i]['profileurl'] = url;
+                                        }
+                                    }
+
+                                    this.setState({friendList:JSON.parse(JSON.stringify(this.state.friendList))})
+                                  })
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    })
+                  }
+                }
+              })
+            }
 
     onRefresh() {
       this.setState({refreshing: true});
@@ -175,8 +267,6 @@ const styles = StyleSheet.create({
       opacity: 1,
       fontSize: 18,
       marginLeft: 15,
-      flex: 1,
-
     },
 });
 

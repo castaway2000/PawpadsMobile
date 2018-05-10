@@ -7,7 +7,12 @@ import TabChannels from './TabChannels'
 import TabChats from './TabChats'
 import TabNearBy from './TabNearBy'
 
+import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType, NotificationActionType, NotificationActionOption, NotificationCategoryOption} from "react-native-fcm";
+import {registerKilledListener, registerAppListener} from '../common/Listeners'
+
 //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
+registerKilledListener();
 
 // create a component
 class Dashboard extends Component {
@@ -25,9 +30,85 @@ class Dashboard extends Component {
         }
     }
 
+    componentDidMount() {
+        FCM.getInitialNotification().then(notif => {
+
+            console.log("FCM.getInitialNotification", notif);
+
+            if(notif){
+              setTimeout(()=>{
+
+                if (notif) {
+
+                    if (notif.data) {
+
+                        let dialog = JSON.parse(notif.data)
+                        
+                        if  (notif.type === '1') {
+                            this.props.navigation.navigate('Chat', {GroupName: dialog.name, IsPriveteGroup: true, Dialog: dialog})
+                        } else if  (notif.type === '2') {
+                            this.props.navigation.navigate('ChatGroup', {GroupName: dialog.name, IsPriveteGroup: true, Dialog: dialog, IsPublicGroup: false})
+                        }
+                    }
+                }
+              }, 500)
+            }
+          });
+
+          FCM.on(FCMEvent.Notification, notif => {
+
+            console.log("FCMEvent.Notification", notif);
+        
+            if(Platform.OS ==='ios' && notif._notificationType === NotificationType.WillPresent && !notif.local_notification){
+              // this notification is only to decide if you want to show the notification when user if in foreground.
+              // usually you can ignore it. just decide to show or not.
+             // notif.finish(WillPresentNotificationResult.All)
+              return;
+            }
+        
+            if(notif.opened_from_tray){
+
+                if (notif) {
+
+                    if (notif.data) {
+
+                        let dialog = JSON.parse(notif.data)
+                        
+                        if  (notif.type === '1') {
+                            this.props.navigation.navigate('Chat', {GroupName: dialog.name, IsPriveteGroup: true, Dialog: dialog})
+                        } else if  (notif.type === '2') {
+                            this.props.navigation.navigate('ChatGroup', {GroupName: dialog.name, IsPriveteGroup: true, Dialog: dialog, IsPublicGroup: false})
+                        }
+                    }
+                }
+            }
+        
+            if(Platform.OS ==='ios'){
+                    //optional
+                    //iOS requires developers to call completionHandler to end notification process. If you do not call it your background remote notifications could be throttled, to read more about it see the above documentation link.
+                    //This library handles it for you automatically with default behavior (for remote notification, finish with NoData; for WillPresent, finish depend on "show_in_foreground"). However if you want to return different result, follow the following code to override
+                    //notif._notificationType is available for iOS platfrom
+                    switch(notif._notificationType){
+                      case NotificationType.Remote:
+                        notif.finish(RemoteNotificationResult.NewData) //other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
+                        break;
+                      case NotificationType.NotificationResponse:
+                        notif.finish();
+                        break;
+                      case NotificationType.WillPresent:
+                        notif.finish(WillPresentNotificationResult.All) //other types available: WillPresentNotificationResult.None
+                        // this type of notificaiton will be called only when you are in foreground.
+                        // if it is a remote notification, don't do any app logic here. Another notification callback will be triggered with type NotificationType.Remote
+                        break;
+                    }
+            }
+          });
+    }
+
     _onMenu = () => {
         this.props.navigation.navigate('DrawerOpen')
     }
+
     _onSearch = () => {
         if(this.state.isNearby){
             this.props.navigation.navigate('Search', {TabName: 'NEARBY'})
@@ -180,7 +261,6 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         alignItems:'center'
     }
-
 });
 
 //make this component available to the app
