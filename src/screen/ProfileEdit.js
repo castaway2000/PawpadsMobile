@@ -604,7 +604,7 @@ class ProfileEdit extends Component {
                         {/*<TouchableOpacity  style = {{marginTop: 70}} onPress = {this._onChooseProfilePicture}>
                             <Image source = {require('../assets/img/camera_grey_icon.png')} style = {{width: 24, height: 17,}} />
                         </TouchableOpacity>*/}
-                        <View style = {styles.cellView}>
+                        <View style = {styles.cellViewTop}>
                             <View style = {styles.lineTop}/>
                             <TextInput
                                 style = {styles.inputText}
@@ -657,7 +657,7 @@ class ProfileEdit extends Component {
                             <Image source = {require('../assets/img/pencil_icon.png')} style = {styles.icon}/>
                             <View style = {styles.lineBottom}/>
                         </View>
-                        <View style = {styles.cellView}>
+                        <View style = {styles.cellViewDescription}>
                             <View style = {styles.lineTop}/>
                             <TextInput
                                 style = {styles.inputText}
@@ -667,7 +667,8 @@ class ProfileEdit extends Component {
                                 keyboardType = 'default'
                                 value = {this.state.userdetail}
                                 underlineColorAndroid = 'transparent'
-                                onSubmitEditing={() => {Keyboard.dismiss()}}/>
+                                multiline={true}
+                                />
                             <Image source = {require('../assets/img/pencil_icon.png')} style = {styles.icon}/>
                             <View style = {styles.lineBottom}/>
                         </View>
@@ -742,7 +743,7 @@ const styles = StyleSheet.create({
     },
     tabView: {
         width: Constant.WIDTH_SCREEN,
-        height: 100,
+        height: 130,
         paddingLeft: 5,
         //marginTop: (Platform.OS == 'ios')? 20 : StatusBar.currentHeight,
         flexDirection:'row',
@@ -750,7 +751,7 @@ const styles = StyleSheet.create({
     },
     tabViewBg: {
         flex: 1,
-        height: 100,
+        height: 130,
         width: '110%',
         position: 'absolute',
     },
@@ -759,6 +760,7 @@ const styles = StyleSheet.create({
         height: 50,
         justifyContent: 'center',
         alignItems:'center',
+        marginTop: 16
     },
     title: {
         color: 'white',
@@ -799,7 +801,7 @@ const styles = StyleSheet.create({
         height: 100,
         borderRadius: 50,
         position: 'absolute',
-        top: 40,
+        top: 80,
         backgroundColor:"lightgray"
       },
     cellView: {
@@ -810,7 +812,27 @@ const styles = StyleSheet.create({
         paddingRight: 20,
         justifyContent:'space-between',
         alignItems: 'center',
-        marginTop: 30,
+        marginTop: 10,
+    },
+    cellViewTop: {
+        flexDirection: 'row',
+        height: 50,
+        width: Constant.WIDTH_SCREEN,
+        paddingLeft: 20,
+        paddingRight: 20,
+        justifyContent:'space-between',
+        alignItems: 'center',
+        marginTop: 50,
+    },
+    cellViewDescription: {
+        flexDirection: 'row',
+        height: 100,
+        width: Constant.WIDTH_SCREEN,
+        paddingLeft: 20,
+        paddingRight: 20,
+        justifyContent:'space-between',
+        alignItems: 'center',
+        marginTop: 10,
     },
     lineTop: {
         width: Constant.WIDTH_SCREEN,
@@ -837,7 +859,8 @@ const styles = StyleSheet.create({
     inputText: {
         flex: 1,
         fontSize: 18,
-        color: Constant.APP_COLOR
+        color: Constant.APP_COLOR,
+   
     },
     placeHolderText: {
         flex: 1,

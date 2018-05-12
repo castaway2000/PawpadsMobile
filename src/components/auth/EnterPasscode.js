@@ -76,13 +76,13 @@ class Passwordrecovery extends Component {
                 </View>
                 <ScrollView style = {styles.mScrollView}>
                     <View style = {styles.mainView}>
-                        <Text style = {styles.detail}>Enter your Passcode for reset your Password</Text>
-                        <Text style = {styles.title_}>Email has be send to your account</Text>
+                        <Text style = {styles.detail}>Enter your Passcode for reset your Password.</Text>
+                        <Text style = {styles.title_}>Email has been send to your email account.</Text>
                         <View style = {styles.emailView}>
                             <TextInput
                                 style = {styles.emailInput}
                                 returnKeyType = 'done'
-                                placeholder = {this.state.isEmail == false? 'Pass code': 'Passcode is required'}
+                                placeholder = {this.state.isEmail == false? 'Pass code': 'Passcode is required!'}
                                 placeholderTextColor = {this.state.isEmail == false? 'black': '#f94746'}
                                 autoCorrect = {true}
                                 underlineColorAndroid = 'transparent'
@@ -106,7 +106,6 @@ class Passwordrecovery extends Component {
         );
     }
 }
-
 
 // define your styles
 const styles = StyleSheet.create({

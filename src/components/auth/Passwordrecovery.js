@@ -32,12 +32,11 @@ class Passwordrecovery extends Component {
     _onback = () => {
         this.props.navigation.goBack()
         this.setState({ loading: false })
-
     }
 
     _emailSend = () => {
       // https://api.sendgrid.com/api/mail.send.json
-         fetch("https://api.sendgrid.com/api/mail.send.json?api_user=nirav.k&api_key=nirav$14*1.&to="+this.state.email+"&toname=Bank mail&subject=passcode&text=this code is use for password reste. passcode is : "+RandomNumber+"&from=info@gmail.com"
+         fetch("https://api.sendgrid.com/api/mail.send.json?api_user=nirav.k&api_key=nirav$14*1.&to="+this.state.email+" &subject=Reset your Pawpads password&text=Hey there,\n Recently you have requested to reset Pawpads app password. Passcode is: "+RandomNumber+" \n\n Thanks, \n Pawpads Team &from=noreply@pawpadsapp.com"
        ).then((response) => response.text())
         .then((responseText) => {
           this.props.navigation.navigate('EnterPasscode', {tableId:this.state.tableId})
@@ -47,7 +46,6 @@ class Passwordrecovery extends Component {
         .catch((error) => {
             console.error(error);
             this.setState({ loading: false })
-
         });
     }
 
@@ -56,12 +54,13 @@ class Passwordrecovery extends Component {
         isEmail = false
         if(this.state.email.length == 0){
             isEmail = true
-        }else {
+        } else {
+            this.setState({ isEmail: isEmail,loading: true  })
 
           firebase.database()
               .ref('users')
               .orderByChild('email')
-              .equalTo(this.state.email)
+              .equalTo(this.state.email.toLowerCase())
               .once("value")
               .then(snapshot => {
                   if (snapshot.val()) {
@@ -73,17 +72,18 @@ class Passwordrecovery extends Component {
                       this.setState({tableId : tableId})
 
                       firebase.database().ref('users/'+tableId).update({passcode:RandomNumber});
+                      
                       this._emailSend()
 
                   }else {
                     this.setState({ loading: false })
 
-                    Alert.alert('EmailId not found')
+                    Alert.alert('Email address not found!')
                   }
               })
 
         }
-        this.setState({ isEmail: isEmail,loading: true  })
+       
     }
 
 
@@ -105,7 +105,7 @@ class Passwordrecovery extends Component {
                 </View>
                 <ScrollView style = {styles.mScrollView}>
                     <View style = {styles.mainView}>
-                        <Text style = {styles.detail}>Send us your email and we will send you a code to reset your password</Text>
+                        <Text style = {styles.detail}>Enter email adderss below to reset your password. We will send the passcode to this email address.</Text>
                         <View style = {styles.emailView}>
                             <TextInput
                                 style = {styles.emailInput}

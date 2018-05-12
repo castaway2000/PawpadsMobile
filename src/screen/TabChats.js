@@ -77,6 +77,7 @@ class TabChats extends Component {
                     }
                 }
 
+
                 const videoPromises = dialogs.map(id => {
                     return firebase.database()
                     .ref(`/dialog/group-chat-private/` + id)
@@ -91,7 +92,7 @@ class TabChats extends Component {
                   .then(snapshots => {
 
                     let dlg = []
-                    // do something with the data
+                    // 
                     for (let i = 0; i < snapshots.length; i++) {
 
                         const element = snapshots[i];
@@ -117,10 +118,16 @@ class TabChats extends Component {
                   })
                   .catch(err => {
                     // handle error
+                    this.setState({ loading: false })
+        
+                    this.setState({dialogs:this.state.dialogs})
+
                   })
 
             } else {
-   
+                this.setState({ loading: false })
+        
+                this.setState({dialogs:this.state.dialogs})
             }
         });
     }

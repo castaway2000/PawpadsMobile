@@ -179,6 +179,31 @@ class Friends extends Component {
       }, 3000)
     }
 
+    renderFriends() {
+        if (this.state.friendList.length > 0) {
+        return (
+            <FlatList
+            data={this.state.friendList}
+            renderItem={this._renderItem}
+            keyExtractor={this._keyExtractor}
+            maxToRenderPerBatch={1}
+            removeClippedSubviews={false}
+            onRefresh={() => this.onRefresh()}
+            refreshing={this.state.refreshing}
+            onRefreshItems= {this.props.onRefreshItems}
+            onEndReached={this.handleLoadMore}
+            onEndReachedThreshold={0}
+            />
+        )
+    } else {
+        return(
+            <View style={styles.loadingView}>
+                <Text style = {styles.placesText}>No friend added yet!</Text>
+            </View>
+        )
+    }
+    }
+
     render() {
          <StatusBar
             barStyle = "light-content"
@@ -195,18 +220,7 @@ class Friends extends Component {
 
                 <Content bounces={false} contentContainerStyle={{ flex: 1, backgroundColor: 'white', alignItems:'center' }}>
 
-                <FlatList
-                  data={this.state.friendList}
-                  renderItem={this._renderItem}
-                  keyExtractor={this._keyExtractor}
-                  maxToRenderPerBatch={1}
-                  removeClippedSubviews={false}
-                  onRefresh={() => this.onRefresh()}
-                  refreshing={this.state.refreshing}
-                  onRefreshItems= {this.props.onRefreshItems}
-                  onEndReached={this.handleLoadMore}
-                  onEndReachedThreshold={0}
-                  />
+                {this.renderFriends()}
 
                 </Content>
             </View>
@@ -267,6 +281,14 @@ const styles = StyleSheet.create({
       opacity: 1,
       fontSize: 18,
       marginLeft: 15,
+    },
+    loadingView: {
+        flex: 1,
+        justifyContent:'center',
+    },
+    placesText: {
+        color: 'gray',
+        textAlign: 'center'
     },
 });
 

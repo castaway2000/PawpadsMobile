@@ -452,7 +452,7 @@ class TabNearBy extends Component {
                                     <Text style = {styles.menuItem}>{data.login}</Text> }
                                 {this.state.distance_unit == 'km' ?
                                     <Text style = {styles.distance}>{this.calculateDistance(data)} {this.state.distance_unit}</Text> :
-                                    <Text style = {styles.distance} numberOfLines = {1}>{this.calculateDistance(data)/1.60934} {this.state.distance_unit}</Text>}
+                                    <Text style = {styles.distance} numberOfLines = {1}>{(this.calculateDistance(data)/1.60934).toFixed(2)} {this.state.distance_unit}</Text>}
                             </ListItem>
                         }
                     >

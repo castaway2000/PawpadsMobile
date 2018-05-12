@@ -109,6 +109,7 @@ class ChatMessageBox extends Component {
 				returnKeyType='go'
 				placeholder={'Type a message...'}
 				multiline={true}
+				keyboardType='default'
 				editable={true}
 				onChangeText={(text) => this.onTextChange(text)}
 				onSubmitEditing={event => this.onButtonPress(event.nativeEvent.text)}

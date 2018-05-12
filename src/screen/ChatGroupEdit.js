@@ -51,7 +51,7 @@ class ChatGroupEdit extends Component {
         // StatusBar.setHidden(true);
     }
 
-    init(){
+    init() {
 
       this.state.userPhotoURL = ""
 
@@ -604,7 +604,7 @@ class ChatGroupEdit extends Component {
 
     var {params} = this.props.navigation.state
 
-    var ref = firebase.database().ref(`/dialog/group-chat-private`)
+    var ref = firebase.database().ref(`/dialog/group-chat-public`)
 
     ref.child(params.Dialog._id).remove();
 
@@ -732,6 +732,7 @@ class ChatGroupEdit extends Component {
                           }
                         </View>
 
+                            { this.state.isleaveAndDeleteBtn?
                         <TouchableOpacity onPress = {this._onChooseProfilePicture} style = {styles.userphotoTouch} >
 
                         <Image source = {{
@@ -739,7 +740,16 @@ class ChatGroupEdit extends Component {
                             }}
                             defaultSource = {require('../assets/img/user_placeholder.png')}
                             style = {styles.userphoto} />
-                            </TouchableOpacity>
+                            
+                        </TouchableOpacity> :
+                        <Image source = {{
+                            uri: this.state.userPhotoURL ,
+                            }}
+                            defaultSource = {require('../assets/img/user_placeholder.png')}
+                            style = {styles.userphotoTouch} />
+                          }
+
+
 
                     </View>
                 </ScrollView>
@@ -827,7 +837,7 @@ const styles = StyleSheet.create({
     },
     tabView: {
         width: Constant.WIDTH_SCREEN,
-        height: 80,
+        height: 90,
         paddingLeft: 5,
         flexDirection:'row',
         alignItems:'center',

@@ -19,7 +19,7 @@ var isEmail = false
 
 // create a component
 class Passwordrecovery extends Component {
-    constructor(props){
+    constructor(props) {
         super(props)
         this.state = {
             password: '',
@@ -37,19 +37,27 @@ class Passwordrecovery extends Component {
     _onRecover = () => {
         ispassword = false
         isconfirm = true
-        if(this.state.password.length == 0){
+
+        if (this.state.password.length == 0) {
+
             ispassword = true
-        }else {
+
+        } else {
 
           if (this.state.conpassword.length == 0) {
+
             isConfirm = false
-          }else {
+
+          } else {
 
             if (this.state.password == this.state.conpassword ) {
 
-                if(this.state.password.length < 8){
-                    Alert.alert('Password is to short (mimimum 8 characters).')
-                } else{
+                if(this.state.password.length < 8) {
+
+                    Alert.alert('Password is too short (Minimum 8 characters).')
+
+                } else {
+
                   this.setState({loading:true})
                   const {state} = this.props.navigation;
                   var name = state.params ? state.params.tableId : "";
@@ -62,13 +70,16 @@ class Passwordrecovery extends Component {
                   this.setState({loading:false})
                 }
 
-            }else {
+            } else {
+
               Alert.alert('Password does not match')
+              
             }
         }
       }
         this.setState({ ispassword: ispassword, isConfirm: isConfirm })
     }
+
     render() {
         <StatusBar
             barStyle = "light-content"
@@ -87,7 +98,7 @@ class Passwordrecovery extends Component {
                 <ScrollView style = {styles.mScrollView}>
                     <View style = {styles.mainView}>
                         <Text style = {styles.detail}>Create a new password</Text>
-                        <Text style = {styles.detail_below}>password are case sensitive and must be at least 8 charecters.</Text>
+                        <Text style = {styles.detail_below}>Password are case sensitive and must be at least 8 charecters.</Text>
 
                         <View style = {styles.emailView}>
                             <TextInput

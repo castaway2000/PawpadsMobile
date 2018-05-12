@@ -106,19 +106,19 @@ class Register extends Component {
         isPassword = false
         isConfirm = false
 
-        if(this.state.name.length == 0 ){
+        if(this.state.name.length == 0 ) {
             isAlert = true
             isName = true
         }
-        if(this.state.email.length == 0 ){
+        if(this.state.email.length == 0 ) {
             isAlert = true
             isEmail = true
         }
-        if(this.state.password.length == 0 ){
+        if(this.state.password.length == 0 ) {
             isAlert = true
             isPassword = true
         }
-        if(this.state.confirm.length == 0 ){
+        if(this.state.confirm.length == 0 ) {
             isAlert = true
             isConfirm = true
         }
@@ -167,7 +167,7 @@ class Register extends Component {
       firebase.database()
           .ref(`/users`)
           .orderByChild("login")
-          .equalTo(this.state.name)
+          .equalTo(this.state.name.toLowerCase())
           .once("value")
           .then(snapshot => {
             this.setState({ loading: false })
@@ -288,7 +288,7 @@ class Register extends Component {
                                 placeholderTextColor = {this.state.isName == false? 'black': '#f94746'}
                                 underlineColorAndroid = 'transparent'
                                 value = {this.state.name}
-                                onChangeText = {(text) => {this.setState({ name: text })}}
+                                onChangeText = {(text) => {this.setState({ name: text.toLowerCase() })}}
                                 onSubmitEditing={this.changeFocus1.bind(this)}
                             />
                         </View>

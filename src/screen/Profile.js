@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight,AsyncStorage } from 'react-native';
+import { View, Text, StyleSheet,Alert, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight,AsyncStorage } from 'react-native';
 import { Container, Header, Content, Button } from 'native-base';
 import Constant from '../common/Constant'
 import reactNativeKeyboardAwareScrollView from 'react-native-keyboard-aware-scroll-view';
@@ -299,31 +299,81 @@ class Profile extends Component {
               })
         }
 
+        _onRemoveFromFriendList = () => {
+
+            Alert.alert(
+                'Are you sure you want to remove this user from your friend list?',
+                '',
+                [
+                  {text: 'Remove', onPress: () => {
+                      this.removeFriend()
+                  }},
+                  {text: 'Cancel', onPress: () => {
+
+                  }, style: 'cancel'} ,
+                ],
+                { cancelable: false }
+              )
+        }
+
+        removeFriend = () => {
+            var {params} = this.props.navigation.state
+
+            firebase.database()
+                .ref(`/friendlist`)
+                .orderByChild("user_id")
+                .equalTo(this.state.userid)
+                .once("value")
+                .then(snapshot => {
+                  if (snapshot.val()) {
+                    let response = snapshot.val()
+                    var keys = Object.keys(response);
+                    for (var i = 0; i < keys.length; i++) {
+                     firebase.database().ref(`/friendlist`).child(response[keys[i]]._id).remove();
+                    }
+                  }
+                })
+
+                firebase.database()
+                .ref(`/friendlist`)
+                .orderByChild("user_id")
+                .equalTo(params.UserInfo.id)
+                .once("value")
+                .then(snapshot => {
+                  if (snapshot.val()) {
+                    let response = snapshot.val()
+                    var keys = Object.keys(response);
+                    for (var i = 0; i < keys.length; i++) {
+                        firebase.database().ref(`/friendlist`).child(response[keys[i]]._id).remove();
+                    }
+                  }
+                })
+
+                this.setState({isFriend:false})
+        }
+
         _onBlockUnblockUser = () => {
 
-          if (this.state.isblockedByMe) {
+            if (this.state.isblockedByMe) {
+                this.unblockUser()
+              } else {
+                Alert.alert(
+                    'Are you sure you want to block this user?',
+                    '',
+                    [
+                      {text: 'Block', onPress: () => {
+                        this.blockUser()
+                      }},
+                      {text: 'Cancel', onPress: () => {
+    
+                      }, style: 'cancel'} ,
+                    ],
+                    { cancelable: false }
+                  )
+              }
+        }
 
-            console.log("Unblock");
-            if (this.state.blockTableKey) {
-              var ref = firebase.database().ref(`/blocklist`)
-              ref.child(this.state.blockTableKey).remove();
-            }
-
-            setTimeout(()=> {
-              this.setState({"isblockedByMe":false})
-               alert("User unblocked successfully.")
-
-               this.setState({isblockedByMe:false})
-               this.setState({isblockedByOp:false})
-
-               this.setState({shouldshowcoverimage:true})
-               this.setState({headermessage:""})
-               this.setState({shouldshowaddbutton:true})
-               this.setState({shouldshowchatbutton:true})
-
-            }, 400)
-
-          } else {
+        blockUser = () => {
 
             var updates = {};
             var newKey = firebase.database().ref().child('blocklist').push().key;
@@ -360,7 +410,28 @@ class Profile extends Component {
                this.setState({shouldshowaddbutton:false})
                this.setState({shouldshowchatbutton:false})
             }, 400)
-          }
+        }
+
+        unblockUser = () => {
+            console.log("Unblock");
+            if (this.state.blockTableKey) {
+              var ref = firebase.database().ref(`/blocklist`)
+              ref.child(this.state.blockTableKey).remove();
+            }
+
+            setTimeout(()=> {
+              this.setState({"isblockedByMe":false})
+               alert("User unblocked successfully.")
+
+               this.setState({isblockedByMe:false})
+               this.setState({isblockedByOp:false})
+
+               this.setState({shouldshowcoverimage:true})
+               this.setState({headermessage:""})
+               this.setState({shouldshowaddbutton:true})
+               this.setState({shouldshowchatbutton:true})
+
+            }, 400)
         }
 
         checkDialogExiste = () => {
@@ -468,6 +539,22 @@ class Profile extends Component {
               </TouchableOpacity>
             )
           }
+        }
+
+        showRemoveFromFriendListButton() {
+            if (this.state.isFriend == true) {
+                return (
+                    <View style = {styles.buttonView}>
+                    <TouchableOpacity style = {styles.blockBtn} onPress = {this._onRemoveFromFriendList}>
+                        <Text style = {{color: '#de380a'}}>Remove from friend list</Text>
+                    </TouchableOpacity>
+                </View>
+                )
+            } else {
+                return (
+                    null
+                )
+            }
         }
 
 
@@ -666,14 +753,10 @@ class Profile extends Component {
                                 { this.showUserAbout() }
 
                                 <View style = {styles.buttonView}>
-                                    {/*<TouchableOpacity style = {styles.removeBtn}>
-                                        <Text style = {{color: Constant.APP_COLOR}}>Remove from friends</Text>
-                                    </TouchableOpacity>*/}
-
                                     { this.renderBlockUnblock() }
-
-
+                                    { this.showRemoveFromFriendListButton() }
                                 </View>
+
                             </View>
                     </View>
 
@@ -739,11 +822,12 @@ const styles = StyleSheet.create({
         height: 60,
         flexDirection:'row',
         alignItems:'center',
+        marginTop:14
     },
 
     tabViewBg: {
       flex: 1,
-      height: 140,
+      height: 150,
       width: '110%',
       position: 'absolute',
       backgroundColor: 'red'
@@ -751,7 +835,7 @@ const styles = StyleSheet.create({
 
     tabViewRedBg: {
       flex: 1,
-      height: 140,
+      height: 150,
       width: '110%',
       position: 'absolute',
       backgroundColor: '#8b0000'
@@ -800,7 +884,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         position:'absolute',
         left: 0,
-        top: (Platform.OS == 'ios')? Constant.HEIGHT_SCREEN/4-115:Constant.HEIGHT_SCREEN/4-111
+        top: (Platform.OS == 'ios')? 64 : 60
     },
     mscrollView: {
         // flex: 1,

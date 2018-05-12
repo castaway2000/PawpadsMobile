@@ -61,9 +61,11 @@ class Login extends Component {
     async componentDidMount() {
       registerAppListener(this.props.navigation);
 
+      tmp = this
+
       FCM.getInitialNotification().then(notif => {
 
-        if(notif && notif.targetScreen === 'detail'){
+        if(notif && notif.targetScreen === 'detail') {
           setTimeout(()=>{
             this.props.navigation.navigate('Detail')
           }, 500)
@@ -736,6 +738,7 @@ class Login extends Component {
                   responseData.user.login = responseData.user.login.toLowerCase()
                   responseData.user.isTogglepushSelected = "true"
                   responseData.user["firid"] = newKey
+                  
                   updates['/users/' + newKey] = responseData.user;
                   firebase.database().ref().update(updates)
 
@@ -775,6 +778,20 @@ class Login extends Component {
                   let facebookID = result["id"]
                   let login = "facebook_" + facebookID
 
+                  var fullname = result["name"]
+
+                  if (!fullname) {
+                    
+                    let firstname = result["first_name"]
+                    let lastname = result["last_name"]
+
+                    if (firstname && lastname) {
+                      fullname = firstname + lastname
+                    } else {
+                      fullname = " "
+                    }
+                  }
+
                   var user =  {"blob_id": 0,
                                   "created_at":dateString,
                                   "full_name":"",
@@ -787,6 +804,7 @@ class Login extends Component {
                                   "isDataMigrated":isDataMigrated,
                                   "firid": newKey,
                                   "isTogglepushSelected":"true",
+                                  "full_name": fullname
                                 }
 
                   updates['/users/' + newKey] = user;
@@ -894,7 +912,7 @@ class Login extends Component {
             var user =  {
               "blob_id": 0,
               "created_at": dateString,
-              "full_name": "",
+              "full_name": loginData["userName"] ,
               "id": newKey,
               "last_request_at": dateString,
               "login": login,

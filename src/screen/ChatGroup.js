@@ -949,7 +949,7 @@ const styles = {
     },
     tabView: {
         width: Constant.WIDTH_SCREEN,
-        height: 60,
+        height: 70,
         paddingLeft: 5,
         marginTop: (Platform.OS == 'ios')? 20 : StatusBar.currentHeight,
         flexDirection:'row',
