@@ -11,6 +11,8 @@ const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 import {CachedImage} from 'react-native-img-cache';
 
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
 // create a component
 class UserProfile extends Component {
     constructor(props){
@@ -19,6 +21,7 @@ class UserProfile extends Component {
             isalert: false,
             token: '',
             username:'',
+            fullname:'',
             userid:'',
             userinfo:'',
             blob_id:'',
@@ -43,6 +46,17 @@ class UserProfile extends Component {
           this.setState({tableId: value })
           this.downloadProfileFirebase()
         })
+    }
+
+    isMyprofile = () => {
+
+        var {params} = this.props.navigation.state
+
+        if (params.UserInfo.id == this.state.userid) {
+            return true
+        }
+
+        return false
     }
 
     downloadProfile() {
@@ -111,6 +125,7 @@ class UserProfile extends Component {
                     var json = JSON.parse(profileObj.custom_data)
                     this.setState({
                         username: profileObj.login,
+                        fullname: profileObj.full_name,
                         userinfo: profileObj.custom_data,
                         loading: false,
                     })
@@ -118,6 +133,7 @@ class UserProfile extends Component {
                   this.setState({
                       username: profileObj.login,
                       loading: false,
+                      fullname: profileObj.full_name,
                   })
                 }
 
@@ -178,28 +194,46 @@ class UserProfile extends Component {
     }
 
     showUserAbout(){
-        if(this.state.userinfo.length > 0){
+        if(this.state.userinfo.length > 0) {
             var json = JSON.parse(this.state.userinfo)
             return(
                 <Text style = {styles.job}>
                     {json.about}
                 </Text>
             )
-        }else{
+        } else {
             return null
         }
     }
 
+    showGender() {
+
+      var json = JSON.parse(this.state.userinfo)
+
+      console.log("this.state.userinfo.usergender ",json.usergender);
+
+      if (json.usergender == "F") {
+        return (
+          <Image source ={require('../assets/img/female_icon.png')} resizeMode = "contain" style = {{width: 17, height: 23}}/>
+        )
+      } else {
+        return (
+          <Image source ={require('../assets/img/male_icon.png')} resizeMode = "contain" style = {{width: 17, height: 23}}/>
+        )
+      }
+    }
+
     showUserAge(){
+
         if(this.state.userinfo.length > 0){
             var json = JSON.parse(this.state.userinfo)
-            if(json.age > 0){
+            if(json.age > 0) {
                 var today = new Date()
                 var currentage = today.getFullYear() - json.age
                 return(
                     <View style = {{flexDirection:'row', alignItems:'center', marginTop: 20}}>
-                        <Image source ={require('../assets/img/male_icon.png')} style = {{width: 17, height: 23}}/>
-                        <Text style = {{color: 'gray'}}> Age :<Text> {currentage}</Text></Text>
+                    {this.showGender()}
+                    <Text style = {{color: 'gray'}}> Age :<Text> {currentage}</Text></Text>
                     </View>
                 )
             }
@@ -236,7 +270,7 @@ class UserProfile extends Component {
     showUserName(){
         return(
             <Text style = {styles.name}>
-                {this.state.username}
+                {this.state.fullname ? this.state.fullname : this.state.username}
             </Text>
         )
     }
@@ -275,6 +309,23 @@ class UserProfile extends Component {
         }
     }
 
+    showBlockButton() {
+
+        if (this.state.isMyprofile == true) {
+            return (
+                <View style = {styles.buttonView}>
+                <TouchableOpacity style = {styles.blockBtn}>
+                    <Text style = {{color: '#de380a'}}>Block user</Text>
+                </TouchableOpacity>
+            </View>
+            )
+        } else {
+            return (
+                null
+            )
+        }
+    }
+
     render() {
         var {params} = this.props.navigation.state
         return (
@@ -302,15 +353,7 @@ class UserProfile extends Component {
                                 { this.showUserHobby() }
                                 { this.showUserAge() }
                                 { this.showUserAbout() }
-
-                                <View style = {styles.buttonView}>
-                                    {/*<TouchableOpacity style = {styles.removeBtn}>
-                                        <Text style = {{color: Constant.APP_COLOR}}>Remove from friends</Text>
-                                    </TouchableOpacity>*/}
-                                    <TouchableOpacity style = {styles.blockBtn}>
-                                        <Text style = {{color: '#de380a'}}>Block user</Text>
-                                    </TouchableOpacity>
-                                </View>
+                                { this.showBlockButton() }
                             </View>
                     </View>
 
@@ -341,7 +384,7 @@ const styles = StyleSheet.create({
     },
     backView: {
         width: Constant.WIDTH_SCREEN,
-        height: 60,
+        height: 100,
         flexDirection:'row',
         alignItems:'center',
     },
@@ -390,7 +433,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         position:'absolute',
         left: 0,
-        top: (Platform.OS == 'ios')? Constant.HEIGHT_SCREEN/4-30:Constant.HEIGHT_SCREEN/4-26
+        top: (Platform.OS == 'ios')? Constant.HEIGHT_SCREEN/4-40 : Constant.HEIGHT_SCREEN/4-26
     },
     mscrollView: {
         // flex: 1,

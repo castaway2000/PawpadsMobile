@@ -1,9 +1,10 @@
 package com.pawpads;
 
-import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.airbnb.android.react.maps.MapsPackage;
+import com.evollu.react.fcm.FIRMessagingPackage;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.react.ReactApplication;
@@ -23,7 +24,7 @@ import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.storage.RNFirebaseStoragePackage;
 
-public class MainApplication extends Application implements ReactApplication {
+public class MainApplication extends MultiDexApplication implements ReactApplication {
 
   private static CallbackManager mCallbackManager = CallbackManager.Factory.create();
 
@@ -41,7 +42,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
-            new RNFetchBlobPackage(),
+              new FIRMessagingPackage(),
+              new RNFetchBlobPackage(),
               new FBSDKPackage(mCallbackManager),
               new TwitterSigninPackage(),
               new RNFirebasePackage(),

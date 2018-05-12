@@ -42,7 +42,7 @@ render() {
   console.log("data:",data);
 
   return(
-            <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => tmpThis.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})} key = {this.props.index}>
+            <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => tmpThis.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: false, Dialog: data, IsPublicGroup: true, TabChannelsRef:tmpThis})} key = {this.props.index}>
               {tmpThis.state.refresh == false? tmpThis.downloadLastUserFirebase(data.last_message_user_id) : null}
               {tmpThis.state.refresh1 == false? tmpThis.downloadGroupPhotoFirebase(data.photo,data._id) : null}
               <View style = {styles.menuIcon} >
@@ -50,7 +50,7 @@ render() {
                   uri: data.photo
                   }}
                   defaultSource = {require('../assets/img/user_placeholder.png')}
-                  style = {styles.menuIcon} />
+                  style = {styles.menuIcon1} />
                   </View>
               <View style = {{flex: 1, marginLeft: 15}}>
                   <Text style = {styles.menuItem}>{data.name}</Text>
@@ -89,6 +89,7 @@ class TabChannels extends Component {
             refresh1:false,
             pagekey:null,
             pagetimestamp:null,
+            userID: '',
         }
         this.onPullRelease = this.onPullRelease.bind(this);
         this.topIndicatorRender = this.topIndicatorRender.bind(this);
@@ -114,6 +115,10 @@ class TabChannels extends Component {
         datas = []
         this.loadDataFromFirebase(null,null)
         tmpThis  = this
+
+        AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
+            this.setState({ userID: value })
+        })
     }
 
     loadData() {
@@ -155,6 +160,7 @@ class TabChannels extends Component {
 
       console.log("pagekey:",pagekey);
       console.log("pagetimestamp:",pagetimestamp);
+
       if (pagekey && pagetimestamp) {
         this.loadGroupUsingIDPage(1,pagekey,pagetimestamp)
         .then((result) => {
@@ -163,7 +169,9 @@ class TabChannels extends Component {
             for (key in result) {
               let obj = result[key]
               obj["pagekey"] = key
-              this.state.dialogs.push(obj)
+              if (obj.type == 1) {
+                this.state.dialogs.push(obj)
+              }
             }
 
             if (this.state.dialogs.length > 0) {
@@ -192,7 +200,10 @@ class TabChannels extends Component {
             for (key in result) {
               let obj = result[key]
               obj["pagekey"] = key
-              this.state.dialogs.push(obj)
+
+              if (obj.type == 1) {
+                this.state.dialogs.push(obj)
+              }
             }
 
             if (this.state.dialogs.length > 0) {
@@ -210,8 +221,6 @@ class TabChannels extends Component {
             }
             this.setState({ loading: false })
             this.setState({dialogs:this.state.dialogs})
-            console.log(z);
-
           }
         })
       }
@@ -244,7 +253,7 @@ class TabChannels extends Component {
     loadGroupUsingID = (groupid) => {
       return new Promise((resolve, reject) => {
       firebase.database()
-          .ref(`/dialog`)
+          .ref(`/dialog/group-chat-public`)
           .orderByChild("last_message_date_sent")
 
           .limitToLast(15)
@@ -262,7 +271,7 @@ class TabChannels extends Component {
     loadGroupUsingIDPage = (groupid,pagekey,pagetimestamp) => {
       return new Promise((resolve, reject) => {
       firebase.database()
-          .ref(`/dialog`)
+          .ref(`/dialog/group-chat-public`)
           .orderByChild("last_message_date_sent")
           .endAt(pagetimestamp-1, pagekey)
           .limitToLast(20)
@@ -308,21 +317,21 @@ class TabChannels extends Component {
                       for(var i = 0;i < this.state.dialogs.length; i++){
                           if(this.state.dialogs[i]._id == id){
                               this.state.dialogs[i]['photo'] = url;
+                              this.state.dialogs[i]['profileurl'] = url;
+
                               console.log("downloadGroupPhotoFirebase:",url);
                           }
                       }
-                      this.setState({
-                          refresh: true
-                      });
-                      this.setState({dialogs:this.state.dialogs})
+
+
+                      this.setState({refresh1: true});
+
+                      this.setState({dialogs:JSON.parse(JSON.stringify(this.state.dialogs))})
                       this.props.ChannelsUsers(this.state.dialogs)
+
                     })
                   }
                 }
-
-                this.setState({
-                    refresh1: true
-                });
               }
             })
           }
@@ -361,13 +370,10 @@ class TabChannels extends Component {
                               for(var i = 0;i < this.state.dialogs.length; i++){
                                   if(this.state.dialogs[i].last_message_user_id == profile["id"]) {
                                       this.state.dialogs[i]['blob_id'] = url;
-                                      console.log("downloadLastUserFirebase:",url);
-                                      this.setState({dialogs:this.state.dialogs})
                                   }
                               }
-                              this.setState({refresh: false});
-                              this.setState({dialogs:this.state.dialogs})
-
+                              this.setState({refresh: true});
+                              this.setState({dialogs:JSON.parse(JSON.stringify(this.state.dialogs))})
                               this.props.ChannelsUsers(this.state.dialogs)
                             })
                           }
@@ -421,7 +427,7 @@ class TabChannels extends Component {
             return(
                 this.state.dialogs.map((data, index) => {
                     return(
-                      <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})} key = {index}>
+                      <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('ChatGroup', {GroupName: data.name, IsPriveteGroup: false, Dialog: data, IsPublicGroup: true, TabChannelsRef:tmpThis})} key = {index}>
                         {this.state.refresh == false? this.downloadLastUserFirebase(data.last_message_user_id) : null}
 
                         {this.state.refresh1 == false? this.downloadGroupPhotoFirebase(data.photo,data._id) : null}
@@ -435,7 +441,6 @@ class TabChannels extends Component {
                         <View style = {{flex: 1, marginLeft: 15}}>
                             <Text style = {styles.menuItem}>{data.name}</Text>
                             <View style = {{flexDirection:'row',marginTop: 5}}>
-
                                 <Image source = {{
                                     uri: data.blob_id
                                     }}
@@ -501,7 +506,7 @@ class TabChannels extends Component {
                   />
 
                 </Content>
-                <TouchableOpacity style = {styles.chatBtn} onPress={() => this.props.navigation.navigate('ChatGroupEdit')}>
+                <TouchableOpacity style = {styles.chatBtn} onPress={this.createGroup}>
                     <Image source = {require('../assets/img/chat_button_new.png')} style = {{width: 70, height: 70}}/>
                 </TouchableOpacity>
             </Container>
@@ -509,6 +514,7 @@ class TabChannels extends Component {
     }
 
     onRefresh() {
+      console.log("onRefresh called.");
       this.setState({refreshing: true});
       setTimeout(() => {
           this.setState({
@@ -518,7 +524,62 @@ class TabChannels extends Component {
       }, 3000)
     }
 
-    _renderItem = ({ item, index }) => ( <MyListItem
+    createGroup = () => {
+
+      //Group Chat
+      var updates = {};
+
+      var milliseconds = (new Date).getTime();
+      var date = new Date();
+
+      var updatescontent = {};
+      var newKey = firebase.database().ref().child('dialog').push().key;
+
+      var occupantsids = [parseInt(this.state.userID)]
+
+      //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+      let dialog =  {
+        _id :  newKey,
+        created_at : date.toISOString(),
+        last_message : "",
+        last_message_date_sent : milliseconds,
+        last_message_user_id : this.state.userID.toString(),
+        name : "New Channel",
+        occupants_ids : occupantsids,
+        photo : "",
+        type : 1, //CHANNEL
+        unread_messages_count : 0,
+        updated_at : date.toISOString(),
+        user_id : this.state.userID.toString()
+      }
+
+      //updates['/dialog/' + newKey] = dialog;
+
+      //firebase.database().ref().update(updates)
+
+      this.props.navigation.navigate('ChatGroupEdit', {onRefresh: this.onRefresh, Dialog: dialog, TabChannelsRef:tmpThis, IsCreated: true})
+    }
+
+    onRefresh = () => {
+
+        this.setState({
+          refreshing: false,
+          loading: true,
+          dialogs: [],
+          last_message_user_id: 0,
+          refresh:false,
+          refresh1:false,
+          pagekey:null,
+          pagetimestamp:null,
+        })
+
+        currentPage = 0
+        datas = []
+        this.loadDataFromFirebase(null,null)
+
+    };
+
+    _renderItem = ({ item, index}) => ( <MyListItem
         index = { index }
         item = { item }
         onPressItem = { this._onPressItem }/>
@@ -549,6 +610,12 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         backgroundColor: '#f1eff0',
+    },
+    menuIcon1: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'transparent',
     },
     chatBtn: {
         position:'absolute',

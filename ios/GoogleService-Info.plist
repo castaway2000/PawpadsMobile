@@ -7,9 +7,9 @@
 	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
 	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
-	<string>637762013744-hjied8kc4hchh1rk7vv1mrkd6led1480.apps.googleusercontent.com</string>
+	<string>637762013744-mnsg580i59ldkbvq3bghm33rqmsgnd4k.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.637762013744-hjied8kc4hchh1rk7vv1mrkd6led1480</string>
+	<string>com.googleusercontent.apps.637762013744-mnsg580i59ldkbvq3bghm33rqmsgnd4k</string>
 	<key>API_KEY</key>
 	<string>AIzaSyCD9aCIS0hDbcH3zKBNc3C5vv6L0ai7Stg</string>
 	<key>GCM_SENDER_ID</key>
@@ -17,7 +17,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.saber.Pawpadsdev</string>
+	<string>com.saber.Pawpads</string>
 	<key>PROJECT_ID</key>
 	<string>pawpads-rn</string>
 	<key>STORAGE_BUCKET</key>
@@ -33,7 +33,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:637762013744:ios:dc0d352a9aaafea4</string>
+	<string>1:637762013744:ios:d608ae1b42581867</string>
 	<key>DATABASE_URL</key>
 	<string>https://pawpads-rn.firebaseio.com</string>
 </dict>

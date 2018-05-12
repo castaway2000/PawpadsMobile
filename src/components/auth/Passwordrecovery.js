@@ -1,8 +1,14 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity,ActivityIndicator, StatusBar, Platform, ScrollView,Alert,ToastAndroid } from 'react-native';
 import Constant from '../../common/Constant'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import RNFirebase from 'react-native-firebase';
+
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+var CryptoJS = require("crypto-js");
+
+var RandomNumber = Math.floor(Math.random() * 1000000) + 1 ;
 
 var isAlert = false
 var isName = false
@@ -17,21 +23,71 @@ class Passwordrecovery extends Component {
         super(props)
         this.state = {
             email: '',
-            isEmail: false
+            isEmail: false,
+            tableId:'',
+            loading:false,
         }
     }
 
     _onback = () => {
         this.props.navigation.goBack()
+        this.setState({ loading: false })
+    }
+
+    _emailSend = () => {
+      // https://api.sendgrid.com/api/mail.send.json
+         fetch("https://api.sendgrid.com/api/mail.send.json?api_user=nirav.k&api_key=nirav$14*1.&to="+this.state.email+" &subject=Reset your Pawpads password&text=Hey there,\n Recently you have requested to reset Pawpads app password. Passcode is: "+RandomNumber+" \n\n Thanks, \n Pawpads Team &from=noreply@pawpadsapp.com"
+       ).then((response) => response.text())
+        .then((responseText) => {
+          this.props.navigation.navigate('EnterPasscode', {tableId:this.state.tableId})
+          this.setState({ loading: false })
+
+        })
+        .catch((error) => {
+            console.error(error);
+            this.setState({ loading: false })
+        });
     }
 
     _onRecover = () => {
+
         isEmail = false
         if(this.state.email.length == 0){
             isEmail = true
+        } else {
+            this.setState({ isEmail: isEmail,loading: true  })
+
+          firebase.database()
+              .ref('users')
+              .orderByChild('email')
+              .equalTo(this.state.email.toLowerCase())
+              .once("value")
+              .then(snapshot => {
+                  if (snapshot.val()) {
+
+                      let response = snapshot.val()
+                      var keys = Object.keys(response);
+                      var tableId =  keys[keys.length-1]
+
+                      this.setState({tableId : tableId})
+
+                      firebase.database().ref('users/'+tableId).update({passcode:RandomNumber});
+                      
+                      this._emailSend()
+
+                  }else {
+                    this.setState({ loading: false })
+
+                    Alert.alert('Email address not found!')
+                  }
+              })
+
         }
-        this.setState({ isEmail: isEmail })
+       
     }
+
+
+
     render() {
         <StatusBar
             barStyle = "light-content"
@@ -49,15 +105,16 @@ class Passwordrecovery extends Component {
                 </View>
                 <ScrollView style = {styles.mScrollView}>
                     <View style = {styles.mainView}>
-                        <Text style = {styles.detail}>Send us your email and we will send you a code to reset your password</Text>
+                        <Text style = {styles.detail}>Enter email adderss below to reset your password. We will send the passcode to this email address.</Text>
                         <View style = {styles.emailView}>
                             <TextInput
                                 style = {styles.emailInput}
                                 returnKeyType = 'done'
                                 placeholder = {this.state.isEmail == false? 'Email': 'Email is required'}
                                 placeholderTextColor = {this.state.isEmail == false? 'black': '#f94746'}
-                                autoCorrect = {true}
+                                autoCorrect = {false}
                                 underlineColorAndroid = 'transparent'
+                                autoCapitalize= 'none'
                                 value = {this.state.email}
                                 onChangeText = {(text) => {this.setState({ email: text })}}
                             />
@@ -66,8 +123,15 @@ class Passwordrecovery extends Component {
                         <TouchableOpacity style = {styles.recoveryButton} onPress = {this._onRecover}>
                             <Text style = {styles.recover}>Recover</Text>
                         </TouchableOpacity>
+
                     </View>
                 </ScrollView>
+
+                {this.state.loading &&
+                  <View style={styles.loadingView}>
+                    <ActivityIndicator color={'black'} size={'large'}/>
+                  </View>
+                }
             </View>
         );
     }
@@ -136,7 +200,6 @@ const styles = StyleSheet.create({
         textAlign:'left',
         fontSize: 14,
         color: 'black',
-
     },
 
     recoveryButton:{
@@ -157,6 +220,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: 'gray',
         marginTop: 70
+    },
+    loadingView: {
+        flex: 1,
+        position: 'absolute',
+        top: Constant.HEIGHT_SCREEN/2
     }
 });
 

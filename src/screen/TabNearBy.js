@@ -1,6 +1,6 @@
 //import liraries
 import React, { Component } from 'react';
-import { StyleSheet, StatusBar, Image, TouchableOpacity, RefreshControl, AsyncStorage,ActivityIndicator, ScrollView, Navigator} from 'react-native';
+import { StyleSheet, StatusBar, Image, TouchableOpacity, Platform,  RefreshControl, AsyncStorage,ActivityIndicator, ScrollView, Navigator} from 'react-native';
 import {
     Content,
 	Text,
@@ -27,10 +27,14 @@ var { Router, Scene } = require('react-native-router-flux');
 
 import SideBar from '../components/sidebar/SideBar'
 
-
 import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 firebase.database().goOnline()
+
+// import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType, NotificationActionType, NotificationActionOption, NotificationCategoryOption} from "react-native-fcm";
+// import {registerKilledListener, registerAppListener} from '../common/Listeners'
+
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
 
 // Geofire
 import { initializeApp } from 'firebase'
@@ -51,6 +55,9 @@ var range = ''
 var gps_accuracy = ''
 var datamigrationobj = null
 
+
+// registerKilledListener();
+
 // create a component
 class TabNearBy extends Component {
 
@@ -67,11 +74,12 @@ class TabNearBy extends Component {
             search_range: '60',
             gps_accuracy: 'medium',
             nearByUsers: [],
-            tableId: ''
+            tableId: '',
         }
     }
 
     componentWillMount() {
+
       datamigrationobj = this
 
         AsyncStorage.getItem(Constant.SETTINGS_DISTANCE_UNIT).then((value) => {
@@ -95,23 +103,119 @@ class TabNearBy extends Component {
         AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
           console.log("tableId is:",value);
           this.setState({tableId: value })
+          this.loadDataFirebase()
+
+          AsyncStorage.getItem(Constant.FCM_TOKEN).then((value) => {
+              if(value){
+                this.updateFCMTokenFirebase(value)
+              }
+          })
         })
+        
+        /*
+        FCM.getInitialNotification().then(notif => {
 
+            console.log("FCM.getInitialNotification", notif);
+
+            if(notif){
+              setTimeout(()=>{
+
+                if (notif) {
+
+                    if (notif.data) {
+
+                        let dialog = JSON.parse(notif.data)
+                        
+                        if  (notif.type === '1') {
+                            this.props.navigation.navigate('Chat', {GroupName: dialog.name, IsPriveteGroup: true, Dialog: dialog})
+                        } else if  (notif.type === '2') {
+                            this.props.navigation.navigate('ChatGroup', {GroupName: dialog.name, IsPriveteGroup: true, Dialog: dialog, IsPublicGroup: false})
+                        }
+                    }
+                }
+              }, 500)
+            }
+          });
+
+          FCM.on(FCMEvent.Notification, notif => {
+
+            console.log("FCMEvent.Notification", notif);
+        
+            if(Platform.OS ==='ios' && notif._notificationType === NotificationType.WillPresent && !notif.local_notification){
+              // this notification is only to decide if you want to show the notification when user if in foreground.
+              // usually you can ignore it. just decide to show or not.
+              notif.finish(WillPresentNotificationResult.All)
+              return;
+            }
+        
+            if(notif.opened_from_tray){
+
+                if (notif) {
+
+                    if (notif.data) {
+
+                        let dialog = JSON.parse(notif.data)
+                        
+                        if  (notif.type === '1') {
+                            this.props.navigation.navigate('Chat', {GroupName: dialog.name, IsPriveteGroup: true, Dialog: dialog})
+                        } else if  (notif.type === '2') {
+                            this.props.navigation.navigate('ChatGroup', {GroupName: dialog.name, IsPriveteGroup: true, Dialog: dialog, IsPublicGroup: false})
+                        }
+                    }
+                }
+            }
+        
+            if(Platform.OS ==='ios'){
+                    //optional
+                    //iOS requires developers to call completionHandler to end notification process. If you do not call it your background remote notifications could be throttled, to read more about it see the above documentation link.
+                    //This library handles it for you automatically with default behavior (for remote notification, finish with NoData; for WillPresent, finish depend on "show_in_foreground"). However if you want to return different result, follow the following code to override
+                    //notif._notificationType is available for iOS platfrom
+                    switch(notif._notificationType){
+                      case NotificationType.Remote:
+                        notif.finish(RemoteNotificationResult.NewData) //other types available: RemoteNotificationResult.NewData, RemoteNotificationResult.ResultFailed
+                        break;
+                      case NotificationType.NotificationResponse:
+                        notif.finish();
+                        break;
+                      case NotificationType.WillPresent:
+                        notif.finish(WillPresentNotificationResult.All) //other types available: WillPresentNotificationResult.None
+                        // this type of notificaiton will be called only when you are in foreground.
+                        // if it is a remote notification, don't do any app logic here. Another notification callback will be triggered with type NotificationType.Remote
+                        break;
+                    }
+            }
+          });
+          */
+        
         //this.loadData()
-        this.loadDataFirebase()
+
         //this._getUsers()
+    }
 
+    updateFCMTokenFirebase = (value) => {
 
+      console.log("updateFCMTokenFirebase");
+
+      //Update full name
+      var updatefullname = {};
+      updatefullname['/users/' + this.state.tableId  + '/FCMToken'] = value;
+      updatefullname['/users/' + this.state.tableId  + '/Platform'] = Platform.OS;
+
+      firebase.database().ref().update(updatefullname)
     }
 
     loadData() {
-        navigator.geolocation.getCurrentPosition(
+        navigator.geolocation.getCurrentPosition (
             (position) => {
+
                 this.setState({
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
                     error: null,
                 })
+
+                console.log("position.coords.latitude",position.coords.latitude)
+                console.log("position.coords.longitude",position.coords.longitude)
 
                 AsyncStorage.getItem(Constant.QB_TOKEN).then((value) => {
                     if(this.state.distance_unit == 'km'){
@@ -154,11 +258,21 @@ class TabNearBy extends Component {
      }
 
     loadDataFirebase() {
+
+        console.log("getting position...")
+
         navigator.geolocation.getCurrentPosition(
             (position) => {
 
+                console.log("position.coords.latitude",position.coords.latitude)
+                console.log("position.coords.longitude",position.coords.longitude)
+
               if (position.coords.latitude && position.coords.longitude) {
                 if (this.isNumeric(position.coords.latitude) && this.isNumeric(position.coords.longitude)) {
+
+                  AsyncStorage.setItem(Constant.USER_LATITUDE, position.coords.latitude.toString())
+                  AsyncStorage.setItem(Constant.USER_LONGITUDE, position.coords.longitude.toString())
+
                   this.setState({
                       latitude: position.coords.latitude,
                       longitude: position.coords.longitude,
@@ -169,9 +283,9 @@ class TabNearBy extends Component {
                 }
               }
             },
-            (error) => this.setState({error: error.message}),
+            (error) => {console.log("Location Error:",error.message)},
             {
-              enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+              enableHighAccuracy: false, timeout: 500000, maximumAge: 1000000
             }
         );
     }
@@ -209,8 +323,6 @@ class TabNearBy extends Component {
 
                if (profile["firid"] != datamigrationobj.state.tableId) {
 
-
-
                  let index =  datamigrationobj.state.nearByUsers.indexOf(profile)
 
                  if (profile["content"]) {
@@ -226,11 +338,9 @@ class TabNearBy extends Component {
 
                        firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
 
-
                          profile["profileurl"] =  url; //profileurl
 
                          console.log("image loaded:",url);
-
 
                          datamigrationobj.state.nearByUsers.push(profile)
                          datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
@@ -254,7 +364,6 @@ class TabNearBy extends Component {
                          })
                        }
                      }
-
                    }
                  } else {
                    datamigrationobj.state.nearByUsers.push(profile)
@@ -279,10 +388,7 @@ class TabNearBy extends Component {
            datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers,loading: false});
          });
       }
-
-
     }
-
 
     _saveUserLocation = () => {
 
@@ -291,7 +397,6 @@ class TabNearBy extends Component {
           "latitude":parseFloat(this.state.latitude),
           "longitude":parseFloat(this.state.longitude),
         });
-
 
         //Save to geofire
         const geofireRef = new geofire(firebaseApp.database().ref('geofire/'))
@@ -307,7 +412,6 @@ class TabNearBy extends Component {
         });
       }
     }
-
 
     _onRefresh() {
         this.setState({refreshing: true});
@@ -341,14 +445,14 @@ class TabNearBy extends Component {
                             <View style = {styles.menuIcon} >
                                 <CachedImage source={{uri: data["profileurl"]}}
                                   defaultSource = {require('../assets/img/user_placeholder.png')}
-                                  style = {styles.menuIcon}/>
+                                  style = {styles.menuIcon1}/>
                                 </View>
                                 {data.full_name?
                                     <Text style = {styles.menuItem}>{data.full_name}</Text> :
                                     <Text style = {styles.menuItem}>{data.login}</Text> }
                                 {this.state.distance_unit == 'km' ?
                                     <Text style = {styles.distance}>{this.calculateDistance(data)} {this.state.distance_unit}</Text> :
-                                    <Text style = {styles.distance} numberOfLines = {1}>{this.calculateDistance(data)/1.60934} {this.state.distance_unit}</Text>}
+                                    <Text style = {styles.distance} numberOfLines = {1}>{(this.calculateDistance(data)/1.60934).toFixed(2)} {this.state.distance_unit}</Text>}
                             </ListItem>
                         }
                     >
@@ -409,6 +513,13 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
+        backgroundColor: '#f1eff0',
+    },
+    menuIcon1: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'transparent',
     },
     distance: {
         color: 'gray',

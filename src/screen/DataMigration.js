@@ -12,6 +12,8 @@ const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 import { initializeApp } from 'firebase'
 const geofire = require('geofire');
 
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
 const firebaseApp = initializeApp({
   apiKey: Constant.FIREBASE_API_KEY,
   authDomain: Constant.FIREBASE_AUTH_DOMAIN,
@@ -95,6 +97,10 @@ class DataMigration extends Component {
              this.state.userBlockListSkipped = this.state.userBlockListSkipped + 1
 
              for (var index = 0; index < responseData["items"].length; index++) {
+               responseData["items"][index]["blocked_user"] = responseData["items"][index]["blocked_user"].toString()
+               responseData["items"][index]["source_user"] = responseData["items"][index]["source_user"].toString()
+               responseData["items"][index]["user_id"] = responseData["items"][index]["user_id"].toString()
+
                this._saveBlocklisttoFirebase(responseData,index)
              }
              this._getBlocklist()
@@ -161,6 +167,11 @@ class DataMigration extends Component {
         var updates = {};
         var newKey = firebase.database().ref().child('friendlist').push().key;
         updates = responseData["items"][index]
+
+        responseData["items"][index].user1 = responseData["items"][index].user1.toString()
+        responseData["items"][index].user2 = responseData["items"][index].user2.toString()
+        responseData["items"][index].user_id = responseData["items"][index].user_id.toString()
+
         firebase.database().ref().child('/friendlist/' + responseData["items"][index]["_id"]).set(updates)
       }
 
@@ -266,20 +277,56 @@ class DataMigration extends Component {
             console.log("No Dialog data found.");
             this.setState({bodyText: "Migrating images please wait...80%" })
             this._getUserBlobs() //4.0
-
           }
         }).catch((e) => {
             console.log(e)
             this.setState({bodyText: "Migrating images please wait...80%" })
             this._getUserBlobs() //4.0
-
         })
       }
+
       _saveUserDialogtoFirebase = (responseData,index) => {
-        var updates = {};
-        var newKey = firebase.database().ref().child('dialog').push().key;
-        updates = responseData["items"][index]
-        firebase.database().ref().child('/dialog/' + responseData["items"][index]["_id"]).set(updates)
+
+        let dialog = responseData["items"][index];
+
+        if (dialog.user_id) {
+          dialog.user_id = dialog.user_id.toString()
+        }
+
+        if (dialog.last_message_user_id) {
+          dialog.last_message_user_id = dialog.last_message_user_id.toString()
+        }
+
+        if (dialog.occupants_ids) {
+
+          dialog.occupants_ids = dialog.occupants_ids.map(String)
+
+          dialog.occupants_ids.sort()
+
+          if (dialog.type == 3) {
+            dialog.occupants_ids_combined = dialog.occupants_ids.join("-")
+          }
+
+        }
+
+        //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+        if (dialog.type == 1) {
+          var updates = {};
+          var newKey = firebase.database().ref().child('dialog/group-public').push().key;
+          updates = dialog
+          firebase.database().ref().child('dialog/group-public/' + dialog._id).set(updates)
+        } else if (dialog.type == 2 || dialog.type == 3) {
+          var updates = {};
+          var newKey = firebase.database().ref().child('dialog/group-chat-private').push().key;
+          updates = dialog
+          firebase.database().ref().child('dialog/group-chat-private/' + dialog._id).set(updates)
+        } 
+        
+
+        //save dialog to user noBorder
+        var newKey = firebase.database().ref().child('dialog/group-public').push().key;
+        var updates = {"id":dialog._id,"type":dialog.type};
+        firebase.database().ref().child('/users/' + this.state.tableId + '/dialog/'+ newKey).set(updates)
       }
 
       /**
@@ -402,6 +449,10 @@ class DataMigration extends Component {
 
             ///
             this.setState({loadedImages: this.state.loadedImages + 1 })
+
+            Console.log("this.state.loadedImages",this.state.loadedImages)
+            Console.log("responseData[items].length",responseData["items"].length)
+
             if (this.state.loadedImages == responseData["items"].length) {
                 console.log("All Images Uploaded.",this.state.loadedImages ,responseData["items"].length);
                 this._firebaseSetDataMigrated()

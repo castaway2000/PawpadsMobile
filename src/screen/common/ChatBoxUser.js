@@ -8,9 +8,10 @@ import {
 	TouchableOpacity,
 } from 'react-native';
 import Constant from '../../common/Constant'
-import RNFirebase from 'react-native-firebase';
 
+import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
 import {CachedImage} from 'react-native-img-cache';
 
 class ChatBoxUser extends Component {
@@ -50,10 +51,11 @@ class ChatBoxUser extends Component {
 
 	showMessageBody() {
 
-		if(this.props.messageImage.length > 0){
+		if(this.props.messageImage.length > 0) {
 
 			if (this.state.attachmentimageurl == '') {
 				this.downloadAttachmentimageurl(this.props.messageImage[0].id)
+				this.state.attachmentimageurl = ' '
 			}
 
 			return(
@@ -63,8 +65,22 @@ class ChatBoxUser extends Component {
 						style = {styles.messageImg}
 				/>
 			)
-		}
-		else{
+		} else if (this.props.messageSticker) {
+			return(
+				<View style={styles.doctorMessageImageContainer}>
+					<Image source = {{
+							uri: this.props.messageSticker,
+							method:'GET',
+							headers: {
+									'Content-Type': 'application/json',
+									'QB-Token': this.state.token
+								},
+							}}
+							style = {styles.messageImg}
+					/>
+				</View>
+			)
+		} else {
 			return(
 				<Text style={styles.messageText}>{this.props.messageBody}</Text>
 			)

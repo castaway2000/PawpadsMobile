@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -38,11 +38,13 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>6</string>
+	<string>1</string>
 	<key>FacebookAppID</key>
 	<string>400576850361462</string>
 	<key>FacebookDisplayName</key>
 	<string>Pawpads-Dev</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>
@@ -66,13 +68,13 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>use camera</string>
+	<string>Camera required to share your picture to your chats.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>use location</string>
+	<string>Your location will be used to find nearby people.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>use microphone</string>
+	<string>Microphone  required to share your video to your chats.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>use library</string>
+	<string>Photo Library required to share your picture to your chats.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Entypo.ttf</string>
@@ -94,6 +96,10 @@
 		<string>Proxima_Nova_Regular_Italic.otf</string>
 		<string>Proxima_Nova_Regular.otf</string>
 		<string>Proxima_Nova_Semibold.otf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

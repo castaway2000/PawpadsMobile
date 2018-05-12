@@ -1,11 +1,17 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight,AsyncStorage } from 'react-native';
+import { View, Text, StyleSheet,Alert, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight,AsyncStorage } from 'react-native';
 import { Container, Header, Content, Button } from 'native-base';
 import Constant from '../common/Constant'
 import reactNativeKeyboardAwareScrollView from 'react-native-keyboard-aware-scroll-view';
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
 import {CachedImage} from 'react-native-img-cache';
+
+var currentUserid = ''
+
+import RNFirebase from 'react-native-firebase';
+
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 // create a component
 class Profile extends Component {
@@ -20,25 +26,44 @@ class Profile extends Component {
             userhobby: '',
             userdetail: '',
             userid:'',
+            isblockedByMe: false,
+            isblockedByOp: false,
+            blockTableKey:"",
+            shouldshowaddbutton: true,
+            shouldshowchatbutton: true,
+            shouldshowcoverimage: true,
+            headermessage:'',
+            isFriend: false,
+            dialog: null,
         }
     }
 
     componentWillMount() {
 
-      console.log(Profile.js);
+      console.log("Profile.js");
 
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             this.setState({ token: token })
         })
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
             this.setState({ userid: value })
+            this.checkAlreadyFriend()
+            this.checkDialogExiste()
         })
 
-        console.log('Profile.js');
+        AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
+          currentUserid = value
+          console.log("USER ID IS:",currentUserid);
+          this.getBlockList()
+        })
     }
 
     _onback = () => {
-        this.props.navigation.goBack()
+      if (this.props.navigation.state.params.ChatVC) {
+        this.props.navigation.state.params.ChatVC.update()
+      }
+
+      this.props.navigation.goBack()
     }
 
     showAlertUserPhoto(){
@@ -97,7 +122,7 @@ class Profile extends Component {
            json = JSON.parse(params.UserInfo.custom_data)
         }
 
-        if(json){
+        if(json) {
             var today = new Date()
             if(json.age > 0){
                 var currentage = today.getFullYear() - json.age
@@ -154,7 +179,7 @@ class Profile extends Component {
         )
     }
 
-    onCreateDialog = () =>{
+    onCreateDialog = () => {
         var {params} = this.props.navigation.state
         let formdata = {'type':'3', 'name': params.UserInfo.full_name, 'occupants_ids': params.UserInfo.id + ',' + this.state.userid}
         var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL
@@ -175,6 +200,541 @@ class Profile extends Component {
             console.log(e)
         })
     }
+
+    onCreateDialogFirebase = () => {
+
+      if (this.state.dialog) {
+        this.props.navigation.navigate('Chat', {GroupName: this.state.dialog.name, IsPriveteGroup: true, Dialog: this.state.dialog})
+      } else {
+        this.createDialog()
+      }
+    }
+
+    getBlockList() {
+
+      var {params} = this.props.navigation.state
+      var last_message_userid = params.UserInfo.id
+
+      console.log("currentUserid.toString():",currentUserid.toString());
+
+      firebase.database()
+      .ref(`/blocklist`)
+      .orderByChild("source_user")
+      .equalTo(currentUserid.toString())
+      .once("value")
+      .then(snapshot => {
+
+        console.log("block list:",snapshot.val());
+
+          if (snapshot.val()) {
+
+            let blocklists =  snapshot.val();
+
+            let keys = Object.keys(blocklists);
+
+            if (keys.length > 0) {
+
+              for (var i = 0; i < keys.length; i++) {
+                let blockobj = blocklists[keys[i]]
+
+                if (blockobj.blocked_user == last_message_userid) {
+                  console.log("I have blocked someone.");
+
+                  this.setState({isblockedByMe:true})
+
+                  this.setState({blockTableKey:keys[i]})
+                  this.setState({shouldshowcoverimage:false})
+                  this.setState({headermessage:"You have blocked this user."})
+                  this.setState({shouldshowaddbutton:false})
+                  this.setState({shouldshowchatbutton:false})
+                }
+              }
+            }
+
+            console.log("blockTableKey is:",this.state.blockTableKey);
+
+            } else {
+              console.log("error is:");
+            }
+          })
+
+          firebase.database()
+          .ref(`/blocklist`)
+          .orderByChild("blocked_user")
+          .equalTo(currentUserid.toString())
+          .once("value")
+          .then(snapshot => {
+
+            console.log("block list:",snapshot.val());
+              if (snapshot.val()) {
+
+                let blocklists =  snapshot.val();
+
+                let keys = Object.keys(blocklists);
+
+                if (keys.length > 0) {
+
+                  for (var i = 0; i < keys.length; i++) {
+                    let blockobj = blocklists[keys[i]]
+
+                    if (blockobj.source_user == last_message_userid) {
+                      console.log("Some one blocked me!");
+
+                      this.setState({isblockedByOp:true})
+
+                      this.setState({blockTableKey:keys[i]})
+                      this.setState({shouldshowcoverimage:false})
+                      this.setState({headermessage:"You are blocked."})
+                      this.setState({shouldshowaddbutton:false})
+                      this.setState({shouldshowchatbutton:false})
+                    }
+                  }
+                }
+
+                console.log("blocklist is:",blocklist);
+
+                } else {
+                  console.log("error is:");
+                }
+              })
+        }
+
+        _onRemoveFromFriendList = () => {
+
+            Alert.alert(
+                'Are you sure you want to remove this user from your friend list?',
+                '',
+                [
+                  {text: 'Remove', onPress: () => {
+                      this.removeFriend()
+                  }},
+                  {text: 'Cancel', onPress: () => {
+
+                  }, style: 'cancel'} ,
+                ],
+                { cancelable: false }
+              )
+        }
+
+        removeFriend = () => {
+            var {params} = this.props.navigation.state
+
+            firebase.database()
+                .ref(`/friendlist`)
+                .orderByChild("user_id")
+                .equalTo(this.state.userid)
+                .once("value")
+                .then(snapshot => {
+                  if (snapshot.val()) {
+                    let response = snapshot.val()
+                    var keys = Object.keys(response);
+                    for (var i = 0; i < keys.length; i++) {
+                     firebase.database().ref(`/friendlist`).child(response[keys[i]]._id).remove();
+                    }
+                  }
+                })
+
+                firebase.database()
+                .ref(`/friendlist`)
+                .orderByChild("user_id")
+                .equalTo(params.UserInfo.id)
+                .once("value")
+                .then(snapshot => {
+                  if (snapshot.val()) {
+                    let response = snapshot.val()
+                    var keys = Object.keys(response);
+                    for (var i = 0; i < keys.length; i++) {
+                        firebase.database().ref(`/friendlist`).child(response[keys[i]]._id).remove();
+                    }
+                  }
+                })
+
+                this.setState({isFriend:false})
+        }
+
+        _onBlockUnblockUser = () => {
+
+            if (this.state.isblockedByMe) {
+                this.unblockUser()
+              } else {
+                Alert.alert(
+                    'Are you sure you want to block this user?',
+                    '',
+                    [
+                      {text: 'Block', onPress: () => {
+                        this.blockUser()
+                      }},
+                      {text: 'Cancel', onPress: () => {
+    
+                      }, style: 'cancel'} ,
+                    ],
+                    { cancelable: false }
+                  )
+              }
+        }
+
+        blockUser = () => {
+
+            var updates = {};
+            var newKey = firebase.database().ref().child('blocklist').push().key;
+
+            var {params} = this.props.navigation.state
+
+            var milliseconds = (new Date).getTime();
+            console.log(milliseconds);
+
+            var date = new Date();
+            console.log(date.toISOString());
+
+            let blocklistdict = {
+              _id: newKey,
+              blocked_user: params.UserInfo.id.toString(),
+              created_at: milliseconds,
+              source_user: currentUserid.toString(),
+              updated_at: milliseconds,
+              user_id: currentUserid.toString(),
+            }
+
+            updates['/blocklist/' + newKey] = blocklistdict;
+            firebase.database().ref().update(updates)
+
+            setTimeout(()=> {
+              this.setState({"isblockedByMe":true})
+               alert("User blocked successfully.")
+
+               this.setState({isblockedByMe:true})
+               this.setState({isblockedByOp:true})
+
+               this.setState({shouldshowcoverimage:false})
+               this.setState({headermessage:"You have blocked this user."})
+               this.setState({shouldshowaddbutton:false})
+               this.setState({shouldshowchatbutton:false})
+            }, 400)
+        }
+
+        unblockUser = () => {
+            console.log("Unblock");
+            if (this.state.blockTableKey) {
+              var ref = firebase.database().ref(`/blocklist`)
+              ref.child(this.state.blockTableKey).remove();
+            }
+
+            setTimeout(()=> {
+              this.setState({"isblockedByMe":false})
+               alert("User unblocked successfully.")
+
+               this.setState({isblockedByMe:false})
+               this.setState({isblockedByOp:false})
+
+               this.setState({shouldshowcoverimage:true})
+               this.setState({headermessage:""})
+               this.setState({shouldshowaddbutton:true})
+               this.setState({shouldshowchatbutton:true})
+
+            }, 400)
+        }
+
+        checkDialogExiste = () => {
+
+          var {params} = this.props.navigation.state
+
+          let ids = [this.state.userid, params.UserInfo.id]
+          ids.sort()
+
+          firebase.database()
+              .ref(`/dialog`)
+              .orderByChild("occupants_ids_combined")
+              .equalTo(ids.join("-"))
+              .once("value")
+              .then(snapshot => {
+
+                if (snapshot.val()) {
+                  var dialogObj = snapshot.val();
+
+                  if (dialogObj) {
+                    let keys = Object.keys(dialogObj);
+
+                    var dialog = null;
+                    if (keys.length > 0) {
+                      dialog = dialogObj[keys[0]]
+                    }
+
+                    if (dialog) {
+                      this.setState({dialog: dialog})
+                    }
+                  }
+                }
+              })
+        }
+
+        createDialog = () => {
+
+          var {params} = this.props.navigation.state
+
+          //create dialog
+          //Group Chat
+          var updates = {};
+
+          var milliseconds = (new Date).getTime()/1000|0;
+          var date = new Date();
+
+          var updatescontent = {};
+          var newKey = firebase.database().ref().child('dialog/group-chat-private').push().key;
+
+          var occupantsids = [this.state.userid, params.UserInfo.id]
+
+          occupantsids = occupantsids.map(String)
+
+          occupantsids.sort()
+
+          var occupants_ids_combined = occupantsids.join("-")
+
+          //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+          let dialog =  {
+            _id :  newKey,
+            created_at : date.toISOString(),
+            last_message : "",
+            last_message_date_sent : milliseconds,
+            last_message_user_id : this.state.userid.toString(),
+            name : params.UserInfo.full_name ? params.UserInfo.full_name : params.UserInfo.login,
+            occupants_ids : occupantsids,
+            photo : "",
+            type : 3, //PERSONAL
+            unread_messages_count : 0,
+            occupants_ids_combined:  occupants_ids_combined,
+            updated_at : date.toISOString(),
+            user_id : this.state.userid.toString()
+          }
+
+          this.setState({dialog: dialog})
+
+          updates['/dialog/group-chat-private/' + newKey] = dialog;
+
+          var ref = firebase.database().ref().update(updates).then( () => {
+              this.props.navigation.navigate('Chat', {GroupName: this.state.dialog.name, IsPriveteGroup: true, Dialog: this.state.dialog})
+          }).catch(function(error) {
+            console.error("Write failed: "+error)
+          });
+
+        }
+
+        renderBlockUnblock = () => {
+
+          if (this.state.isblockedByMe) {
+            return (
+              <TouchableOpacity style = {styles.blockBtn} onPress = {this._onBlockUnblockUser}>
+                  <Text style = {{color: '#de380a'}}>Unblock User</Text>
+              </TouchableOpacity>
+            )
+          } else if (this.state.isblockedByOp) {
+            return (
+              <TouchableOpacity style = {styles.blockBtn}>
+                  <Text style = {{color: '#de380a'}}>You are Blocked.</Text>
+              </TouchableOpacity>
+            )
+          } else {
+            return (
+              <TouchableOpacity style = {styles.blockBtn} onPress = {this._onBlockUnblockUser}>
+                  <Text style = {{color: '#de380a'}}>Block User</Text>
+              </TouchableOpacity>
+            )
+          }
+        }
+
+        showRemoveFromFriendListButton() {
+            if (this.state.isFriend == true) {
+                return (
+                    <View style = {styles.buttonView}>
+                    <TouchableOpacity style = {styles.blockBtn} onPress = {this._onRemoveFromFriendList}>
+                        <Text style = {{color: '#de380a'}}>Remove from friend list</Text>
+                    </TouchableOpacity>
+                </View>
+                )
+            } else {
+                return (
+                    null
+                )
+            }
+        }
+
+
+        sendFriendRequest = () => {
+
+          this.popupDialog.dismiss()
+          var {params} = this.props.navigation.state
+
+          var milliseconds = (new Date).getTime()/1000|0;
+
+          var date = new Date();
+
+
+          ///
+          var updates = {};
+          var newKey = firebase.database().ref().child('friendlist').push().key;
+
+          var chatdict = {
+            "_id" : newKey,
+            "created_at" : date,
+            "date_sent" : milliseconds,
+            "updated_at" : date,
+            "user_id" : this.state.userid,
+            "friend_id" : params.UserInfo.id,
+            "status" : 1, //approved
+          }
+
+          updates['/friendlist/' + newKey] = chatdict;
+          firebase.database().ref().update(updates)
+
+          ///
+          var updates1 = {};
+          var newKey1 = firebase.database().ref().child('friendlist').push().key;
+
+          var chatdict1 = {
+            "_id" : newKey1,
+            "created_at" : date,
+            "date_sent" : milliseconds,
+            "updated_at" : date,
+            "user_id" : params.UserInfo.id,
+            "friend_id" : this.state.userid,
+            "status" : 1, //approved
+          }
+
+          updates1['/friendlist/' + newKey1] = chatdict1;
+          firebase.database().ref().update(updates1)
+
+          this.setState({isFriend:true})
+        }
+
+        checkAlreadyFriend = () => {
+          var {params} = this.props.navigation.state
+          firebase.database()
+              .ref(`/friendlist`)
+              .orderByChild("user_id")
+              .equalTo(this.state.userid)
+              .once("value")
+              .then(snapshot => {
+                if (snapshot.val()) {
+                  let response = snapshot.val()
+                  var keys = Object.keys(response);
+                  for (var i = 0; i < keys.length; i++) {
+                    //console.log("checkAlreadyFriend",response[keys[i]]);
+                    if (response[keys[i]].friend_id == params.UserInfo.id) {
+                      console.log("friend found");
+                      this.setState({isFriend:true})
+                    }
+                  }
+                }
+              })
+            }
+
+        showaddbutton() {
+          if (this.state.shouldshowaddbutton) {
+            if (this.state.isFriend) {
+              return(
+                <Image source = {require('../assets/img/added_to_friend.png')} style = {styles.addphoto}/>
+              )
+            } else {
+              return(
+                <TouchableOpacity onPress={() => { this.popupDialog.show(); }}>
+                  <Image source = {require('../assets/img/add_to_friend.png')} style = {styles.addphoto}/>
+                </TouchableOpacity>
+              )
+            }
+
+          } else {
+            return null
+          }
+
+        }
+
+        showchatbutton() {
+          if (this.state.shouldshowchatbutton) {
+          return(
+            <TouchableOpacity onPress = {this.onCreateDialogFirebase} >
+                <Image source = {require('../assets/img/chat_button_new.png')} style = {styles.addphoto}/>
+            </TouchableOpacity>
+          )
+        } else {
+          return null
+        }}
+
+        showCoverImage() {
+            var {params} = this.props.navigation.state
+
+            if (Platform.OS == 'ios') {
+                return(
+                    <CachedImage source = {{
+                        uri: params.UserInfo.coverPictureURL,
+                        }}
+                        defaultSource = {require('../assets/img/app_bar_bg.png')}
+                        style = {styles.tabViewBg} />
+                    )
+                
+            } else {
+                return (
+                    <View style = {styles.tabViewBg}>
+                    <Image source = {require('../assets/img/app_bar_bg.png')}
+                       defaultSource = {require('../assets/img/app_bar_bg.png')}
+                        style = {styles.tabViewBg} />
+
+                <CachedImage source = {{
+                    uri: params.UserInfo.coverPictureURL,
+                    }}
+                    defaultSource = {require('../assets/img/app_bar_bg.png')}
+                    style = {styles.tabViewBg} />
+                    </View>
+                )
+            }
+        }
+
+        renderCoverImage() {
+
+          var {params} = this.props.navigation.state
+
+          if (this.state.shouldshowcoverimage) {
+              
+            return(
+              <View style = {styles.tabView}>
+              <View style = {styles.tabViewRedBg} />
+
+              {this.showCoverImage()}
+
+              <View style = {styles.backView}>
+                  <TouchableOpacity style = {styles.backButton} onPress = {this._onback}>
+                      <Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
+                  </TouchableOpacity>
+                  <Text style = {styles.title}>Profile</Text>
+              </View>
+              
+              </View>
+            )
+          } else {
+            return(
+
+              <View style={{flex: 1, flexDirection: 'row'}}>
+              <View style = {styles.tabView}>
+
+              <View style = {styles.tabViewRedBg} />
+
+              <View style = {styles.backView}>
+
+              <TouchableOpacity style = {styles.backButton} onPress = {this._onback}>
+              <Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
+              </TouchableOpacity>
+              <Text style = {styles.title}>Profile</Text>
+              </View>
+
+              <View style={{flex: 1, flexDirection:'row',alignItems:'flex-start',justifyContent:'center'}}>
+              <Text style = {{marginTop: 0, backgroundColor:'transparent', color: 'white'}}>{this.state.headermessage}</Text>
+              </View>
+              </View>
+              </View>
+            )
+          }
+        }
+
+//
+
     render() {
         var {params} = this.props.navigation.state
         return (
@@ -182,20 +742,8 @@ class Profile extends Component {
                 <View style={styles.container}>
                     <View style = {styles.statusbar}/>
                     <ScrollView style = {{backgroundColor: 'white'}}>
-                    <View style = {styles.tabView}>
-                        <CachedImage source = {{
-                            uri: params.UserInfo.coverPictureURL,
-                            }}
-                            defaultSource = {require('../assets/img/app_bar_bg.png')}
-                            style = {styles.tabViewBg} />
 
-                        <View style = {styles.backView}>
-                            <TouchableOpacity style = {styles.backButton} onPress = {this._onback}>
-                                <Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
-                            </TouchableOpacity>
-                            <Text style = {styles.title}>Profile</Text>
-                        </View>
-                    </View>
+                    {this.renderCoverImage()}
 
                     <View style = {styles.bodyView}>
                             <View style = {styles.mscrollView}>
@@ -205,24 +753,18 @@ class Profile extends Component {
                                 { this.showUserAbout() }
 
                                 <View style = {styles.buttonView}>
-                                    {/*<TouchableOpacity style = {styles.removeBtn}>
-                                        <Text style = {{color: Constant.APP_COLOR}}>Remove from friends</Text>
-                                    </TouchableOpacity>*/}
-                                    <TouchableOpacity style = {styles.blockBtn}>
-                                        <Text style = {{color: '#de380a'}}>Block user</Text>
-                                    </TouchableOpacity>
+                                    { this.renderBlockUnblock() }
+                                    { this.showRemoveFromFriendListButton() }
                                 </View>
+
                             </View>
                     </View>
 
                     <View style = {styles.editView}>
-                        <TouchableOpacity onPress={() => { this.popupDialog.show(); }}>
-                            <Image source = {require('../assets/img/add_to_friend.png')} style = {styles.addphoto}/>
-                        </TouchableOpacity>
+                    { this.showaddbutton() }
                         { this.showUserPhoto() }
-                        <TouchableOpacity onPress = {this.onCreateDialog} >
-                            <Image source = {require('../assets/img/chat_button_new.png')} style = {styles.addphoto}/>
-                        </TouchableOpacity>
+                        { this.showchatbutton() }
+
                     </View>
                     </ScrollView>
                     <PopupDialog
@@ -242,13 +784,13 @@ class Profile extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style = {{width:Constant.WIDTH_SCREEN*0.7, backgroundColor:'transparent', marginTop: 5}}/>
-                    <TouchableHighlight style = {styles.cancelBtn} onPress = {() => this.popupDialog.dismiss()}>
+                    <TouchableHighlight style = {styles.cancelBtn} onPress = {() => this.sendFriendRequest()}>
                         <Text style = {styles.requestButton}>Send request</Text>
                     </TouchableHighlight>
                 </PopupDialog>
                 </View>
         );
-    }d
+    }
 }
 
 // define your styles
@@ -280,13 +822,24 @@ const styles = StyleSheet.create({
         height: 60,
         flexDirection:'row',
         alignItems:'center',
+        marginTop:14
     },
 
     tabViewBg: {
       flex: 1,
-      height: 100,
+      height: 150,
       width: '110%',
       position: 'absolute',
+      backgroundColor: 'red'
+    },
+
+    tabViewRedBg: {
+      flex: 1,
+      height: 150,
+      width: '110%',
+      position: 'absolute',
+      backgroundColor: '#8b0000'
+
     },
 
     backButton: {
@@ -324,14 +877,14 @@ const styles = StyleSheet.create({
     },
     editView: {
         width: Constant.WIDTH_SCREEN,
-        height: 100,
+        height: 170,
         backgroundColor: 'transparent',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-around',
         position:'absolute',
         left: 0,
-        top: (Platform.OS == 'ios')? Constant.HEIGHT_SCREEN/4-115:Constant.HEIGHT_SCREEN/4-111
+        top: (Platform.OS == 'ios')? 64 : 60
     },
     mscrollView: {
         // flex: 1,

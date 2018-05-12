@@ -144,7 +144,7 @@ class ProfileEdit extends Component {
                     if(profileObj.custom_data) {
                       var json = JSON.parse(profileObj.custom_data)
 
-                      if (blobid == json["backg roundId"]) {
+                      if (blobid == json["backgroundId"]) {
                         let path = "content/" + profileObj["firid"] + "/" + profileObj["content"][item]["name"]
                         console.log('path:', path);
 
@@ -157,7 +157,6 @@ class ProfileEdit extends Component {
                         })
                       }
                     }
-
                   }
                 }
               }
@@ -166,7 +165,7 @@ class ProfileEdit extends Component {
         })
     }
 
-    downloadProfile(){
+    downloadProfile() {
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             AsyncStorage.getItem(Constant.QB_USERID).then((userid) => {
                 var REQUEST_URL = Constant.USERS_URL + userid + '.json'
@@ -362,7 +361,7 @@ class ProfileEdit extends Component {
               });
             alert("Profile Updated Successfully!")
           }
-});
+        });
       } else {
         isCoverphotoUpdated = true
       }
@@ -564,6 +563,9 @@ class ProfileEdit extends Component {
     }
 
     render() {
+
+      console.log("this.state.coverPictureURL", this.state.coverPictureURL);
+
         return (
             <View style={styles.container}>
                 <KeyboardAwareScrollView
@@ -573,15 +575,18 @@ class ProfileEdit extends Component {
                     resetScrollToCoords = {{x:0, y:0}}
                 >
                     <View style = {styles.tabView}>
+
                         <CachedImage source = {{
                             uri: this.state.coverPictureURL,
                             }}
                             defaultSource = {require('../assets/img/app_bar_bg.png')}
                             style = {styles.tabViewBg} />
+
                             <Image source = {{
                                 uri: this.state.coverPictureURL,
                                 }}
                                 style = {styles.tabViewBg} />
+
                         <TouchableOpacity style = {styles.backButton} onPress = {this._onback}>
                             <Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
                         </TouchableOpacity>
@@ -596,10 +601,10 @@ class ProfileEdit extends Component {
                     </View>
 
                     <View style = {styles.bodyView}>
-                        <TouchableOpacity  style = {{marginTop: 70}} onPress = {this._onChooseProfilePicture}>
+                        {/*<TouchableOpacity  style = {{marginTop: 70}} onPress = {this._onChooseProfilePicture}>
                             <Image source = {require('../assets/img/camera_grey_icon.png')} style = {{width: 24, height: 17,}} />
-                        </TouchableOpacity>
-                        <View style = {styles.cellView}>
+                        </TouchableOpacity>*/}
+                        <View style = {styles.cellViewTop}>
                             <View style = {styles.lineTop}/>
                             <TextInput
                                 style = {styles.inputText}
@@ -652,7 +657,7 @@ class ProfileEdit extends Component {
                             <Image source = {require('../assets/img/pencil_icon.png')} style = {styles.icon}/>
                             <View style = {styles.lineBottom}/>
                         </View>
-                        <View style = {styles.cellView}>
+                        <View style = {styles.cellViewDescription}>
                             <View style = {styles.lineTop}/>
                             <TextInput
                                 style = {styles.inputText}
@@ -662,22 +667,21 @@ class ProfileEdit extends Component {
                                 keyboardType = 'default'
                                 value = {this.state.userdetail}
                                 underlineColorAndroid = 'transparent'
-                                onSubmitEditing={() => {Keyboard.dismiss()}}/>
+                                multiline={true}
+                                />
                             <Image source = {require('../assets/img/pencil_icon.png')} style = {styles.icon}/>
                             <View style = {styles.lineBottom}/>
                         </View>
 
                     </View>
                     {this.loadingView()}
-                    <CachedImage source = {{
-                        uri: this.state.profilePictureURL,
-                        }}
-                        defaultSource = {require('../assets/img/user_placeholder.png')}
-                        style = {styles.userphoto} />
-                        <Image source = {{
-                            uri: this.state.profilePictureURL,
-                          }}
-                            style = {styles.userphoto} />
+
+                    <View style = {styles.userphotoTouch1}>
+                    <TouchableOpacity onPress = {this._onChooseProfilePicture} style = {styles.userphotoTouch} >
+                    <Image source = {{ uri: this.state.profilePictureURL, }} defaultSource = {require('../assets/img/user_placeholder.png')} style = {styles.userphoto} />
+                    </TouchableOpacity>
+                    </View>
+
                 </KeyboardAwareScrollView>
                 <PopupDialog
                     ref={(popupDialog) => { this.popupDialog = popupDialog; }}
@@ -739,7 +743,7 @@ const styles = StyleSheet.create({
     },
     tabView: {
         width: Constant.WIDTH_SCREEN,
-        height: 100,
+        height: 130,
         paddingLeft: 5,
         //marginTop: (Platform.OS == 'ios')? 20 : StatusBar.currentHeight,
         flexDirection:'row',
@@ -747,7 +751,7 @@ const styles = StyleSheet.create({
     },
     tabViewBg: {
         flex: 1,
-        height: 100,
+        height: 130,
         width: '110%',
         position: 'absolute',
     },
@@ -756,6 +760,7 @@ const styles = StyleSheet.create({
         height: 50,
         justifyContent: 'center',
         alignItems:'center',
+        marginTop: 16
     },
     title: {
         color: 'white',
@@ -776,15 +781,29 @@ const styles = StyleSheet.create({
         flex: 1,
         width: Constant.WIDTH_SCREEN,
         backgroundColor: 'white',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     userphoto: {
         width: 100,
         height: 100,
         borderRadius: 50,
         position: 'absolute',
-        top: 70
+        top: 0,
     },
+    userphotoTouch: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      position: 'absolute',
+    },
+    userphotoTouch1: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        position: 'absolute',
+        top: 80,
+        backgroundColor:"lightgray"
+      },
     cellView: {
         flexDirection: 'row',
         height: 50,
@@ -793,7 +812,27 @@ const styles = StyleSheet.create({
         paddingRight: 20,
         justifyContent:'space-between',
         alignItems: 'center',
-        marginTop: 30,
+        marginTop: 10,
+    },
+    cellViewTop: {
+        flexDirection: 'row',
+        height: 50,
+        width: Constant.WIDTH_SCREEN,
+        paddingLeft: 20,
+        paddingRight: 20,
+        justifyContent:'space-between',
+        alignItems: 'center',
+        marginTop: 50,
+    },
+    cellViewDescription: {
+        flexDirection: 'row',
+        height: 100,
+        width: Constant.WIDTH_SCREEN,
+        paddingLeft: 20,
+        paddingRight: 20,
+        justifyContent:'space-between',
+        alignItems: 'center',
+        marginTop: 10,
     },
     lineTop: {
         width: Constant.WIDTH_SCREEN,
@@ -820,7 +859,8 @@ const styles = StyleSheet.create({
     inputText: {
         flex: 1,
         fontSize: 18,
-        color: Constant.APP_COLOR
+        color: Constant.APP_COLOR,
+   
     },
     placeHolderText: {
         flex: 1,

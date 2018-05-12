@@ -4,13 +4,17 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Pawpads.iml" filepath="$PROJECT_DIR$/Pawpads.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../node_modules/react-native-maps/lib/android/lib-react-native-maps.iml" filepath="$PROJECT_DIR$/../node_modules/react-native-maps/lib/android/lib-react-native-maps.iml" />
       <module fileurl="file://$PROJECT_DIR$/../node_modules/react-native-fbsdk/android/react-native-fbsdk.iml" filepath="$PROJECT_DIR$/../node_modules/react-native-fbsdk/android/react-native-fbsdk.iml" />
       <module fileurl="file://$PROJECT_DIR$/../node_modules/react-native-fetch-blob/android/react-native-fetch-blob.iml" filepath="$PROJECT_DIR$/../node_modules/react-native-fetch-blob/android/react-native-fetch-blob.iml" />
       <module fileurl="file://$PROJECT_DIR$/../node_modules/react-native-firebase/android/react-native-firebase.iml" filepath="$PROJECT_DIR$/../node_modules/react-native-firebase/android/react-native-firebase.iml" />
       <module fileurl="file://$PROJECT_DIR$/../node_modules/react-native-image-picker/android/react-native-image-picker.iml" filepath="$PROJECT_DIR$/../node_modules/react-native-image-picker/android/react-native-image-picker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../node_modules/react-native-image-picker/android/react-native-image-picker-react-native-image-picker.iml" filepath="$PROJECT_DIR$/../node_modules/react-native-image-picker/android/react-native-image-picker-react-native-image-picker.iml" />
       <module fileurl="file://$PROJECT_DIR$/../node_modules/react-native-maps/lib/android/react-native-maps.iml" filepath="$PROJECT_DIR$/../node_modules/react-native-maps/lib/android/react-native-maps.iml" />
       <module fileurl="file://$PROJECT_DIR$/../node_modules/react-native-twitter-signin/android/react-native-twitter-signin.iml" filepath="$PROJECT_DIR$/../node_modules/react-native-twitter-signin/android/react-native-twitter-signin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../node_modules/react-native-twitter-signin/android/react-native-twitter-signin-react-native-twitter-signin.iml" filepath="$PROJECT_DIR$/../node_modules/react-native-twitter-signin/android/react-native-twitter-signin-react-native-twitter-signin.iml" />
       <module fileurl="file://$PROJECT_DIR$/../node_modules/react-native-vector-icons/android/react-native-vector-icons.iml" filepath="$PROJECT_DIR$/../node_modules/react-native-vector-icons/android/react-native-vector-icons.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../node_modules/react-native-vector-icons/android/react-native-vector-icons-react-native-vector-icons.iml" filepath="$PROJECT_DIR$/../node_modules/react-native-vector-icons/android/react-native-vector-icons-react-native-vector-icons.iml" />
     </modules>
   </component>
 </project>

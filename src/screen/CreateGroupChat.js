@@ -18,6 +18,11 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import SearchBox from './common/SearchBox'
 // import CheckBox from 'react-native-icon-checkbox';
 
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
+import RNFirebase from 'react-native-firebase';
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
 var isAlert = false
 var isName = false
 var isEmail = false
@@ -27,9 +32,10 @@ var isEmail = false
 
 var datas = []
 var filteredData = []
+
 // create a component
 class CreateGroupChat extends Component {
-    constructor(props){
+    constructor(props) {
         super(props)
         this.state = {
             email: '',
@@ -43,15 +49,58 @@ class CreateGroupChat extends Component {
             loading: true,
         }
     }
+
     componentWillMount() {
         currentPage = 0
         datas = []
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
             this.setState({ userID: value })
+            
+            var {params} = this.props.navigation.state
+
+            let dialogs = params.Dialog.filter(e => (e.type !== 1) && e.type !== 2)
+
+            this.setState({
+                dialogs: dialogs,
+                loading: false
+            })
         })
-        this.loadData()
     }
-    loadData(){
+
+    loadDataFirebase() {
+
+      firebase.database()
+          .ref('/dialog')
+          .orderByChild("user_id")
+          .equalTo(this.state.userID.toString())
+          .once("value")
+          .then(snapshot => {
+
+            console.log("snapshot",snapshot.val());
+
+            var dialogs =  snapshot.val()
+
+            if (dialogs) {
+
+              var keys = Object.keys(dialogs);
+
+              var values = keys.map(function(v) { return dialogs[v]; });
+
+              dialogs = values.filter(e => (e.type !== 1) && e.type !== 2)
+
+               datas.push(dialogs)
+
+               currentPage ++
+
+               this.setState({
+                   dialogs: JSON.parse(JSON.stringify(datas[0])),
+                   loading: false
+               })
+            }
+          })
+    }
+
+    loadData() {
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             var REQUEST_URL = Constant.RETRIEVE_DIALOGS_URL + '?type[in]=2,3' + '&limit=10' + '&skip=' + currentPage*10
             fetch(REQUEST_URL, {
@@ -63,7 +112,7 @@ class CreateGroupChat extends Component {
             })
             .then((response) => response.json())
             .then((responseData) => {
-                if(responseData.limit > 0){
+                if(responseData.limit > 0) {
                     datas.push(responseData.items)
                     console.log(datas)
                     currentPage ++
@@ -72,7 +121,7 @@ class CreateGroupChat extends Component {
                         token: token,
                         loading: false
                     })
-                }else{
+                } else {
                     this.setState({ loading: false })
                 }
 
@@ -81,11 +130,82 @@ class CreateGroupChat extends Component {
             })
         })
     }
+
     _onback = () => {
         var emptyArry = []
         this.props.SearchResult(emptyArry)
         this.props.navigation.goBack()
     }
+
+    _onCreateGroup = () => {
+
+      let isGroup = false
+      let isCheckedCount = 0
+      let userDialogsSelected = []
+      for (var i = 0; i < this.state.dialogs.length; i++) {
+        if (this.state.dialogs[i].ischecked) {
+          if (this.state.dialogs[i].ischecked == true) {
+            isCheckedCount = isCheckedCount + 1
+            userDialogsSelected.push(this.state.dialogs[i])
+          }
+        }
+      }
+
+      if (isCheckedCount< 1) {
+        alert('Please select at least two member to create group.')
+        return
+      }
+
+      if (isCheckedCount > 1) {
+        isGroup = true
+      }
+
+      if (!isGroup) {
+
+        //Personal chat
+        this.props.navigation.navigate('Chat', {GroupName: userDialogsSelected[0].name, GroupChatting: false, Dialog: userDialogsSelected[0], Token: this.state.token})
+
+      } else {
+
+        //Group Chat
+        var updates = {};
+
+        var milliseconds = (new Date).getTime()/1000|0;
+        var date = new Date();
+
+        var updatescontent = {};
+        var newKey = firebase.database().ref().child('dialog/group-chat-private').push().key;
+
+        var occupantsids = []
+        for (var i = 0; i < userDialogsSelected.length; i++) {
+          occupantsids.push(userDialogsSelected[i].userid)
+        }
+
+        //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+        let dialog =  {
+          _id :  newKey,
+          created_at : date.toISOString(),
+          last_message : "",
+          last_message_date_sent : milliseconds,
+          last_message_user_id : this.state.userID.toString(),
+          name : "New Group",
+          occupants_ids : occupantsids,
+          photo : "",
+          type : 2, //GROUP
+          unread_messages_count : 0,
+          updated_at : date.toISOString(),
+          user_id : this.state.userID.toString()
+        }
+
+        updates['/dialog/group-chat-private/' + newKey] = dialog;
+        firebase.database().ref().update(updates)
+
+        const { navigation } = this.props;
+        navigation.goBack();
+        navigation.state.params.onRefresh({ isRefresh: true });
+      }
+    }
+
     _onRefresh() {
         this.loadData()
         this.setState({refreshing: true});
@@ -96,18 +216,21 @@ class CreateGroupChat extends Component {
             })
         }, 2000)
     }
+
     handleSelectedKilometers = (checked) => {
         this.setState({
             isKilometerSelected: true,
         });
     }
-    downloadLastUser(occupants_ids){
+
+    downloadLastUser(occupants_ids) {
         var last_message_userid = ''
         for(var j=0; j<occupants_ids.length; j++){
             if(occupants_ids[j] != this.state.userID){
                 last_message_userid = occupants_ids[j].toString()
             }
         }
+
         var REQUEST_URL = Constant.USERS_URL + last_message_userid +'.json'
         fetch(REQUEST_URL, {
             method: 'GET',
@@ -118,7 +241,7 @@ class CreateGroupChat extends Component {
         })
         .then((response) => response.json())
         .then((responseData) => {
-            for(var i = 0;i < this.state.dialogs.length; i++){
+            for(var i = 0;i < this.state.dialogs.length; i++) {
                 if(this.state.dialogs[i].name == responseData.user.login || this.state.dialogs[i].name == responseData.user.full_name){
                     this.state.dialogs[i]['blob_id'] = responseData.user.blob_id.toString();
                     this.state.dialogs[i]['custom_data'] = responseData.user.custom_data;
@@ -132,20 +255,93 @@ class CreateGroupChat extends Component {
             console.log(e)
         })
     }
-    handleSelectUser(flag){
+
+    downloadLastUserFirebase(data, index) {
+
+      if (data.occupants_ids) {
+
+        let occupants_ids = data.occupants_ids
+
+          var last_message_userid = ''
+          for(var j=0; j<occupants_ids.length; j++) {
+              if(occupants_ids[j] != this.state.userID){
+                  last_message_userid = occupants_ids[j].toString()
+              }
+          }
+
+          console.log("last_message_userid",last_message_userid);
+
+          firebase.database()
+            .ref('/users')
+            .orderByChild("id")
+            .equalTo(occupants_ids.toString())
+            .once("value")
+            .then(snapshot => {
+
+              let profileObj =  snapshot.val();
+
+              if (profileObj) {
+                let keys = Object.keys(profileObj);
+
+                var profile = null;
+                if (keys.length > 0) {
+                  profile = profileObj[keys[0]]
+                }
+
+                if (profile) {
+
+                  if (profile["content"]) {
+                    for (let item in profile["content"]) {
+                      let content = profile["content"][item]
+                      let blobid =  content["id"]
+
+                      if (blobid == profile["blob_id"]) {
+                        let path = "content/" + profile["firid"] + "/" + profile["content"][item]["name"]
+
+                        firebase.storage().ref(path).getDownloadURL().then((url) => {
+
+                          this.state.dialogs[index]['blob_id'] = profile.blob_id.toString();
+                          this.state.dialogs[index]['custom_data'] = profile.custom_data;
+                          this.state.dialogs[index]['ischecked'] = false
+                          this.state.dialogs[index]['profileURL'] = url
+
+                          this.setState({
+                              refresh: true
+                          });
+
+                        })
+                      }
+                    }
+                  }
+                }
+
+              } else {
+
+              }
+
+            })
+          }
+        }
+
+    handleSelectUser(flag) {
         for(var i = 0;i < this.state.dialogs.length; i++){
             if(flag==i){
-                if(this.state.dialogs[i]['ischecked'] == false){
+              if (this.state.dialogs[i]['ischecked']) {
+                if (this.state.dialogs[i]['ischecked'] == false) {
                     this.state.dialogs[i]['ischecked'] = true
-                }else{
+                } else {
                     this.state.dialogs[i]['ischecked'] = false
                 }
+              } else {
+                this.state.dialogs[i]['ischecked'] = true
+              }
             }
         }
         this.setState({
             refresh: true
         });
     }
+
     renderCreateChats(List){
         if(this.state.loading){
             return (
@@ -159,8 +355,8 @@ class CreateGroupChat extends Component {
                 List.map((data, index) => {
                     console.log(data)
                     return(
-                      <TouchableOpacity style = {styles.tabChannelListCell} key = {index} onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})}>
-                        {this.state.refresh == false? this.downloadLastUser(data.occupants_ids) : null}
+                      <TouchableOpacity style = {styles.tabChannelListCell} key = {index} onPress={() => this.handleSelectUser(index)}>
+                        {this.state.refresh == false? this.downloadLastUserFirebase(data,index) : null}
                         <TouchableOpacity onPress = {()=>this.handleSelectUser(index)}>
                             <Image source = {data.ischecked? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
                         </TouchableOpacity>
@@ -174,12 +370,7 @@ class CreateGroupChat extends Component {
                             iconStyle = {{color: Constant.APP_COLOR}}
                         />*/}
                         <Image source = {{
-                            uri: Constant.BLOB_URL + data.blob_id + '/download.json',
-                            method:'GET',
-                            headers: {
-                                    'Content-Type': 'application/json',
-                                    'QB-Token': this.state.token
-                                },
+                            uri: data.profileURL
                             }}
                             defaultSource = {require('../assets/img/user_placeholder.png')}
                             style = {styles.menuIcon}
@@ -191,7 +382,7 @@ class CreateGroupChat extends Component {
             )
         }
     }
-    
+
     render() {
         var { filteredData } = this.props;
         <StatusBar
@@ -206,7 +397,7 @@ class CreateGroupChat extends Component {
                         <Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
                     </TouchableOpacity>
                     <Text style = {styles.title}>Create group</Text>
-                    <TouchableOpacity style = {styles.doneBtn} onPress = {this._onback}>
+                    <TouchableOpacity style = {styles.doneBtn} onPress = {this._onCreateGroup}>
                         <Text style = {{color: 'white', fontSize: 15}}>Done</Text>
                     </TouchableOpacity>
                 </View>
