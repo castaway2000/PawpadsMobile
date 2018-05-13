@@ -25,6 +25,7 @@ project.xcworkspace
 
 # Android/IntelliJ
 #
+app/pawpadskey.jks
 build/
 app/build
 *.idea

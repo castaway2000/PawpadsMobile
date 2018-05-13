@@ -2,193 +2,84 @@
 <items version="2" >
 
     <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.facebook.fresco/drawee/1.3.0/jars/classes.jar"
+        is-multidex="true"
+        jar="/Users/xwing/PycharmProjects/PawpadsMobile/node_modules/react-native-fbsdk/android/build/intermediates/intermediate-jars/release/classes.jar"
         jumboMode="false"
+        min-sdk-version="21"
         optimize="true"
-        revision="23.0.1"
-        sha1="c65a2e39d54023bac3aef64a2f0cff89289c7ff6">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-drawee-1.3.0_7e0a76cfdf51c7139fe4090d507788ea63d606cf.jar" />
+        revision="26.0.2"
+        sha1="ce2b293f217b5d6255c438847e083d4376367ad0">
+        <dex dex="/Users/xwing/PycharmProjects/PawpadsMobile/android/app/build/intermediates/transforms/preDex/release/83/classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/Users/macos/.gradle/caches/modules-2/files-2.1/javax.inject/javax.inject/1/6975da39a7040257bd51d21a231b76c915872d38/javax.inject-1.jar"
+        is-multidex="true"
+        jar="/Users/xwing/PycharmProjects/PawpadsMobile/node_modules/react-native-vector-icons/android/build/intermediates/intermediate-jars/release/classes.jar"
         jumboMode="false"
+        min-sdk-version="21"
         optimize="true"
-        revision="23.0.1"
-        sha1="6975da39a7040257bd51d21a231b76c915872d38">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/javax.inject-1_906c5379d8c714b93b5bcfaf2b0bfd2c9342ebd7.jar" />
+        revision="26.0.2"
+        sha1="f2cf527de8d0bd35d72088fafea02395ba4a9eec">
+        <dex dex="/Users/xwing/PycharmProjects/PawpadsMobile/android/app/build/intermediates/transforms/preDex/release/85/classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.facebook.fresco/fresco/1.3.0/jars/classes.jar"
+        is-multidex="true"
+        jar="/Users/xwing/PycharmProjects/PawpadsMobile/node_modules/react-native-fetch-blob/android/build/intermediates/intermediate-jars/release/classes.jar"
         jumboMode="false"
+        min-sdk-version="21"
         optimize="true"
-        revision="23.0.1"
-        sha1="fe85b87215e405f5917d40ae4960488ac9224b74">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-fresco-1.3.0_3430f7f8dbab00bb3ac116d05ef4f35a80736548.jar" />
+        revision="26.0.2"
+        sha1="400ccb8b93276f4e474706d856d4994d82815282">
+        <dex dex="/Users/xwing/PycharmProjects/PawpadsMobile/android/app/build/intermediates/transforms/preDex/release/81/classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/Users/macos/.gradle/caches/modules-2/files-2.1/com.parse.bolts/bolts-tasks/1.4.0/d85884acf6810a3bbbecb587f239005cbc846dc4/bolts-tasks-1.4.0.jar"
+        is-multidex="true"
+        jar="/Users/xwing/PycharmProjects/PawpadsMobile/node_modules/react-native-fcm/android/build/intermediates/intermediate-jars/release/classes.jar"
         jumboMode="false"
+        min-sdk-version="21"
         optimize="true"
-        revision="23.0.1"
-        sha1="d85884acf6810a3bbbecb587f239005cbc846dc4">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/bolts-tasks-1.4.0_ee9c6fd556e8d1647f00a2f25211dc2059e9f5a1.jar" />
+        revision="26.0.2"
+        sha1="89d8dd59ef67d47a6199e5a9122be7b9a742d346">
+        <dex dex="/Users/xwing/PycharmProjects/PawpadsMobile/android/app/build/intermediates/transforms/preDex/release/80/classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.49.3/jars/classes.jar"
+        is-multidex="true"
+        jar="/Users/xwing/PycharmProjects/PawpadsMobile/node_modules/react-native-maps/lib/android/build/intermediates/intermediate-jars/release/classes.jar"
         jumboMode="false"
+        min-sdk-version="21"
         optimize="true"
-        revision="23.0.1"
-        sha1="e013739f7ddb6740bf196dc515d8999a6030f9ea">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/com.facebook.react-react-native-0.49.3_b6977035cee06af9918759ab83e110c899e82b40.jar" />
+        revision="26.0.2"
+        sha1="5ab151698a7278176c9e6a60b6e18dbb4bebdf9f">
+        <dex dex="/Users/xwing/PycharmProjects/PawpadsMobile/android/app/build/intermediates/transforms/preDex/release/86/classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/jars/classes.jar"
+        is-multidex="true"
+        jar="/Users/xwing/PycharmProjects/PawpadsMobile/node_modules/react-native-twitter-signin/android/build/intermediates/intermediate-jars/release/classes.jar"
         jumboMode="false"
+        min-sdk-version="21"
         optimize="true"
-        revision="23.0.1"
-        sha1="d86429b0f0b3f3cafbeb78dda1b9d89119ccb05d">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/com.android.support-appcompat-v7-23.0.1_95f513ad2be3faf33a2b6b35d0f37e92f87ba4ed.jar" />
+        revision="26.0.2"
+        sha1="194d8cd17e75f7ec78b57fd2a9190052e67f7922">
+        <dex dex="/Users/xwing/PycharmProjects/PawpadsMobile/android/app/build/intermediates/transforms/preDex/release/82/classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.facebook.soloader/soloader/0.1.0/jars/classes.jar"
+        is-multidex="true"
+        jar="/Users/xwing/PycharmProjects/PawpadsMobile/node_modules/react-native-image-picker/android/build/intermediates/intermediate-jars/release/classes.jar"
         jumboMode="false"
+        min-sdk-version="21"
         optimize="true"
-        revision="23.0.1"
-        sha1="8f615bca00639150c9eb6175d4b5471193f70794">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/com.facebook.soloader-soloader-0.1.0_3e70b3b09ab35dcffa445fb20a7985e5779bdd2d.jar" />
+        revision="26.0.2"
+        sha1="f11158b8d80b40b3dd9ec097ea14c31717971b5f">
+        <dex dex="/Users/xwing/PycharmProjects/PawpadsMobile/android/app/build/intermediates/transforms/preDex/release/87/classes.dex" />
     </item>
     <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.facebook.fresco/imagepipeline-okhttp3/1.3.0/jars/classes.jar"
+        is-multidex="true"
+        jar="/Users/xwing/PycharmProjects/PawpadsMobile/node_modules/react-native-firebase/android/build/intermediates/intermediate-jars/release/classes.jar"
         jumboMode="false"
+        min-sdk-version="21"
         optimize="true"
-        revision="23.0.1"
-        sha1="c03c08c9934b23c8c09c803345ec51a74119127b">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-imagepipeline-okhttp3-1.3.0_765107a509ae2885c4093aed92bb1eed3ab7d8a0.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.0.1/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="c31e21b53ff2f74664e498248d01453a32e32d48">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/com.android.support-support-v4-23.0.1_1c908240197e86297e26d29d3631e2c85f36f3e7.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.facebook.fresco/imagepipeline/1.3.0/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="48c7f54c2515a2312d3a4481d10c43fbb807f3af">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-imagepipeline-1.3.0_8367ce6ba892436bb72aa1ca31648452506ce15b.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.0.1/jars/libs/internal_impl-23.0.1.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="aa92916125166649d8ad4ba3940c3dd7515596d3">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/internal_impl-23.0.1_28f511fcf85ad4100f963f7f3e1adbe8f1135b40.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/macos/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/23.0.1/support-annotations-23.0.1.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="1fce89a6428c51467090d7f424e4c9c3dbd55f7e">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/support-annotations-23.0.1_cd8487ca3d15243955ba0503fbd04fc8fcae23f2.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/macos/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.13.0/a9283170b7305c8d92d25aff02a6ab7e45d06cbe/okio-1.13.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="a9283170b7305c8d92d25aff02a6ab7e45d06cbe">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/okio-1.13.0_52aa16e0fe64803326d6e5938873d2575dedf4ae.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/macos/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp-urlconnection/3.6.0/3f9b16b774f2c36cfd86dd2053d0b3059531dacc/okhttp-urlconnection-3.6.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="3f9b16b774f2c36cfd86dd2053d0b3059531dacc">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/okhttp-urlconnection-3.6.0_59f052114708134dd37608c4ba63d089d67ecedc.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.facebook.fresco/fbcore/1.3.0/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="37345de2ed2772f385eaeec37a9c2ff0fea99ad7">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-fbcore-1.3.0_9cc2f996cfe46f214a30b30dc69817dd7ad581b9.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.facebook.react/react-native/0.49.3/jars/libs/infer-annotations-4.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="9809e90be788acdb479b2b44e2112f3295a03068">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/infer-annotations-4.0_afefd7942eae7389c4592a204ab7a308fc5101a5.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.facebook.fbui.textlayoutbuilder/textlayoutbuilder/1.0.0/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="f90b593491e4044903f0bbf68dc3fa2790b151b9">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/com.facebook.fbui.textlayoutbuilder-textlayoutbuilder-1.0.0_03f519417defec88db27478eee767a39301f9142.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/macos/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.6.0/69edde9fc4b01c9fd51d25b83428837478c27254/okhttp-3.6.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="69edde9fc4b01c9fd51d25b83428837478c27254">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/okhttp-3.6.0_a656dc38bf2078a60227116faa9ae0cd249292c3.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/macos/.gradle/caches/modules-2/files-2.1/com.facebook.fbui.textlayoutbuilder/staticlayout-proxy/1.0/f162442a19fff13995fbd51ba414d9ee05579080/staticlayout-proxy-1.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="f162442a19fff13995fbd51ba414d9ee05579080">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/staticlayout-proxy-1.0_4e5fffccc7d3513ceeb61f76f7463690bdd91cdf.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/exploded-aar/com.facebook.fresco/imagepipeline-base/1.3.0/jars/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="72128af126ddd7d6252da9357fe560d3abcdfb0c">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/com.facebook.fresco-imagepipeline-base-1.3.0_2d3e83b9f1e54ea1ee290cdf75d0af94bb0221a0.jar" />
-    </item>
-    <item
-        is-multidex="false"
-        jar="/Users/macos/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.0/5871fb60dc68d67da54a663c3fd636a10a532948/jsr305-3.0.0.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="23.0.1"
-        sha1="5871fb60dc68d67da54a663c3fd636a10a532948">
-        <dex dex="/Volumes/Data/WorkSpace/React_Naitve/Pawpads/android/app/build/intermediates/pre-dexed/debug/jsr305-3.0.0_e225c59da30b50f5979d85fdc668d7c945ed8049.jar" />
+        revision="26.0.2"
+        sha1="7f4e4c7721186d30d290c229239ac032b15378cb">
+        <dex dex="/Users/xwing/PycharmProjects/PawpadsMobile/android/app/build/intermediates/transforms/preDex/release/84/classes.dex" />
     </item>
 
 </items>
