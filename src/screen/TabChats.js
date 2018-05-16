@@ -557,6 +557,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         backgroundColor: 'transparent',
+        overlayColor: 'white',
     },
     chatBtn: {
         position:'absolute',

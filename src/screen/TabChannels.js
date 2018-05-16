@@ -170,6 +170,11 @@ class TabChannels extends Component {
               let obj = result[key]
               obj["pagekey"] = key
               if (obj.type == 1) {
+
+                console.log('====================================');
+                console.log("Load more obj:",obj);
+                console.log('====================================');
+                
                 this.state.dialogs.push(obj)
               }
             }
@@ -228,6 +233,10 @@ class TabChannels extends Component {
 
     handleLoadMore = () => {
       if (!this.state.loading) {
+          console.log('====================================');
+          console.log("LOADING MORE...");
+          console.log('====================================');
+          this.setState({ loading: true })
         this.loadDataFromFirebase(this.state.pagekey,this.state.pagetimestamp);
       }
     }
@@ -322,7 +331,6 @@ class TabChannels extends Component {
                               console.log("downloadGroupPhotoFirebase:",url);
                           }
                       }
-
 
                       this.setState({refresh1: true});
 
@@ -432,7 +440,7 @@ class TabChannels extends Component {
 
                         {this.state.refresh1 == false? this.downloadGroupPhotoFirebase(data.photo,data._id) : null}
                         <View style = {styles.menuIcon} >
-                        <Image source = {{
+                        <CachedImage source = {{
                             uri: data.photo
                             }}
                             defaultSource = {require('../assets/img/user_placeholder.png')}
@@ -441,7 +449,7 @@ class TabChannels extends Component {
                         <View style = {{flex: 1, marginLeft: 15}}>
                             <Text style = {styles.menuItem}>{data.name}</Text>
                             <View style = {{flexDirection:'row',marginTop: 5}}>
-                                <Image source = {{
+                                <CachedImage source = {{
                                     uri: data.blob_id
                                     }}
                                     defaultSource = {require('../assets/img/user_placeholder.png')}
@@ -502,7 +510,7 @@ class TabChannels extends Component {
                   refreshing={this.state.refreshing}
                   onRefreshItems= {this.props.onRefreshItems}
                   onEndReached={this.handleLoadMore}
-                  onEndReachedThreshold={0}
+                  onEndReachedThreshold={10}
                   />
 
                 </Content>
@@ -610,6 +618,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         backgroundColor: '#f1eff0',
+        overlayColor: 'white',
     },
     menuIcon1: {
         width: 50,

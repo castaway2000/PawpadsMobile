@@ -66,30 +66,28 @@ class Profile extends Component {
       this.props.navigation.goBack()
     }
 
-    showAlertUserPhoto(){
+    showAlertUserPhoto() {
         var {params} = this.props.navigation.state
+    
         return(
-            <Image source = {{
-                uri: Constant.BLOB_URL + params.UserInfo.blob_id + '/download.json',
-                method:'GET',
-                headers: {
-                        'Content-Type': 'application/json',
-                        'QB-Token': this.state.token
-                    },
+            <CachedImage source = {{
+                uri: params.UserInfo.profileurl,
                 }}
                 defaultSource = {require('../assets/img/user_placeholder.png')}
-                style = {[styles.addphoto, {marginTop: -40}]}/>
+                style = {[styles.addphoto, {marginTop: Platform.OS === 'ios' ? -40 : 0 }]}/>
         )
     }
 
     showUserPhoto() {
         var {params} = this.props.navigation.state
         return(
+            <View style = {styles.userphoto1}>
             <CachedImage source = {{
                 uri: params.UserInfo.profileurl,
               }}
                 defaultSource = {require('../assets/img/user_placeholder.png')}
                 style = {styles.userphoto} />
+                </View>
         )
     }
 
@@ -136,7 +134,7 @@ class Profile extends Component {
         }
     }
 
-    showUserHobby(){
+    showUserHobby() {
         var {params} = this.props.navigation.state
 
           var json = null;
@@ -557,7 +555,6 @@ class Profile extends Component {
             }
         }
 
-
         sendFriendRequest = () => {
 
           this.popupDialog.dismiss()
@@ -640,11 +637,9 @@ class Profile extends Component {
                 </TouchableOpacity>
               )
             }
-
           } else {
             return null
           }
-
         }
 
         showchatbutton() {
@@ -773,7 +768,7 @@ class Profile extends Component {
                     dialogStyle = {styles.dialogView}
                     overlayBackgroundColor = {Constant.APP_COLOR}
                     overlayOpacity = {0.9}
-                    height = {50}
+                    height = {300}
                 >
                     <View style = {{alignItems:'center', backgroundColor:'white', padding: 10}}>
                         { this.showAlertUserPhoto() }
@@ -868,6 +863,13 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 50,
+    },
+
+    userphoto1: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor:"lightgray"
     },
 
     addphoto: {

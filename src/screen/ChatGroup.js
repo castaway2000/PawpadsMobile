@@ -222,6 +222,7 @@ class ChatGroup extends Component {
 					firebase.database()
 							.ref(`/chats`)
 							.orderByChild("chat_dialog_id")
+							.limitToLast(10)
 							.equalTo(params.Dialog._id)
 							.once("value")
 							.then(snapshot => {
