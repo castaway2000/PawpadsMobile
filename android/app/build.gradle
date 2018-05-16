@@ -73,7 +73,7 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    entryFile: "index.js"
+        entryFile: "index.js"
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -98,16 +98,18 @@ android {
     buildToolsVersion '26.0.2'
 
     defaultConfig {
-        applicationId "com.pawpads"
+        applicationId "saberapplications.pawpads"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 1
+        versionCode 41
         versionName "1.0"
         multiDexEnabled true
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
     }
+
+
     splits {
         abi {
             reset()
@@ -121,6 +123,7 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+
         }
     }
     // applicationVariants are e.g. debug, release
@@ -128,7 +131,7 @@ android {
         variant.outputs.each { output ->
             // For each separate APK per architecture, set a unique version code as described here:
             // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
-            def versionCodes = ["armeabi-v7a":1, "x86":2]
+            def versionCodes = ["armeabi-v7a": 1, "x86": 2]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
                 output.versionCodeOverride =
@@ -139,16 +142,18 @@ android {
 }
 
 dependencies {
+    compile("com.facebook.react:react-native:0.49.3") { force = true }
     compile project(':react-native-fcm')
     compile project(':react-native-fetch-blob')
     compile project(':react-native-twitter-signin')
     compile project(':react-native-fbsdk')
     compile(project(':react-native-firebase')) {
         transitive = false
+
     }
     compile project(':react-native-vector-icons')
 
-    compile(project(':react-native-maps')){
+    compile(project(':react-native-maps')) {
         exclude group: 'com.google.android.gms', module: 'play-services-base'
         exclude group: 'com.google.android.gms', module: 'play-services-maps'
     }

@@ -212,7 +212,8 @@ class Register extends Component {
                                           "password":ciphertext,
                                           "email": this.state.email,
                                           "isDataMigrated":"true",
-                                          "isTogglepushSelected":"true"}
+                                          "isTogglepushSelected":"true",
+                                          "firid": newKey}
 
                           updates['/users/' + newKey] = user;
                           firebase.database().ref().update(updates)

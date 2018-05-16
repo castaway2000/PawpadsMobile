@@ -55,7 +55,6 @@ var range = ''
 var gps_accuracy = ''
 var datamigrationobj = null
 
-
 // registerKilledListener();
 
 // create a component
@@ -75,6 +74,7 @@ class TabNearBy extends Component {
             gps_accuracy: 'medium',
             nearByUsers: [],
             tableId: '',
+            isLocationServiceEnabled: true
         }
     }
 
@@ -101,8 +101,9 @@ class TabNearBy extends Component {
         })
 
         AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
-          console.log("tableId is:",value);
-          this.setState({tableId: value })
+
+          this.setState({tableId: value})
+          
           this.loadDataFirebase()
 
           AsyncStorage.getItem(Constant.FCM_TOKEN).then((value) => {
@@ -194,8 +195,6 @@ class TabNearBy extends Component {
 
     updateFCMTokenFirebase = (value) => {
 
-      console.log("updateFCMTokenFirebase");
-
       //Update full name
       var updatefullname = {};
       updatefullname['/users/' + this.state.tableId  + '/FCMToken'] = value;
@@ -204,6 +203,7 @@ class TabNearBy extends Component {
       firebase.database().ref().update(updatefullname)
     }
 
+    /*
     loadData() {
         navigator.geolocation.getCurrentPosition (
             (position) => {
@@ -242,16 +242,19 @@ class TabNearBy extends Component {
                         this.props.NearByUsers(responseData.items)
 
                     }).catch((e) => {
-                        console.log(e)
+
+                        alert("Location services is turned off!")
                     })
                 })
             },
-            (error) => this.setState({error: error.message}),
+            (error) => {
+                alert("Location services is turned off!")
+            },
             {
-              enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+              enableHighAccuracy: true, timeout: 1000, maximumAge: 1000
             }
         );
-    }
+    }*/
 
      isNumeric(n) {
        return !isNaN(parseFloat(n)) && isFinite(n);
@@ -283,7 +286,10 @@ class TabNearBy extends Component {
                 }
               }
             },
-            (error) => {console.log("Location Error:",error.message)},
+            (error) => {
+                this.setState({loading: false,isLocationServiceEnabled: false})
+                alert("Location services is turned off! Please turn on from setting.")
+            },
             {
               enableHighAccuracy: false, timeout: 500000, maximumAge: 1000000
             }
@@ -360,7 +366,6 @@ class TabNearBy extends Component {
                            console.log("url IS a a:",url);
 
                             profile["coverPictureURL"] =  url; //profileurl
-
                          })
                        }
                      }
@@ -429,7 +434,7 @@ class TabNearBy extends Component {
 					<ActivityIndicator color={'black'} size={'large'}/>
 				</View>
 			);
-        } else{
+        } else {
             if(this.state.nearByUsers.length > 0){
                 return(
                     <List
@@ -443,10 +448,10 @@ class TabNearBy extends Component {
                         renderRow={data =>
                             <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})} style = {{height:70}}>
                             <View style = {styles.menuIcon} >
-                                <CachedImage source={{uri: data["profileurl"]}}
-                                  defaultSource = {require('../assets/img/user_placeholder.png')}
-                                  style = {styles.menuIcon1}/>
-                                </View>
+                               <CachedImage source={{uri: data["profileurl"]}}
+                                defaultSource = {require('../assets/img/user_placeholder.png')}
+                                style = {styles.menuIcon1}/>
+                            </View>
                                 {data.full_name?
                                     <Text style = {styles.menuItem}>{data.full_name}</Text> :
                                     <Text style = {styles.menuItem}>{data.login}</Text> }
@@ -461,11 +466,10 @@ class TabNearBy extends Component {
             }else{
                 return(
                     <View style={styles.loadingView}>
-                        <Text style = {styles.placesText}>There seems to be no one around. Try visiting this screen later or change your Distnace Settings.</Text>
+                        <Text style = {styles.placesText}>{this.state.isLocationServiceEnabled ? "There seems to be no one around. Try visiting this screen later or change your Distnace Settings." : "Location services is turned off! Please turn on from setting." }</Text>
                     </View>
                 )
             }
-
         }
     }
 
@@ -473,18 +477,11 @@ class TabNearBy extends Component {
       let distance = parseInt(geofire.distance([this.state.latitude, this.state.longitude], [data.latitude,data.longitude]))
       data.distance = distance
       return distance
-
     }
 
     render() {
         return (
-            <Container>
-                <Content bounces={false} style={{ flex: 1, backgroundColor: 'white'}}>
-
-                    { this.renderNearBy() }
-
-                </Content>
-            </Container>
+            this.renderNearBy() 
         );
     }
 }
@@ -520,6 +517,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         backgroundColor: 'transparent',
+        overlayColor: 'white',
     },
     distance: {
         color: 'gray',
@@ -528,7 +526,7 @@ const styles = StyleSheet.create({
     loadingView: {
         flex: 1,
         justifyContent:'center',
-        top: 200
+
     },
     placesText: {
         color: 'gray',
