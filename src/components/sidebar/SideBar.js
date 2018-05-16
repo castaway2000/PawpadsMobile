@@ -140,10 +140,11 @@ class SideBar extends Component {
 
                               if (blobid == profile["blob_id"]) {
 
+                                console.log("content/" + profile["firid"] + "/" + profile["content"][item]["name"]);
+
                                 firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
-
+                                  console.log("profileimage::",url);
                                   this.setState({profileimage: url,});
-
                                 })
                               }
 
@@ -323,7 +324,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        
+        overlayColor: 'transparent',
     },
     name: {
         color: 'white',
