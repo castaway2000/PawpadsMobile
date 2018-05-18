@@ -74,7 +74,8 @@ class TabNearBy extends Component {
             gps_accuracy: 'medium',
             nearByUsers: [],
             tableId: '',
-            isLocationServiceEnabled: true
+            isLocationServiceEnabled: true,
+            geofireKeyAndLoc: []
         }
     }
 
@@ -298,101 +299,121 @@ class TabNearBy extends Component {
 
     _queryuser = () => {
 
-      if (this.state.latitude && this.state.longitude) {
-        const geofireRef = new geofire(firebaseApp.database().ref('geofire/'))
+        if (this.state.latitude && this.state.longitude) {
+            const geofireRef = new geofire(firebaseApp.database().ref('geofire/'))
 
-        var radious = 0
-        if (this.state.distance_unit == 'km') {
-          radious = parseInt(this.state.search_range)
-        } else {
-          radious = parseInt(this.state.search_range)*1.60934
+            var radious = 0
+            if (this.state.distance_unit == 'km') {
+                radious = parseInt(this.state.search_range)
+            } else {
+                radious = parseInt(this.state.search_range) * 1.60934
+            }
+
+            var geoQuery = geofireRef.query({
+                center: [this.state.latitude, this.state.longitude],
+                radius: radious
+            });
+
+            var onKeyEnteredRegistration = geoQuery.on("key_entered", function (key, location) {
+
+                let data = { 'latitude': location[0], 'longitude': location[1] }
+
+                let distance = datamigrationobj.calculateDistance(data)
+
+                datamigrationobj.state.geofireKeyAndLoc.push({ 'key': key, 'distance': distance })
+
+                console.log(key + " onKeyEnteredRegistration. Hi " + key + "!" + distance);
+
+            });
+
+            var onKeyExitedRegistration = geoQuery.on("key_exited", function (key, location) {
+                console.log(key + " migrated out of the query. Bye bye :(");
+            });
+
+            var onKeyMovedRegistration = geoQuery.on("key_moved", function (key, location) {
+                console.log(key + " moved to somewere else within the query.");
+            });
+
+            var onKeyMovedRegistration = geoQuery.on("ready", function (key, location) {
+
+                console.log("onKeyMovedRegistration!!");
+
+                datamigrationobj.state.geofireKeyAndLoc.sort(function (a, b) {
+                    var keyA = a.distance,
+                        keyB = b.distance;
+                    if (keyA > keyB) return 1;
+                    if (keyA < keyB) return -1;
+                    return 0;
+                });
+
+                for (let index = 0; index < datamigrationobj.state.geofireKeyAndLoc.length; index++) {
+                    const obj = datamigrationobj.state.geofireKeyAndLoc[index];
+                    console.log('After sort',obj.distance)
+                    datamigrationobj._setProfileData(obj.key)
+                }
+
+                datamigrationobj.setState({ loading: false });
+            });
         }
+    }
 
-        var geoQuery = geofireRef.query({
-          center: [this.state.latitude, this.state.longitude],
-          radius: radious
-        });
+    _setProfileData = (key) => {
 
-        var onKeyEnteredRegistration = geoQuery.on("key_entered", function(key, location) {
-           console.log(key + " entered the query. Hi " + key + "!");
+        //Get all data
+        firebase.database()
+            .ref('users/' + key)
+            .once("value")
+            .then(snapshot => {
+                if (snapshot.val()) {
 
-           //Get all data
-           firebase.database()
-           .ref('users/' + key)
-           .once("value")
-           .then(snapshot => {
-             if (snapshot.val()) {
+                    var profile = snapshot.val();
 
-               console.log("snapshot is:",snapshot.val());
+                    if (profile["firid"] != datamigrationobj.state.tableId) {
 
-               var profile = snapshot.val();
+                        profile.distance = datamigrationobj.calculateDistance(profile)
 
-               if (profile["firid"] != datamigrationobj.state.tableId) {
+                        if (profile["content"]) {
 
-                 let index =  datamigrationobj.state.nearByUsers.indexOf(profile)
+                            for (let item in profile["content"]) {
 
-                 if (profile["content"]) {
+                                let content = profile["content"][item]
 
-                   for (let item in profile["content"]) {
+                                let blobid = content["id"]
 
-                     let content = profile["content"][item]
-                     let blobid =  content["id"]
+                                if (blobid == profile["blob_id"]) {
 
-                     //datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
+                                    firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
 
-                     if (blobid == profile["blob_id"]) {
+                                        profile["profileurl"] = url; //profileurl
 
-                       firebase.storage().ref("content/" + profile["firid"] + "/" + profile["content"][item]["name"]).getDownloadURL().then((url) => {
+                                        datamigrationobj.state.nearByUsers.push(profile)
 
-                         profile["profileurl"] =  url; //profileurl
+                                        datamigrationobj.setState({ nearByUsers: datamigrationobj.state.nearByUsers });
+                                        datamigrationobj.props.NearByUsers(datamigrationobj.state.nearByUsers)
+                                    })
+                                }
 
-                         console.log("image loaded:",url);
+                                if (profile.custom_data) {
 
-                         datamigrationobj.state.nearByUsers.push(profile)
-                         datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
-                         datamigrationobj.props.NearByUsers(datamigrationobj.state.nearByUsers)
+                                    var json = JSON.parse(profile.custom_data)
 
-                       })
-                     }
+                                    if (blobid == json["backgroundId"]) {
+                                        let path = "content/" + profile["firid"] + "/" + profile["content"][item]["name"]
+                                        firebase.storage().ref(path).getDownloadURL().then((url) => {
+                                            profile["coverPictureURL"] = url; //profileurl
+                                        })
+                                    }
+                                }
+                            }
+                        } else {
 
-                     if(profile.custom_data) {
-                       var json = JSON.parse(profile.custom_data)
+                            datamigrationobj.state.nearByUsers.push(profile)
 
-                       if (blobid == json["backgroundId"]) {
-                         let path = "content/" + profile["firid"] + "/" + profile["content"][item]["name"]
-                         console.log('path:', path);
-
-                         firebase.storage().ref(path).getDownloadURL().then((url) => {
-                           console.log("url IS a a:",url);
-
-                            profile["coverPictureURL"] =  url; //profileurl
-                         })
-                       }
-                     }
-                   }
-                 } else {
-                   datamigrationobj.state.nearByUsers.push(profile)
-                   datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers});
-                 }
-               }
-             }
-           })
-         });
-
-         var onKeyExitedRegistration = geoQuery.on("key_exited", function(key, location) {
-           console.log(key + " migrated out of the query. Bye bye :(");
-         });
-
-         var onKeyMovedRegistration = geoQuery.on("key_moved", function(key, location) {
-           console.log(key + " moved to somewere else within the query.");
-         });
-
-         var onKeyMovedRegistration = geoQuery.on("ready", function(key, location) {
-           console.log("ready!!");
-           console.log("datamigrationobj.state.nearByUsers",datamigrationobj.state.nearByUsers);
-           datamigrationobj.setState({nearByUsers: datamigrationobj.state.nearByUsers,loading: false});
-         });
-      }
+                            datamigrationobj.setState({ nearByUsers: datamigrationobj.state.nearByUsers });
+                        }
+                    }
+                }
+            })
     }
 
     _saveUserLocation = () => {
@@ -436,6 +457,7 @@ class TabNearBy extends Component {
 			);
         } else {
             if(this.state.nearByUsers.length > 0){
+
                 return(
                     <List
                         refreshControl={
@@ -456,8 +478,8 @@ class TabNearBy extends Component {
                                     <Text style = {styles.menuItem}>{data.full_name}</Text> :
                                     <Text style = {styles.menuItem}>{data.login}</Text> }
                                 {this.state.distance_unit == 'km' ?
-                                    <Text style = {styles.distance}>{this.calculateDistance(data)} {this.state.distance_unit}</Text> :
-                                    <Text style = {styles.distance} numberOfLines = {1}>{(this.calculateDistance(data)/1.60934).toFixed(2)} {this.state.distance_unit}</Text>}
+                                    <Text style = {styles.distance}>{data.distance.toFixed(2)} {this.state.distance_unit}</Text> :
+                                    <Text style = {styles.distance} numberOfLines = {1}>{(data.distance/1.60934).toFixed(2)} {this.state.distance_unit}</Text>}
                             </ListItem>
                         }
                     >
