@@ -349,7 +349,7 @@ class TabNearBy extends Component {
                 for (let index = 0; index < datamigrationobj.state.geofireKeyAndLoc.length; index++) {
                     const obj = datamigrationobj.state.geofireKeyAndLoc[index];
                     console.log('After sort',obj.distance)
-                    datamigrationobj._setProfileData(obj.key)
+                    datamigrationobj._setProfileData(obj.key, index)
                 }
 
                 datamigrationobj.setState({ loading: false });
@@ -357,7 +357,7 @@ class TabNearBy extends Component {
         }
     }
 
-    _setProfileData = (key) => {
+    _setProfileData = (key,index) => {
 
         //Get all data
         firebase.database()
@@ -386,7 +386,7 @@ class TabNearBy extends Component {
 
                                         profile["profileurl"] = url; //profileurl
 
-                                        datamigrationobj.state.nearByUsers.push(profile)
+                                        datamigrationobj.state.nearByUsers[index] = profile
 
                                         datamigrationobj.setState({ nearByUsers: datamigrationobj.state.nearByUsers });
                                         datamigrationobj.props.NearByUsers(datamigrationobj.state.nearByUsers)
@@ -407,7 +407,7 @@ class TabNearBy extends Component {
                             }
                         } else {
 
-                            datamigrationobj.state.nearByUsers.push(profile)
+                            datamigrationobj.state.nearByUsers[index] = profile
 
                             datamigrationobj.setState({ nearByUsers: datamigrationobj.state.nearByUsers });
                         }
