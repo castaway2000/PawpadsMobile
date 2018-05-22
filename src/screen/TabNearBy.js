@@ -316,13 +316,14 @@ class TabNearBy extends Component {
 
             var onKeyEnteredRegistration = geoQuery.on("key_entered", function (key, location) {
 
+                if (key != datamigrationobj.state.tableId) {
+                        
                 let data = { 'latitude': location[0], 'longitude': location[1] }
 
                 let distance = datamigrationobj.calculateDistance(data)
 
                 datamigrationobj.state.geofireKeyAndLoc.push({ 'key': key, 'distance': distance })
-
-                console.log(key + " onKeyEnteredRegistration. Hi " + key + "!" + distance);
+                }
 
             });
 
@@ -347,8 +348,8 @@ class TabNearBy extends Component {
                 });
 
                 for (let index = 0; index < datamigrationobj.state.geofireKeyAndLoc.length; index++) {
+
                     const obj = datamigrationobj.state.geofireKeyAndLoc[index];
-                    console.log('After sort',obj.distance)
                     datamigrationobj._setProfileData(obj.key, index)
                 }
 
@@ -469,11 +470,16 @@ class TabNearBy extends Component {
                         dataArray={this.state.nearByUsers}
                         renderRow={data =>
                             <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})} style = {{height:70}}>
+                            
                             <View style = {styles.menuIcon} >
                                <CachedImage source={{uri: data["profileurl"]}}
                                 defaultSource = {require('../assets/img/user_placeholder.png')}
                                 style = {styles.menuIcon1}/>
+
+                               {data.isonline ? <View style = {styles.onlinestatus}/> : null} 
+
                             </View>
+
                                 {data.full_name?
                                     <Text style = {styles.menuItem}>{data.full_name}</Text> :
                                     <Text style = {styles.menuItem}>{data.login}</Text> }
@@ -553,6 +559,15 @@ const styles = StyleSheet.create({
     placesText: {
         color: 'gray',
         textAlign: 'center'
+    },
+    onlinestatus: { 
+        borderRadius: 5,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#00ff00", 
+        width:10, 
+        height:10
     }
 });
 

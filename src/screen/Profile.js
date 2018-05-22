@@ -79,15 +79,15 @@ class Profile extends Component {
     }
 
     showUserPhoto() {
-        var {params} = this.props.navigation.state
-        return(
-            <View style = {styles.userphoto1}>
-            <CachedImage source = {{
-                uri: params.UserInfo.profileurl,
-              }}
-                defaultSource = {require('../assets/img/user_placeholder.png')}
-                style = {styles.userphoto} />
-                </View>
+        var { params } = this.props.navigation.state
+        return (
+            <View style={styles.userphoto1}>
+                <CachedImage source={{
+                    uri: params.UserInfo.profileurl,
+                }}
+                    defaultSource={require('../assets/img/user_placeholder.png')}
+                    style={ params.UserInfo.isonline ? styles.userphotoonline : styles.userphoto} />
+            </View>
         )
     }
 
@@ -858,11 +858,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 50
     },
-
     userphoto: {
         width: 100,
         height: 100,
         borderRadius: 50,
+    },
+    userphotoonline: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        borderWidth: 4,
+        borderColor: '#00ff00'
     },
 
     userphoto1: {

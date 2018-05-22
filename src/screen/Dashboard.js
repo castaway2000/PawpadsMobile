@@ -10,6 +10,9 @@ import TabNearBy from './TabNearBy'
 import FCM, {FCMEvent, RemoteNotificationResult, WillPresentNotificationResult, NotificationType, NotificationActionType, NotificationActionOption, NotificationCategoryOption} from "react-native-fcm";
 import {registerKilledListener, registerAppListener} from '../common/Listeners'
 
+import RNFirebase from 'react-native-firebase';
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
 //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
 
 registerKilledListener();
@@ -27,16 +30,24 @@ class Dashboard extends Component {
             isNearby: true,
             isChats: false,
             isChannels: false,
+            tableId: '',
         }
     }
 
     componentDidMount() {
+
+        AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+            this.setState({ tableId: value })
+            this.setOnlineOfflineStatus()
+        })
+
         FCM.getInitialNotification().then(notif => {
 
             console.log("FCM.getInitialNotification", notif);
 
-            if(notif){
-              setTimeout(()=>{
+            if(notif) {
+
+              setTimeout(() => {
 
                 if (notif) {
 
@@ -45,9 +56,13 @@ class Dashboard extends Component {
                         let dialog = JSON.parse(notif.data)
                         
                         if  (notif.type === '1') {
+
                             this.props.navigation.navigate('Chat', {GroupName: dialog.name, IsPriveteGroup: true, Dialog: dialog})
-                        } else if  (notif.type === '2') {
+                        
+                        } else if  (notif.type === '2')  {
+                            
                             this.props.navigation.navigate('ChatGroup', {GroupName: dialog.name, IsPriveteGroup: true, Dialog: dialog, IsPublicGroup: false})
+                        
                         }
                     }
                 }
@@ -66,7 +81,7 @@ class Dashboard extends Component {
               return;
             }
         
-            if(notif.opened_from_tray){
+            if(notif.opened_from_tray) {
 
                 if (notif) {
 
@@ -103,6 +118,13 @@ class Dashboard extends Component {
                     }
             }
           });
+    }
+
+    setOnlineOfflineStatus = () => {
+
+        //Online offline status
+        firebase.database().ref('users/' + this.state.tableId).update({"isonline": 1});
+        firebase.database().ref('users/' + this.state.tableId).onDisconnect().update({"isonline": 0});
     }
 
     _onMenu = () => {

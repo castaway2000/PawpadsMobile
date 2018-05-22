@@ -3,9 +3,10 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, AsyncStorage } from 'react-native';
 import Constant from '../common/Constant'
 import hmacSHA1 from 'crypto-js/hmac-sha1'
-import RNFirebase from 'react-native-firebase';
+
 import RNFetchBlob from 'react-native-fetch-blob'
 
+import RNFirebase from 'react-native-firebase';
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 // Geofire

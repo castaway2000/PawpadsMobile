@@ -91,6 +91,7 @@ class TabChannels extends Component {
             pagetimestamp:null,
             userID: '',
         }
+        
         this.onPullRelease = this.onPullRelease.bind(this);
         this.topIndicatorRender = this.topIndicatorRender.bind(this);
     }
