@@ -6,6 +6,13 @@ import Constant from '../common/Constant'
 import reactNativeKeyboardAwareScrollView from 'react-native-keyboard-aware-scroll-view';
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
 
+import RNFirebase from 'react-native-firebase';
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
+import {CachedImage} from 'react-native-img-cache';
+
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
 // create a component
 class UserProfile extends Component {
     constructor(props){
@@ -14,12 +21,17 @@ class UserProfile extends Component {
             isalert: false,
             token: '',
             username:'',
+            fullname:'',
             userid:'',
             userinfo:'',
             blob_id:'',
             loading:true,
+            tableId:'',
+            profilePictureURL: '',
+            coverPictureURL: '',
         }
     }
+
     componentWillMount() {
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             this.setState({ token: token })
@@ -27,9 +39,27 @@ class UserProfile extends Component {
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
             this.setState({ userid: value })
         })
-        this.downloadProfile()
+        //this.downloadProfile()
+        console.log('UserProfile.js');
+
+        AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+          this.setState({tableId: value })
+          this.downloadProfileFirebase()
+        })
     }
-    downloadProfile(){
+
+    isMyprofile = () => {
+
+        var {params} = this.props.navigation.state
+
+        if (params.UserInfo.id == this.state.userid) {
+            return true
+        }
+
+        return false
+    }
+
+    downloadProfile() {
         AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
             AsyncStorage.getItem(Constant.QB_USERID).then((userid) => {
                 var REQUEST_URL = Constant.USERS_URL + userid + '.json'
@@ -70,46 +100,140 @@ class UserProfile extends Component {
             })
         })
     }
+
+    downloadProfileFirebase() {
+
+      firebase.database()
+      .ref('/users/' + this.state.tableId)
+        .once("value")
+        .then(snapshot => {
+
+          this.setState({
+              loading: false
+          });
+
+          if (snapshot.val()) {
+            var profileObj = snapshot.val();
+
+            if (profileObj) {
+
+              console.log("profileObj IS a a:",profileObj);
+
+              if (profileObj) {
+
+                if(profileObj.custom_data) {
+                    var json = JSON.parse(profileObj.custom_data)
+                    this.setState({
+                        username: profileObj.login,
+                        fullname: profileObj.full_name,
+                        userinfo: profileObj.custom_data,
+                        loading: false,
+                    })
+                } else {
+                  this.setState({
+                      username: profileObj.login,
+                      loading: false,
+                      fullname: profileObj.full_name,
+                  })
+                }
+
+                if (profileObj["content"]) {
+                  for (let item in profileObj["content"]) {
+                    let content = profileObj["content"][item]
+                    let blobid =  content["id"]
+
+                    if (blobid == profileObj["blob_id"]) {
+                      let path = "content/" + profileObj["firid"] + "/" + profileObj["content"][item]["name"]
+                      console.log('path:', path);
+
+                      firebase.storage().ref(path).getDownloadURL().then((url) => {
+                        console.log("url IS a a:",url);
+
+                        this.setState({
+                            profilePictureURL: url
+                        });
+                      })
+                    }
+
+                    if(profileObj.custom_data) {
+                      var json = JSON.parse(profileObj.custom_data)
+
+                      if (blobid == json["backgroundId"]) {
+                        let path = "content/" + profileObj["firid"] + "/" + profileObj["content"][item]["name"]
+                        console.log('path:', path);
+
+                        firebase.storage().ref(path).getDownloadURL().then((url) => {
+                          console.log("url IS a a:",url);
+
+                          this.setState({
+                              coverPictureURL: url
+                          });
+                        })
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        })
+    }
+
     _onback = () => {
         this.props.navigation.goBack()
     }
+
     showUserPhoto() {
         return(
-            <Image source = {{
-                uri: Constant.BLOB_URL + this.state.blob_id + '/download.json',
-                method:'GET',
-                headers: {
-                        'Content-Type': 'application/json',
-                        'QB-Token': this.state.token
-                    },
+            <CachedImage source = {{
+                uri: this.state.profilePictureURL,
                 }}
                 defaultSource = {require('../assets/img/user_placeholder.png')}
-                style = {styles.userphoto}
-            />
+                style = {styles.userphoto}/>
         )
     }
+
     showUserAbout(){
-        if(this.state.userinfo.length > 0){
+        if(this.state.userinfo.length > 0) {
             var json = JSON.parse(this.state.userinfo)
             return(
                 <Text style = {styles.job}>
                     {json.about}
                 </Text>
             )
-        }else{
+        } else {
             return null
         }
     }
+
+    showGender() {
+
+      var json = JSON.parse(this.state.userinfo)
+
+      console.log("this.state.userinfo.usergender ",json.usergender);
+
+      if (json.usergender == "F") {
+        return (
+          <Image source ={require('../assets/img/female_icon.png')} resizeMode = "contain" style = {{width: 17, height: 23}}/>
+        )
+      } else {
+        return (
+          <Image source ={require('../assets/img/male_icon.png')} resizeMode = "contain" style = {{width: 17, height: 23}}/>
+        )
+      }
+    }
+
     showUserAge(){
+
         if(this.state.userinfo.length > 0){
             var json = JSON.parse(this.state.userinfo)
-            if(json.age > 0){
+            if(json.age > 0) {
                 var today = new Date()
                 var currentage = today.getFullYear() - json.age
                 return(
                     <View style = {{flexDirection:'row', alignItems:'center', marginTop: 20}}>
-                        <Image source ={require('../assets/img/male_icon.png')} style = {{width: 17, height: 23}}/>
-                        <Text style = {{color: 'gray'}}> Age :<Text> {currentage}</Text></Text>
+                    {this.showGender()}
+                    <Text style = {{color: 'gray'}}> Age :<Text> {currentage}</Text></Text>
                     </View>
                 )
             }
@@ -117,6 +241,7 @@ class UserProfile extends Component {
             return null
         }
     }
+
     showUserHobby(){
         if(this.state.userinfo.length > 0){
             var json = JSON.parse(this.state.userinfo)
@@ -129,6 +254,7 @@ class UserProfile extends Component {
             return null
         }
     }
+
     showAlertUserName(){
         var {params} = this.props.navigation.state
         return(
@@ -140,10 +266,11 @@ class UserProfile extends Component {
             </Text>
         )
     }
+
     showUserName(){
         return(
             <Text style = {styles.name}>
-                {this.state.username}
+                {this.state.fullname ? this.state.fullname : this.state.username}
             </Text>
         )
     }
@@ -182,13 +309,36 @@ class UserProfile extends Component {
         }
     }
 
+    showBlockButton() {
+
+        if (this.state.isMyprofile == true) {
+            return (
+                <View style = {styles.buttonView}>
+                <TouchableOpacity style = {styles.blockBtn}>
+                    <Text style = {{color: '#de380a'}}>Block user</Text>
+                </TouchableOpacity>
+            </View>
+            )
+        } else {
+            return (
+                null
+            )
+        }
+    }
+
     render() {
         var {params} = this.props.navigation.state
         return (
             <View style = {{backgroundColor: 'white', flex: 1}}>
                 <View style={styles.container}>
                     <View style = {styles.tabView}>
-                        <Image source = {require('../assets/img/app_bar_bg.png')} style = {styles.tabViewBg}/>
+
+                        <CachedImage source = {{
+                            uri: this.state.coverPictureURL,
+                            }}
+                            defaultSource = {require('../assets/img/app_bar_bg.png')}
+                            style = {styles.tabViewBg}/>
+
                         <View style = {styles.backView}>
                             <TouchableOpacity style = {styles.backButton} onPress = {this._onback}>
                                 <Image source = {require('../assets/img/back.png')} style = {{width: 18, height: 18}}/>
@@ -203,15 +353,7 @@ class UserProfile extends Component {
                                 { this.showUserHobby() }
                                 { this.showUserAge() }
                                 { this.showUserAbout() }
-
-                                <View style = {styles.buttonView}>
-                                    {/*<TouchableOpacity style = {styles.removeBtn}>
-                                        <Text style = {{color: Constant.APP_COLOR}}>Remove from friends</Text>
-                                    </TouchableOpacity>*/}
-                                    <TouchableOpacity style = {styles.blockBtn}>
-                                        <Text style = {{color: '#de380a'}}>Block user</Text>
-                                    </TouchableOpacity>
-                                </View>
+                                { this.showBlockButton() }
                             </View>
                     </View>
 
@@ -237,21 +379,20 @@ const styles = StyleSheet.create({
         width: Constant.WIDTH_SCREEN,
         height: Constant.HEIGHT_SCREEN*0.25,
         paddingLeft: 5,
-        marginTop: (Platform.OS == 'ios')? 20 : StatusBar.currentHeight,
+        //marginTop: (Platform.OS == 'ios')? 20 : StatusBar.currentHeight,
 
     },
     backView: {
         width: Constant.WIDTH_SCREEN,
-        height: 60,
+        height: 100,
         flexDirection:'row',
         alignItems:'center',
     },
     tabViewBg: {
-        flex: 1,
-        height: 160,
-        position: 'absolute',
-        top: 0,
-        left: 0,
+      flex: 1,
+      height: Constant.HEIGHT_SCREEN*0.25,
+      width: '110%',
+      position: 'absolute',
     },
     backButton: {
         width: 50,
@@ -292,7 +433,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         position:'absolute',
         left: 0,
-        top: (Platform.OS == 'ios')? Constant.HEIGHT_SCREEN/4-30:Constant.HEIGHT_SCREEN/4-26
+        top: (Platform.OS == 'ios')? Constant.HEIGHT_SCREEN/4-40 : Constant.HEIGHT_SCREEN/4-26
     },
     mscrollView: {
         // flex: 1,
@@ -308,7 +449,10 @@ const styles = StyleSheet.create({
     job: {
         color: Constant.APP_COLOR,
         fontSize: 15,
-        marginTop: 10
+        marginTop: 10,
+        marginLeft:8,
+        marginRight:8,
+        textAlign: 'center',
     },
     detail: {
         color: 'gray',

@@ -9,29 +9,84 @@ import {
 } from 'react-native';
 import Constant from '../../common/Constant'
 
-class ChatBoxUser extends Component {
+import RNFirebase from 'react-native-firebase';
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
-	showMessageBody(){
-		if(this.props.messageImage.length > 0){
+import {CachedImage} from 'react-native-img-cache';
+
+class ChatBoxUser extends Component {
+	constructor(props) {
+        super(props)
+        this.state = {
+					attachmentimageurl: '',
+        }
+    }
+
+	downloadAttachmentimageurl(imageid) {
+		console.log("imageid",imageid);
+		firebase.database()
+				.ref(`/content`)
+				.orderByChild("id")
+				.equalTo(parseInt(imageid))
+				.once("value")
+				.then(snapshot => {
+
+					let contents = snapshot.val()
+
+					if (contents) {
+						var keys = Object.keys(contents);
+
+						if (keys.length > 0) {
+							let content = contents[keys[0]]
+
+							firebase.storage().ref("content/" + content["tableId"] + "/" + content["name"]).getDownloadURL().then((url) => {
+								this.setState({
+									attachmentimageurl: url,
+								});
+							})
+						}
+					}
+				})
+	}
+
+	showMessageBody() {
+
+		if(this.props.messageImage.length > 0) {
+
+			if (this.state.attachmentimageurl == '') {
+				this.downloadAttachmentimageurl(this.props.messageImage[0].id)
+				this.state.attachmentimageurl = ' '
+			}
+
 			return(
-				<Image source = {{
-						uri: Constant.BLOB_URL + this.props.messageImage[0].id + '/download.json',
-						method:'GET',
-						headers: { 
-								'Content-Type': 'application/json',
-								'QB-Token': this.props.token
-							},
+				<CachedImage source = {{
+						uri: this.state.attachmentimageurl,
 						}}
-						style = {styles.messageImg} 
+						style = {styles.messageImg}
 				/>
 			)
-		}
-		else{
+		} else if (this.props.messageSticker) {
+			return(
+				<View style={styles.doctorMessageImageContainer}>
+					<Image source = {{
+							uri: this.props.messageSticker,
+							method:'GET',
+							headers: {
+									'Content-Type': 'application/json',
+									'QB-Token': this.state.token
+								},
+							}}
+							style = {styles.messageImg}
+					/>
+				</View>
+			)
+		} else {
 			return(
 				<Text style={styles.messageText}>{this.props.messageBody}</Text>
 			)
 		}
 	}
+
 	render() {
 		const {userMessageContainer, messagesContainer, messageTime, messageText} = styles;
 		return (

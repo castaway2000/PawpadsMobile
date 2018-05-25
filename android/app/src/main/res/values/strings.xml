@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pawpads</string>
+    <string name="app_name">PawPads</string>
     <string name="facebook_app_id">400576850361462</string>
     <string name="fb_login_protocol_scheme">fb400576850361462</string>
 </resources>

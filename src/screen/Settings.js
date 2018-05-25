@@ -1,14 +1,18 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight, AsyncStorage } from 'react-native';
+import { Alert, View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, TouchableHighlight, AsyncStorage } from 'react-native';
 import Constant from '../common/Constant'
 // import CheckBox from 'react-native-icon-checkbox';
 import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
 import {Button} from 'native-base';
 import {colors} from '../actions/const';
 
+import RNFirebase from 'react-native-firebase';
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
 // create a component
 class Settings extends Component {
+
     constructor(props) {
         super(props);
         this.state = {
@@ -19,12 +23,20 @@ class Settings extends Component {
             isHighSelected: false,
             isMediumSelected: true,
             isLowSelected: false,
-            isTogglepushSelected: false,
+            isTogglepushSelected: true,
             isToggleMessagingSelected: true,
             searchRange: '60',
+			      tableId:'',
         };
     }
+
     componentWillMount() {
+
+      AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+        console.log("tableId is:",value);
+        this.setState({tableId: value })
+      })
+
         AsyncStorage.getItem(Constant.SETTINGS_DISTANCE_UNIT).then((value) => {
             if(value == 'km'){
                 this.setState({
@@ -38,12 +50,16 @@ class Settings extends Component {
                 })
             }
         })
+
         AsyncStorage.getItem(Constant.SETTINGS_RANGE).then((value) => {
+
             if(value){
                 this.setState({ searchRange: value })
             }
         })
+
         AsyncStorage.getItem(Constant.SETTINGS_GPS_ACCURACY).then((value) => {
+
             if(value == 'High'){
                 this.setState({
                     isHighSelected: true,
@@ -56,7 +72,7 @@ class Settings extends Component {
                     isMediumSelected: true,
                     isLowSelected: false,
                 })
-            }else{
+            } else {
                 this.setState({
                     isHighSelected: false,
                     isMediumSelected: false,
@@ -64,19 +80,47 @@ class Settings extends Component {
                 })
             }
         })
+
+        AsyncStorage.getItem(Constant.SETTINGS_TOGGLE_PUSH_NOTIFICATIONS).then((value) => {
+          if (value) {
+            if(value == "true"){
+                this.setState({ isTogglepushSelected: true })
+            } else {
+              this.setState({ isTogglepushSelected: false })
+            }
+          } else {
+              this.setState({ isTogglepushSelected: true })
+          }
+        })
+
+        AsyncStorage.getItem(Constant.SETTINGS_TOGGLE_MESSAGING_POPUPS).then((value) => {
+
+          if (value) {
+            if(value == "true" ){
+                this.setState({ isToggleMessagingSelected: true })
+            } else {
+              this.setState({ isToggleMessagingSelected: false })
+            }
+          } else {
+            this.setState({ isToggleMessagingSelected: true })
+          }
+        })
     }
+
     handleSelectedKilometers = (checked) => {
         this.setState({
             isKilometerSelected: true,
             isMilesSelected: false
         });
     }
+
     handleSelectedMiles = (checked) => {
         this.setState({
             isKilometerSelected: false,
             isMilesSelected: true
         });
     }
+
     handleSelectedHigh = (checked) => {
         this.setState({
             isHighSelected: true,
@@ -84,6 +128,7 @@ class Settings extends Component {
             isLowSelected: false
         })
     }
+
     handleSelectedMedium = (checked) => {
         this.setState({
             isHighSelected: false,
@@ -91,6 +136,7 @@ class Settings extends Component {
             isLowSelected: false
         })
     }
+
     handleSelectedLow = (checked) => {
         this.setState({
             isHighSelected: false,
@@ -98,43 +144,94 @@ class Settings extends Component {
             isLowSelected: true
         })
     }
+
     handleSelectedPush = (checked) => {
+      if (this.state.isTogglepushSelected == false) {
         this.setState({
-            isTogglepushSelected: checked,
+            isTogglepushSelected: true,
         })
+
+        var updatescontent2 = {};
+        updatescontent2['/users/' + this.state.tableId + '/' + "isTogglepushSelected"] = 'true'
+        firebase.database().ref().update(updatescontent2)
+
+      } else {
+        this.setState({
+            isTogglepushSelected: false,
+        })
+
+        var updatescontent2 = {};
+        updatescontent2['/users/' + this.state.tableId + '/' + "isTogglepushSelected"] = 'false'
+        firebase.database().ref().update(updatescontent2)
+      }
     }
+
     handleSelectedMessaging = (checked) => {
-        this.setState({
-            isToggleMessagingSelected: checked
-        })
+
+        if (this.state.isToggleMessagingSelected == false) {
+          this.setState({
+              isToggleMessagingSelected: true,
+          })
+        } else {
+          this.setState({
+              isToggleMessagingSelected: false,
+          })
+        }
     }
 
     _onback = () => {
+
         if(this.state.isKilometerSelected){
             AsyncStorage.setItem(Constant.SETTINGS_DISTANCE_UNIT, 'km');
         }
+
         if(this.state.isMilesSelected){
             AsyncStorage.setItem(Constant.SETTINGS_DISTANCE_UNIT, 'miles');
         }
+
         AsyncStorage.setItem(Constant.SETTINGS_RANGE, this.state.searchRange);
         if(this.state.isHighSelected){
             AsyncStorage.setItem(Constant.SETTINGS_GPS_ACCURACY, 'High');
         }
+
         if(this.state.isMediumSelected){
             AsyncStorage.setItem(Constant.SETTINGS_GPS_ACCURACY, 'Medium');
         }
+
         if(this.state.isLowSelected){
             AsyncStorage.setItem(Constant.SETTINGS_GPS_ACCURACY, 'Low');
         }
+
         if(this.state.isTogglepushSelected){
-            AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_PUSH_NOTIFICATIONS, 'push_notification');
+            AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_PUSH_NOTIFICATIONS, "true");
+        } else {
+          AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_PUSH_NOTIFICATIONS, "false");
         }
+
         if(this.state.isToggleMessagingSelected){
-            AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_MESSAGING_POPUPS, 'messaging_popups')
+            AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_MESSAGING_POPUPS, "true");
+        } else {
+          AsyncStorage.setItem(Constant.SETTINGS_TOGGLE_MESSAGING_POPUPS, "false");
         }
 
         this.props.navigation.goBack()
     }
+
+    deleteAccount = () => {
+      this.popupDialog.dismiss()
+
+      var updatescontent2 = {};
+      updatescontent2['/users/' + this.state.tableId + '/' + "isDeleted"] = 'true'
+      firebase.database().ref().update(updatescontent2)
+
+      Alert.alert('Your account deleted successfully.','',
+      [
+        {text: 'OK', onPress: () => this.props.navigation.navigate('Logout')},
+      ],
+  {cancelable: false}
+)
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -166,8 +263,7 @@ class Settings extends Component {
                                     value = {this.state.searchRange}
                                     placeholderTextColor = {Constant.APP_COLOR}
                                     keyboardType = 'numeric'
-                                    underlineColorAndroid = 'transparent'
-                                />
+                                    underlineColorAndroid = 'transparent'/>
                                 <Image source = {require('../assets/img/pencil_icon.png')} style = {styles.icon}/>
                                 <View style = {styles.lineBottom}/>
                             </View>
@@ -177,7 +273,7 @@ class Settings extends Component {
                                 <Image source = {this.state.isHighSelected? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
                                 <Text style = {styles.settingsItem}>High</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style = {{flexDirection: 'row', width: 200, height: 40, alignItems: 'center'}} onPress = {this.isMediumSelected}>
+                            <TouchableOpacity style = {{flexDirection: 'row', width: 200, height: 40, alignItems: 'center'}} onPress = {this.handleSelectedMedium}>
                                 <Image source = {this.state.isMediumSelected? require('../assets/img/radio-button-checked.png'): require('../assets/img/radio-button-unchecked.png')}  style = {styles.checkBox}/>
                                 <Text style = {styles.settingsItem}>Medium</Text>
                             </TouchableOpacity>
@@ -218,7 +314,7 @@ class Settings extends Component {
                         <Text style = {{textAlign:'center', fontWeight:'bold', marginTop: 10}}>Are you sure you want to delete your account?</Text>
                         <Text style = {{textAlign:'center', color:'#545454', fontSize: 13, marginTop: 10}}>if you delete your account you will permanently loose your profile, photos and messages.</Text>
                         <View style = {{width:Constant.WIDTH_SCREEN*0.7, height:1, backgroundColor:'#e4e4e4', marginTop: 15}}/>
-                        <TouchableOpacity style = {{marginTop: 12}}>
+                        <TouchableOpacity style = {{marginTop: 12}} onPress = {() => this.deleteAccount()}>
                             <Text style = {{textAlign:'center', color:'#fb5e33'}}>Delete</Text>
                         </TouchableOpacity>
                     </View>

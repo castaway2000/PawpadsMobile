@@ -11,6 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import reactNativeKeyboardAwareScrollView from 'react-native-keyboard-aware-scroll-view';
 
+import GifScroller from '../../components/ThirdParty/GifScroller.js';
 
 class ChatMessageBox extends Component {
 	constructor (props) {
@@ -45,7 +46,23 @@ class ChatMessageBox extends Component {
 			this.props.sendMessage(text);
 			this.setState({
 				text: '',
-				height: 40
+				height: 40,
+				showGif: false,
+			});
+		}
+	}
+
+	onGifButtonPress () {
+
+		if (this.state.showGif) {
+			this.setState({ showGif: false } )
+			this.setState({
+				heightIOS: (Platform.OS === 'ios'? 50 : 80)
+			});
+		} else {
+			this.setState({ showGif: true } )
+			this.setState({
+				heightIOS:  this.state.heightIOS  + (Platform.OS === 'ios'? 100 : 100)
 			});
 		}
 	}
@@ -55,6 +72,30 @@ class ChatMessageBox extends Component {
 			height: height
 		});
 	}
+
+	giphyPicked(url) {
+		console.log(url);
+
+		this.props.giphyPicked(url)
+
+		this.setState({ showGif: false } )
+		this.setState({
+			heightIOS: 50
+		});
+	}
+
+	renderGif = () => {
+		const {textInputStyle} = styles;
+
+		if (this.state.showGif) {
+			return (
+				<View>
+					<GifScroller inputText={this.state.text}  handleGifSelect={ (url) => this.giphyPicked(url) }/>
+				</View> )
+			} else {
+				return
+			}
+		}
 
 	renderTextInput () {
 		const {height} = this.state;
@@ -68,6 +109,7 @@ class ChatMessageBox extends Component {
 				returnKeyType='go'
 				placeholder={'Type a message...'}
 				multiline={true}
+				keyboardType='default'
 				editable={true}
 				onChangeText={(text) => this.onTextChange(text)}
 				onSubmitEditing={event => this.onButtonPress(event.nativeEvent.text)}
@@ -100,35 +142,35 @@ class ChatMessageBox extends Component {
 		}
 	}
 
-	// _sendFile = () => {
-	// 	this.props.onPressFile
-	// }
-
 	render () {
 		const {container, buttonContainer,graphicIcon} = styles;
 		const {heightIOS} = this.state;
 		return (
-			<View style={Platform.OS === 'ios' ? [container, {height: (heightIOS+40)}] : container}>
+			<View style={Platform.OS === 'ios' ? [container, {height: (heightIOS+40)}] : [container, {height: (heightIOS+40)}]}>
+			{this.renderGif()}
 				<View style = {{flexDirection:'row', alignItems:'center'}}>
 					{this.renderTextInput()}
 					<TouchableOpacity style={buttonContainer} onPress={() => this.onButtonPress(this.state.text)}>
 						{this.renderButtonSend()}
 					</TouchableOpacity>
 				</View>
+
 				<View style = {{flexDirection:'row'}}>
 					<TouchableOpacity onPress= {this.props.onPressFile}>
 						<Image source = {require('../../assets/img/paper_clip.png')} style = {graphicIcon}/>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={() => this.onButtonPress(this.state.text)}>
+					{/*<TouchableOpacity onPress= {this.props.onPressEmoji}>
 						<Image source = {require('../../assets/img/smiling-emoticon-square-face.png')} style = {graphicIcon}/>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => this.onButtonPress(this.state.text)}>
+					</TouchableOpacity>*/}
+					<TouchableOpacity onPress={() => this.onGifButtonPress()}>
 						<Image source = {require('../../assets/img/giphy.png')} style = {graphicIcon}/>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={() => this.onButtonPress(this.state.text)}>
+					{/*
+					<TouchableOpacity onPress= {this.props.onPressAdd}>
 						<Image source = {require('../../assets/img/add_imoji.png')} style = {graphicIcon}/>
-					</TouchableOpacity>
+					</TouchableOpacity>*/}
 				</View>
+
 			</View>
 		);
 	}

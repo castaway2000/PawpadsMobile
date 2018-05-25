@@ -1,18 +1,23 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, Switch,AsyncStorage, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, Alert, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, Switch, AsyncStorage, ActivityIndicator } from 'react-native';
 import { Container, Header, Content, Button, List, ListItem, } from 'native-base';
 import Constant from '../common/Constant'
 import reactNativeKeyboardAwareScrollView from 'react-native-keyboard-aware-scroll-view';
 
-const participants_datas = []
+import PopupDialog, { SlideAnimation, DialogTitle } from 'react-native-popup-dialog';
 
-var isBusy = false;
-var groupName = '';
-var groupType = '';
-var groupParticipants = '';
-var adminName = '';
-var userPhotoURL = ''
+import RNFirebase from 'react-native-firebase';
+const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
+
+var ImagePicker = require("react-native-image-picker");
+
+import {CachedImage} from 'react-native-img-cache';
+import { NavigationActions } from 'react-navigation';
+//Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
+var isCamera = false;
+var isGallery = false;
 
 // create a component
 class ChatGroupEdit extends Component {
@@ -22,8 +27,8 @@ class ChatGroupEdit extends Component {
             groupName : '',
             groupType : '',
             groupParticipants : '',
-            adminName : '',
             userPhotoURL: '',
+            userPhotoPath:'',
             token: '',
             people: [],
             isparticipantsLayout: true,
@@ -35,75 +40,99 @@ class ChatGroupEdit extends Component {
             blob_id:'',
             qbusername:'',
             loading: false,
+            participants_datas:[],
+            tableId:'',
+            isGroupUpdated:false,
         }
     }
+
     componentWillMount() {
         this.init()
         // StatusBar.setHidden(true);
     }
 
-    init(){
-        this.setState({ loading: true })
+    init() {
+
+      this.state.userPhotoURL = ""
+
+        this.setState({userPhotoURL: "" })
+
         var {params} = this.props.navigation.state
-        
-        AsyncStorage.getItem(Constant.QB_TOKEN).then((token) => {
-            AsyncStorage.getItem(Constant.QB_USERID).then((currentUserId) => {
-                if(params.Dialog != null && params.Dialog.type == 1){
-                    this.setState({ isparticipantsLayout: false, token: token })
-                    if(params.Dialog.user_id != currentUserId){
-                        this.setState({ isleaveAndDeleteBtn: false,  })
-                    }
-                }
-                if(params.Dialog != null && currentUserId != params.Dialog.user_id){
-                    this.setState({
-                        isgroundAvatar: false,
-                        isphotoAvatarIcon: false,
-                        isgroupTitleText: false,
-                        isSaveBtn: false,
-                        token: token
-                    })
-                }
-                this.loadData()
-            })
+
+        AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+          this.setState({tableId: value})
         })
-    }
+
+        AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
+
+          this.setState({ userid: value})
+
+            if(params.Dialog != null && params.Dialog.type == 1) {
+                this.setState({ isparticipantsLayout: false })
+                if(params.Dialog.user_id == value){
+                    this.setState({ isleaveAndDeleteBtn: true,})
+                } else {
+                  this.setState({ isleaveAndDeleteBtn: false,})
+                }
+            }
+
+            if(params.Dialog != null && value != params.Dialog.user_id){
+                this.setState({
+                    isgroundAvatar: false,
+                    isphotoAvatarIcon: false,
+                    isgroupTitleText: false,
+                    isSaveBtn: false,
+                })
+            }
+
+            this.loadData()
+        })
+      }
 
     loadData(){
         var {params} = this.props.navigation.state
-        this.loadQBUserProfile(params.Dialog.user_id)
+        this.loadQBUserProfileFirebase(params.Dialog.user_id)
         if(params.Dialog == null) return null
-        isBusy = true
-        groupName = params.Dialog.name
-        if(params.Dialog.type == 2){
-            groupType = 'Private Group'
-        }else{
-            groupType = 'Channel'
-        }
-        var ocupantsSize = params.Dialog.occupants_ids.length
-        if(ocupantsSize == 0){
-            groupParticipants = 'Participants (0)'
-        }else{
-            groupParticipants = 'Participants (' + (ocupantsSize-1) + ')' 
+
+        this.setState({groupName:params.Dialog.name})
+
+        if(params.Dialog.type == 2) {
+            this.setState({groupType:'Private Group'})
+        } else {
+            this.setState({groupType:'Channel'})
         }
 
-        this.getUsers(params.Dialog.occupants_ids)
-        if(params.Dialog.photo != null){
-            userPhotoURL = params.Dialog.photo
+        
+        var ocupants = params.Dialog.occupants_ids
+        if (ocupants) {
+            var ocupantsSize = params.Dialog.occupants_ids.length
+            if (ocupantsSize == 0) {
+                this.setState({groupParticipants: 'Participants (0)'})
+            } else {
+                this.setState({groupParticipants: 'Participants (' + (ocupantsSize-1) + ')'})
+            }
+        } else {
+            this.setState({groupParticipants: 'Participants (0)'})
+        }
+
+
+        this.getUsersFirebase(params.Dialog.occupants_ids)
+        if(params.Dialog.profileurl != null){
+            userPhotoURL = params.Dialog.profileurl
+            this.setState({userPhotoURL: userPhotoURL})
         }
         this.setState({
-            groupName : groupName,
-            groupType : groupType,
-            groupParticipants : groupParticipants,
-            userPhotoURL: userPhotoURL,
+            groupName : this.state.groupName,
+            groupType : this.state.groupType,
+            groupParticipants : this.state.groupParticipants,
         })
-
     }
 
     loadQBUserProfile(userid){
         var REQUEST_URL = Constant.USERS_URL + userid + '.json'
         fetch(REQUEST_URL, {
             method: 'GET',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'QB-Token': this.state.token
             },
@@ -123,41 +152,136 @@ class ChatGroupEdit extends Component {
                     loading: false ,
                 })
             }
-            
+
         }).catch((e) => {
             console.log(e)
-        })   
+        })
     }
 
-    getUsers(userIdsList){
-        participants_datas = []
+    loadQBUserProfileFirebase(userid) {
+      firebase.database()
+					.ref('/users')
+					.orderByChild("id")
+					.equalTo(userid.toString())
+					.once("value")
+					.then(snapshot => {
+
+            let profileObj =  snapshot.val();
+
+            if (profileObj) {
+              let keys = Object.keys(profileObj);
+
+              var profile = null;
+              if (keys.length > 0) {
+                profile = profileObj[keys[0]]
+              }
+
+              if (profile) {
+                if(profile.full_name) {
+                    this.setState({
+                        qbusername: profile.full_name,
+                        loading: false,
+                    })
+                } else {
+                    this.setState({
+                        qbusername: profile.login,
+                        loading: false ,
+                    })
+                }
+
+                if (profile["content"]) {
+                  for (let item in profile["content"]) {
+                    let content = profile["content"][item]
+                    let blobid =  content["id"]
+
+                    if (blobid == profile["blob_id"]) {
+                      let path = "content/" + profile["firid"] + "/" + profile["content"][item]["name"]
+                      console.log('path:', path);
+
+                      firebase.storage().ref(path).getDownloadURL().then((url) => {
+                        this.setState({
+                            blob_id: url
+                        })
+                      })
+                    }
+                  }
+                }
+              }
+
+            } else {
+
+            }
+
+					})
+    }
+
+    getUsers(userIdsList) {
+        this.state.participants_datas = []
         var {params} = this.props.navigation.state
         if(userIdsList == null || userIdsList.length == 0){
             return null
         }
         var index = userIdsList.indexOf(params.Dialog.user_id)
         userIdsList.splice(index, 1)
-        isBusy = false
+
         userIdsList.map((item, index) => {
             var REQUEST_URL = Constant.USERS_URL +  item.blob_id + '.json'
             fetch(REQUEST_URL, {
                 method: 'GET',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'QB-Token': this.state.token
                 },
             })
             .then((response) => response.json())
             .then((responseData) => {
-                participants_datas.push(responseData)
+                this.state.participants_datas.push(responseData)
             }).catch((e) => {
                 console.log(e)
             })
         })
-
     }
 
-    showLoading(){
+    getUsersFirebase(userIdsList) {
+        var {params} = this.props.navigation.state
+        if(userIdsList == null || userIdsList.length == 0){
+            return null
+        }
+
+        var index = userIdsList.indexOf(params.Dialog.user_id)
+        userIdsList.splice(index, 1)
+
+        userIdsList.map((item, index) => {
+          firebase.database()
+    					.ref('/users')
+    					.orderByChild("id")
+    					.equalTo(item.toString())
+    					.once("value")
+    					.then(snapshot => {
+
+                let profileObj =  snapshot.val();
+
+                if (profileObj) {
+                  let keys = Object.keys(profileObj);
+
+                  var profile = null;
+                  if (keys.length > 0) {
+                    profile = profileObj[keys[0]]
+                  }
+
+                  if (profile) {
+                    this.state.participants_datas.push(profile)
+                  }
+
+                } else {
+
+                }
+
+    					})
+        })
+    }
+
+    showLoading() {
         if (this.state.loading) {
 			return (
 				<View style={styles.loadingView}>
@@ -165,11 +289,345 @@ class ChatGroupEdit extends Component {
 				</View>
 			);
 		}
-    }
+  }
 
     _onback = () => {
-        this.props.navigation.goBack()
+      const { navigation } = this.props;
+
+    	if (this.props.navigation.state.params.TabChannelsRef) {
+    		this.props.navigation.state.params.TabChannelsRef.onRefresh()
+    	}
+
+      if (this.props.navigation.state.params.ChatGroupVC) {
+        let vc = this.props.navigation.state.params.ChatGroupVC
+
+        vc.onRefresh()
+
+        //vc.props.navigation.state.params.GroupName = "test test"
+      }
+
+    	this.props.navigation.goBack()
     }
+
+    _onChooseProfilePicture = () => {
+      this.popupDialogCamera.show()
+    }
+
+    onCamera = () => {
+      isCamera = true
+      isGallery = false
+      this.popupDialogCamera.dismiss()
+      //this.getAttachmentID()
+      this.showPicker()
+    }
+
+    onGallery = () => {
+      isCamera = false
+      isGallery = true
+      this.popupDialogCamera.dismiss()
+      this.showPicker()
+    }
+
+    showPicker() {
+
+      const options = {
+        quality: 1.0,
+        maxWidth: 200,
+        maxHeight: 200,
+        storageOptions: {
+        skipBackup: true,
+        cameraRoll: true,
+        waitUntilSaved: true
+        }
+      }
+
+      if(isCamera) {
+        ImagePicker.launchCamera(options, (response)  => {
+          console.log('Response = ', response);
+
+          if (response.didCancel) {
+            console.log('User cancelled image picker');
+          }
+          else if (response.error) {
+            console.log('ImagePicker Error: ', response.error);
+          }
+          else if (response.customButton) {
+            console.log('User tapped custom button: ', response.customButton);
+          } else {
+            var source = ''
+            console.log("ProfileScreen.js Platform: ", Platform);
+            if (Platform.OS === 'ios') {
+              source = response.uri.replace('file://', '')
+            } else {
+              source = response.uri
+            }
+            console.log(source)
+
+            this.setState ({ userPhotoURL: source, userPhotoPath: source})
+          }
+        });
+      } else {
+        ImagePicker.launchImageLibrary(options, (response)  => {
+          console.log('Response = ', response);
+
+          // console.log('Response Data = ', response.data);
+
+          if (response.didCancel) {
+            console.log('User cancelled image picker');
+          }
+          else if (response.error) {
+            console.log('ImagePicker Error: ', response.error);
+          }
+          else if (response.customButton) {
+            console.log('User tapped custom button: ', response.customButton);
+          } else {
+            var source = ''
+            if (Platform.OS === 'ios') {
+              source = response.uri.replace('file://', '');
+            } else {
+              source = response.uri;
+            }
+            console.log(source)
+            this.setState ({ userPhotoURL: source, userPhotoPath: source})
+
+          }
+        });
+      }
+    }
+
+    onCancelCamera = () => {
+      this.popupDialogCamera.dismiss()
+    }
+
+    _onSaveProfile = () => {
+
+      this.setState({ loading: true })
+
+      var {params} = this.props.navigation.state
+
+      if (params.IsCreated) {
+        if (params.IsCreated == true) {
+
+          var updates = {};
+
+          updates['/dialog/group-chat-public/' + params.Dialog._id] = params.Dialog;
+
+          var ref = firebase.database().ref().update(updates).then( () => {
+
+            params.IsCreated = false
+
+            console.log("Write completed")
+
+            this.updateGroup()
+
+          }).catch(function(error) {
+            console.error("Write failed: "+error)
+          });
+        }
+      } else {
+        this.updateGroup()
+      }
+
+      /*
+
+      var {params} = this.props.navigation.state
+      this.setState({ loading: true })
+
+      if (this.state.userPhotoPath != '') {
+        let imagename = "groutphoto_" + params.Dialog._id +".jpg"
+
+        firebase.storage().ref("content/" + this.state.tableId + "/" + imagename).putFile(this.state.userPhotoURL).then(file => {
+
+          console.log("Image uploaded successfully.",file);
+
+          //Update content
+          var milliseconds = (new Date).getTime();
+          var date = new Date();
+
+          var updatescontent = {};
+          var newKeycontent = firebase.database().ref().child('content').push().key;
+
+          let content = {
+            "blob_status" : "complete",
+            "content_type" : "image/jpeg",
+            "created_at" : date.toISOString(),
+            "id" : milliseconds,
+            "name" : imagename,
+            "public" : false,
+            "set_completed_at" : date.toISOString(),
+            "size" : 0,
+            "tableId" : this.state.tableId,
+            "uid" : this.uidString(),
+            "updated_at" : date.toISOString(),
+            "userid" : this.state.userid
+          }
+
+          backgroundId = milliseconds;
+
+            //Update User content
+          updatescontent['/content/' + newKeycontent] = content;
+          firebase.database().ref().update(updatescontent)
+
+          var newKeyUsercontent = firebase.database().ref().child('users').child('content').push().key;
+
+          var updatescontent1 = {};
+          updatescontent1['/users/' + this.state.tableId  + '/content/'+ newKeyUsercontent] = content;
+          firebase.database().ref().update(updatescontent1)
+
+          //Update custom_data
+          var updatescontent2 = {};
+          updatescontent2['/dialog/' + params.Dialog._id + '/photo'] = milliseconds.toString()
+          firebase.database().ref().update(updatescontent2)
+
+          params.Dialog.name = this.state.groupName
+
+          this.setState({ loading: false, isGroupUpdated:true})
+
+
+          alert("Group Updated Successfully!")
+        });
+      } else {
+
+        //Update custom_data
+        var updatescontent2 = {};
+        updatescontent2['/dialog/' + params.Dialog._id + '/name' ] = this.state.groupName
+        firebase.database().ref().update(updatescontent2)
+
+        params.Dialog.name = this.state.groupName
+
+        this.setState({ loading: false, isGroupUpdated:true})
+
+
+        alert("Group Updated Successfully!")
+      }*/
+    }
+
+    updateGroup = () => {
+      var {params} = this.props.navigation.state
+      this.setState({ loading: true })
+
+      if (this.state.userPhotoPath != '') {
+        let imagename = "groutphoto_" + params.Dialog._id +".jpg"
+
+        firebase.storage().ref("content/" + this.state.tableId + "/" + imagename).putFile(this.state.userPhotoURL).then(file => {
+
+          console.log("Image uploaded successfully.",file);
+
+          //Update content
+          var milliseconds = (new Date).getTime();
+          var date = new Date();
+
+          var updatescontent = {};
+          var newKeycontent = firebase.database().ref().child('content').push().key;
+
+          let content = {
+            "blob_status" : "complete",
+            "content_type" : "image/jpeg",
+            "created_at" : date.toISOString(),
+            "id" : milliseconds,
+            "name" : imagename,
+            "public" : false,
+            "set_completed_at" : date.toISOString(),
+            "size" : 0,
+            "tableId" : this.state.tableId,
+            "uid" : this.uidString(),
+            "updated_at" : date.toISOString(),
+            "userid" : this.state.userid
+          }
+
+          backgroundId = milliseconds;
+
+            //Update User content
+          updatescontent['/content/' + newKeycontent] = content;
+          firebase.database().ref().update(updatescontent)
+
+          var newKeyUsercontent = firebase.database().ref().child('users').child('content').push().key;
+
+          var updatescontent1 = {};
+          updatescontent1['/users/' + this.state.tableId  + '/content/'+ newKeyUsercontent] = content;
+          firebase.database().ref().update(updatescontent1)
+
+          //Update custom_data
+          var updatescontent2 = {};
+          updatescontent2['/dialog/group-chat-public/' + params.Dialog._id + '/photo'] = milliseconds.toString()
+          firebase.database().ref().update(updatescontent2)
+
+          params.Dialog.name = this.state.groupName
+
+          this.setState({ loading: false, isGroupUpdated:true})
+
+
+          alert("Group Updated Successfully!")
+        });
+      } else {
+
+        //Update custom_data
+        var updatescontent2 = {};
+        updatescontent2['/dialog/group-chat-public/' + params.Dialog._id + '/name' ] = this.state.groupName
+        firebase.database().ref().update(updatescontent2)
+
+        params.Dialog.name = this.state.groupName
+
+        this.setState({ loading: false, isGroupUpdated:true})
+
+
+        alert("Group Updated Successfully!")
+    }
+  }
+
+    uidString() {
+      return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  onRemoveChannel = () => {
+    Alert.alert(
+      'Alert',
+      'Are you seure you want to delete this group?',
+      [
+        {text: 'Delete', onPress: () => {
+          this.deleteGroup()
+        }},
+        {text: 'Cancel', onPress: () => {
+
+        }, style: 'cancel'},
+      ],
+      { cancelable: false }
+    )
+  }
+
+  deleteGroup = () => {
+
+    this.setState({ loading: true })
+
+    var {params} = this.props.navigation.state
+
+    var ref = firebase.database().ref(`/dialog/group-chat-public`)
+
+    ref.child(params.Dialog._id).remove();
+
+    setTimeout(()=>{
+      this.setState({ loading: false })
+      alert("Channel deleted successfully")
+      this.props.navigation.goBack("Login")
+
+
+      const navigateAction = NavigationActions.navigate({
+        routeName: 'Dashboard',
+
+        params: {},
+
+        action: NavigationActions.navigate({ routeName: 'Dashboard' }),
+      });
+
+      this.props.navigation.dispatch(navigateAction);
+
+    }, 500)
+
+  }
+
     render() {
         return (
             <View style={styles.container}>
@@ -182,22 +640,23 @@ class ChatGroupEdit extends Component {
                             </TouchableOpacity>
                             {this.state.isSaveBtn?
                                 <View style = {styles.saveView}>
-                                    <TouchableOpacity style = {styles.backButton} onPress = {this._onback}>
+                                    <TouchableOpacity style = {styles.backButton} onPress = {this._onSaveProfile}>
                                         <Text style = {styles.savetxt}>Save</Text>
                                     </TouchableOpacity>
                                 </View> :
                                 null
                             }
                         </View>
-                        
+
                         <View style = {styles.bodyView}>
+
                             {this.state.isphotoAvatarIcon?
-                                <TouchableOpacity  style = {{marginTop: 60}}>
+                                <TouchableOpacity  style = {{marginTop: 60}} onPress = {this._onChooseProfilePicture}>
                                     <Image source = {require('../assets/img/camera_grey_icon.png')} style = {{width: 24, height: 17,}}/>
                                 </TouchableOpacity>:
                                 <Image source = {require('../assets/img/camera_grey_icon.png')} style = {{width: 24, height: 17,marginTop: 60}}/>
                             }
-                            
+
                             <View style = {styles.cellView}>
                                 <TextInput
                                     editable = {this.state.isphotoAvatarIcon? true: false}
@@ -215,8 +674,8 @@ class ChatGroupEdit extends Component {
                                     <Image source = {require('../assets/img/pencil_icon.png')} style = {styles.icon}/>:
                                     null
                                 }
-                                
                             </View>
+
                             <View style = {styles.cellView}>
                                 <Text style = {{fontSize: 18, color:'#515151'}}>{this.state.groupType}</Text>
                                 {/*<Switch
@@ -233,67 +692,135 @@ class ChatGroupEdit extends Component {
                             </View>
 
                             <View style = {styles.chatadminView}>
-                                <Image source = {{
-                                    uri: Constant.BLOB_URL + this.state.blob_id + '/download.json',
-                                    method:'GET',
-                                    headers: { 
-                                            'Content-Type': 'application/json',
-                                            'QB-Token': this.state.token
-                                        },
+                                <CachedImage source = {{
+                                    uri: this.state.blob_id,
                                     }}
                                     defaultSource = {require('../assets/img/user_placeholder.png')}
                                     style = {styles.menuIcon} />
                                 <Text style = {styles.menuItem}>{this.state.qbusername}</Text>
                             </View>
 
-                            
-                            {this.state.isparticipantsLayout? 
+                            {this.state.isparticipantsLayout?
                                 <View style = {styles.cellCategoryView}>
                                     <Text style = {styles.chatText}>{this.state.groupParticipants}</Text>
                                 </View>:
                                 null
                             }
-                            
+
                             <List
                                 scrollEnabled = {false}
-                                style = {styles.mList} 
-                                dataArray={participants_datas}
+                                style = {styles.mList}
+                                dataArray={this.state.participants_datas}
                                 renderRow={data =>
                                     <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile', { GroupName: data.login})} style = {styles.cellItem}>
-                                        <Image source = {{
-                                            uri: Constant.BLOB_URL + data.blob_id + '/download.json',
-                                            method:'GET',
-                                            headers: { 
-                                                    'Content-Type': 'application/json',
-                                                    'QB-Token': this.state.token
-                                                },
-                                            }}
-                                            defaultSource = {require('../assets/img/user_placeholder.png')}
-                                            style = {styles.menuIcon} />
+                                      {this.showCellImage(data)}
                                         <Text style = {styles.menuItem}>{data.full_name? data.full_name: data.login}</Text>
                                     </ListItem>
                                 }
                             >
                             </List>
+                            
+                            { this.state.isleaveAndDeleteBtn?
+                            <View style = {styles.buttonView}>
+                                {/*<TouchableOpacity style = {styles.removeBtn}>
+                                    <Text style = {{color: Constant.APP_COLOR}}>Remove from friends</Text>
+                                </TouchableOpacity>*/}
+                                <TouchableOpacity style = {styles.blockBtn} onPress = {this.onRemoveChannel}>
+                                    <Text style = {{color: '#de380a'}}>Leave and delete</Text>
+                                </TouchableOpacity>
+                            </View> : null
+                          }
                         </View>
-                        
+
+                            { this.state.isleaveAndDeleteBtn?
+                        <TouchableOpacity onPress = {this._onChooseProfilePicture} style = {styles.userphotoTouch} >
+
                         <Image source = {{
-                            uri: Constant.BLOB_URL + this.state.userPhotoURL + '/download.json',
-                            method:'GET',
-                            headers: { 
-                                    'Content-Type': 'application/json',
-                                    'QB-Token': this.state.token
-                                },
+                            uri: this.state.userPhotoURL ,
                             }}
                             defaultSource = {require('../assets/img/user_placeholder.png')}
                             style = {styles.userphoto} />
+                            
+                        </TouchableOpacity> :
+                        <Image source = {{
+                            uri: this.state.userPhotoURL ,
+                            }}
+                            defaultSource = {require('../assets/img/user_placeholder.png')}
+                            style = {styles.userphotoTouch} />
+                          }
+
+
+
                     </View>
                 </ScrollView>
                 {this.showLoading()}
+                
+                <PopupDialog
+                            ref={(popupDialog) => { this.popupDialogCamera = popupDialog; }}
+                            //dialogStyle = {styles.dialogView}
+                            overlayBackgroundColor = {'black'}
+                            overlayOpacity = {0.9}
+                            height = {200}
+                            width = {280}
+                            >
+                            <View style = {{backgroundColor:'white', padding: 15, borderRadius: 10}}>
+                                <Text style = {{textAlign:'left', margin: 10, fontSize: 20, fontWeight: 'bold'}}>Select file</Text>
+                                <TouchableOpacity onPress = {this.onCamera}>
+                                    <Text style = {{textAlign:'left', fontSize: 17, marginTop: 10, marginLeft: 10}}>Take from camera</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress = {this.onGallery}>
+                                    <Text style = {{textAlign:'left', fontSize: 17, marginTop: 20, marginLeft: 10}}>Choose from gallery</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress = {this.onCancelCamera}>
+                                    <Text style = {{textAlign:'left', fontSize: 17, marginTop: 20, marginLeft: 10}}>Cancel</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </PopupDialog>
             </View>
         );
     }
-}
+
+    showCellImage(profile) {
+
+      if (profile["content"]) {
+        var index = 0
+        for (let item in profile["content"]) {
+          index = index + 1
+          let content = profile["content"][item]
+          let blobid =  content["id"]
+
+          if (blobid == profile["blob_id"]) {
+            let path = "content/" + profile["firid"] + "/" + profile["content"][item]["name"]
+            console.log('path:', path);
+
+            firebase.storage().ref(path).getDownloadURL().then((url) => {
+              //profile.profileurl = url
+
+              var newDs = [];
+              newDs = this.state.participants_datas.slice();
+              this.state.participants_datas[index].profileurl = url;
+              this.state.participants_datas =  this.state.dataSource.cloneWithRows(newDs)
+
+              this.setState({
+                 participants_datas: this.state.participants_datas
+               })
+
+            })
+          }
+        }
+      }
+
+
+      return (
+        <CachedImage source = {{
+          uri: profile.profileurl,
+        }}
+        defaultSource = {require('../assets/img/user_placeholder.png')}
+        style = {styles.menuIcon} />
+      );
+    }
+
+  }
 
 // define your styles
 const styles = StyleSheet.create({
@@ -310,7 +837,7 @@ const styles = StyleSheet.create({
     },
     tabView: {
         width: Constant.WIDTH_SCREEN,
-        height: 80,
+        height: 90,
         paddingLeft: 5,
         flexDirection:'row',
         alignItems:'center',
@@ -352,11 +879,18 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     userphoto: {
-        width: 100, 
-        height: 100, 
-        borderRadius: 50, 
+        width: 100,
+        height: 100,
+        borderRadius: 50,
         position: 'absolute',
-        top: 30
+        top: 0
+    },
+    userphotoTouch: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      position: 'absolute',
+      top: 30,
     },
     cellView: {
         flexDirection: 'row',
@@ -425,8 +959,8 @@ const styles = StyleSheet.create({
         color: '#515151'
     },
     mList: {
-        flex: 1, 
-        width: Constant.WIDTH_SCREEN, 
+        flex: 1,
+        width: Constant.WIDTH_SCREEN,
         backgroundColor:'white'
     },
     menuItem:{
@@ -441,7 +975,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     cellItem: {
-        height:70, 
+        height:70,
         padding:10,
         borderTopWidth: 1,
         borderBottomWidth: 1,
@@ -459,7 +993,29 @@ const styles = StyleSheet.create({
         flex: 1,
         position: 'absolute',
         top: Constant.HEIGHT_SCREEN/2
-    }
+    },
+    removeBtn: {
+        width: Constant.WIDTH_SCREEN,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: '#f4f4f4'
+    },
+    buttonView: {
+        marginTop: 60
+    },
+    blockBtn: {
+        width: Constant.WIDTH_SCREEN,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: '#f4f4f4',
+        marginTop: 20
+    },
 });
 
 //make this component available to the app

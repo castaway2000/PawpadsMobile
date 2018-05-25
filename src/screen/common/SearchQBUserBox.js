@@ -1,8 +1,8 @@
 //import liraries
 import React, { Component, PropTypes } from 'react';
-import { 
-    View, 
-    Text, 
+import {
+    View,
+    Text,
     StyleSheet,
     TextInput,
     Image,
@@ -76,17 +76,17 @@ class SearchQBUserBox extends Component {
             filteredData = this.filterChannels(text, this.props.users)
             this.props.SearchChannelsResult(filteredData)
         }
-        
+
     }
-    filterNearBy(text, list){
+
+    filterNearBy(text, list) {
         var query = text.toLowerCase();
-        return list.filter(function(el){
-            if(el.geo_datum.user.user.full_name){
-                return el.geo_datum.user.user.full_name.toLowerCase().indexOf(query) > -1
-            }else{
-                return el.geo_datum.user.user.login.toLowerCase().indexOf(query) > -1
+        return list.filter(function(el) {
+            if(el.full_name) {
+                return el.full_name.toLowerCase().indexOf(query) > -1
+            } else {
+                return el.login.toLowerCase().indexOf(query) > -1
             }
-            
         })
     }
 
@@ -113,7 +113,7 @@ class SearchQBUserBox extends Component {
     render() {
         return (
             <View style = {styles.searchView}>
-                <TextInput 
+                <TextInput
                     style = {styles.searchInput}
                     returnKeyType = 'search'
                     placeholder = 'Search'
@@ -123,10 +123,10 @@ class SearchQBUserBox extends Component {
                     onChangeText = {(text) => this.set(text)}
                     onSubmitEditing = {(event) => Keyboard.dismiss()}
                 />
-                
+
                 <TouchableOpacity onPress = {this.onClearText}>
                     <Image source = {require('../../assets/img/x_white.png')} style = {styles.cancelImg}/>
-                </TouchableOpacity>      
+                </TouchableOpacity>
             </View>
         )
     }
@@ -145,4 +145,3 @@ const mapDispatchToProps = dispatch => ({
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchQBUserBox)
-

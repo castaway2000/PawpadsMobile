@@ -30,23 +30,26 @@
 		2B5CF74E76B44CF4BC823D70 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 56A0B229144D4477AF64C7F1 /* MaterialIcons.ttf */; };
 		31AB82FE468E42E7BA1FC1F7 /* Proxima_Nova_Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 337F1C4D91414410A04727A1 /* Proxima_Nova_Regular.otf */; };
 		33760386FE6449B79A727377 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 13D1EF1A65C649D280EC1527 /* Feather.ttf */; };
-		35421AB41FD82045005B4D1F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 35421AB31FD82045005B4D1F /* GoogleService-Info.plist */; };
+		350FB86620871F9900FF350E /* TwitterKitResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 35BD61431FD97632002A9E8A /* TwitterKitResources.bundle */; };
+		3519ECA4202D7AB600476425 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 229AFF3F1F95BA4C00EBFE37 /* libRNImagePicker.a */; };
 		35620A181FD94BBD0088941C /* libRCTFBSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35620A151FD94A340088941C /* libRCTFBSDK.a */; };
 		35620A1A1FD94CAC0088941C /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35620A191FD94CAC0088941C /* Bolts.framework */; };
 		35620A1E1FD94D130088941C /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35620A1B1FD94D130088941C /* FBSDKShareKit.framework */; };
 		35620A1F1FD94D130088941C /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35620A1C1FD94D130088941C /* FBSDKLoginKit.framework */; };
 		35620A201FD94D130088941C /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35620A1D1FD94D130088941C /* FBSDKCoreKit.framework */; };
+		35ADA22C206E4D200042F780 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 35ADA22B206E4D200042F780 /* GoogleService-Info.plist */; };
 		35BD616F1FD97632002A9E8A /* TwitterCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35BD616B1FD97632002A9E8A /* TwitterCore.framework */; };
 		35BD61711FD97632002A9E8A /* TwitterKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35BD616D1FD97632002A9E8A /* TwitterKit.framework */; };
 		35BD61871FD97718002A9E8A /* libRNTwitterSignIn.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35BD611C1FD97100002A9E8A /* libRNTwitterSignIn.a */; };
 		35D7364D1FD952CE00B87455 /* libRNFirebase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D4F3571FD162B200E10C97 /* libRNFirebase.a */; };
+		35FF36FB20662A1000C5D3DC /* libRNFIRMessaging.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35FF36F720662A0000C5D3DC /* libRNFIRMessaging.a */; };
 		362D4134015B488187B7E273 /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 786C4BCA173946958EA2E129 /* Foundation.ttf */; };
 		3E012F46CC9345FF902C5C0E /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4ECBCFB6265A44DA82451901 /* SimpleLineIcons.ttf */; };
 		40C712287B2C458E9E5FBC83 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 30C9806F1C0B4ED3AAA7EA30 /* Zocial.ttf */; };
 		45310CD2D179447AAF73EA6D /* Proxima_Nova_Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0508F793CF18498CB751E64C /* Proxima_Nova_Bold.otf */; };
 		45C7F04F65F243B39FEEFAD0 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 23D2823E79D74C1088288BB4 /* libReact.a */; };
 		50EC5802E93948CFBD5D5401 /* libjschelpers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F30AA1A3D2B94FFEB51EF925 /* libjschelpers.a */; };
-		61807501FCC1B282A912DB25 /* libPods-Pawpads.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 551D040F2194F35BD4C59967 /* libPods-Pawpads.a */; };
+		61807501FCC1B282A912DB25 /* libPods-PawPads.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 551D040F2194F35BD4C59967 /* libPods-PawPads.a */; };
 		65BDE9AA05EE48D9B83BAEAD /* libyoga.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F0B0B18D95A4F81B7315FB3 /* libyoga.a */; };
 		683080E294134A75B512F479 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 618F344883194B47A3812261 /* EvilIcons.ttf */; };
 		6A72BA61400542D5BCA68C6A /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D1F8806B42834A60801B545B /* EvilIcons.ttf */; };
@@ -229,6 +232,13 @@
 			remoteGlobalIDString = A15C300E1CD25C330074CB35;
 			remoteInfo = RNFetchBlob;
 		};
+		35FF36F620662A0000C5D3DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 35FF36CD20662A0000C5D3DC /* RNFIRMessaging.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNFIRMessaging;
+		};
 		3DAD3E831DF850E9000B6D8A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 00C302BB1ABCB91800DB3ED1 /* RCTImage.xcodeproj */;
@@ -365,7 +375,7 @@
 		00C302D31ABCB9D200DB3ED1 /* RCTNetwork.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTNetwork.xcodeproj; path = "../node_modules/react-native/Libraries/Network/RCTNetwork.xcodeproj"; sourceTree = "<group>"; };
 		00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTVibration.xcodeproj; path = "../node_modules/react-native/Libraries/Vibration/RCTVibration.xcodeproj"; sourceTree = "<group>"; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* PawpadsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PawpadsTests.m; sourceTree = "<group>"; };
+		00E356F21AD99517003FC87E /* PawPadsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PawPadsTests.m; sourceTree = "<group>"; };
 		00F56F3555B345069ECAAB3C /* AirMaps.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = AirMaps.xcodeproj; path = "../node_modules/react-native-maps/lib/ios/AirMaps.xcodeproj"; sourceTree = "<group>"; };
 		01C95BF69FC2467285672C9A /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		035F0618AD254BB382C11D11 /* Roboto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto.ttf; path = "../node_modules/native-base/Fonts/Roboto.ttf"; sourceTree = "<group>"; };
@@ -374,13 +384,13 @@
 		0FA9928852A74A8FAE004F47 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
 		139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* Pawpads.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pawpads.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Pawpads/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Pawpads/AppDelegate.m; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* PawPads.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PawPads.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = PawPads/AppDelegate.h; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = PawPads/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Pawpads/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Pawpads/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Pawpads/main.m; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = PawPads/Images.xcassets; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = PawPads/Info.plist; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = PawPads/main.m; sourceTree = "<group>"; };
 		13D1EF1A65C649D280EC1527 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		13E6908453D24F36B6388209 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
@@ -391,15 +401,17 @@
 		2E6FCA79C8B44517B5B333BD /* RNTwitterSignIn.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNTwitterSignIn.xcodeproj; path = "../node_modules/react-native-twitter-signin/ios/RNTwitterSignIn.xcodeproj"; sourceTree = "<group>"; };
 		30C9806F1C0B4ED3AAA7EA30 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		337F1C4D91414410A04727A1 /* Proxima_Nova_Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Proxima_Nova_Regular.otf; path = ../src/assets/fonts/Proxima_Nova_Regular.otf; sourceTree = "<group>"; };
-		35421AB31FD82045005B4D1F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		35620A191FD94CAC0088941C /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Bolts.framework; path = "../../../Users/3rddigital-001/Documents/FacebookSDK/Bolts.framework"; sourceTree = "<group>"; };
 		35620A1B1FD94D130088941C /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKShareKit.framework; path = "../../../Users/3rddigital-001/Documents/FacebookSDK/FBSDKShareKit.framework"; sourceTree = "<group>"; };
 		35620A1C1FD94D130088941C /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKLoginKit.framework; path = "../../../Users/3rddigital-001/Documents/FacebookSDK/FBSDKLoginKit.framework"; sourceTree = "<group>"; };
 		35620A1D1FD94D130088941C /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKCoreKit.framework; path = "../../../Users/3rddigital-001/Documents/FacebookSDK/FBSDKCoreKit.framework"; sourceTree = "<group>"; };
+		35813C0220663D7200919D2F /* PawPads.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = PawPads.entitlements; path = PawPads/PawPads.entitlements; sourceTree = "<group>"; };
+		35ADA22B206E4D200042F780 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		35BD61431FD97632002A9E8A /* TwitterKitResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = TwitterKitResources.bundle; path = "../../../Users/3rddigital-001/Documents/TwitterKitManual/TwitterKitResources.bundle"; sourceTree = "<group>"; };
 		35BD616B1FD97632002A9E8A /* TwitterCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TwitterCore.framework; path = "../../../Users/3rddigital-001/Documents/TwitterKitManual/TwitterCore.framework"; sourceTree = "<group>"; };
 		35BD616C1FD97632002A9E8A /* TwitterShareExtensionUIResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = TwitterShareExtensionUIResources.bundle; path = "../../../Users/3rddigital-001/Documents/TwitterKitManual/TwitterShareExtensionUIResources.bundle"; sourceTree = "<group>"; };
 		35BD616D1FD97632002A9E8A /* TwitterKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TwitterKit.framework; path = "../../../Users/3rddigital-001/Documents/TwitterKitManual/TwitterKit.framework"; sourceTree = "<group>"; };
+		35FF36CD20662A0000C5D3DC /* RNFIRMessaging.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFIRMessaging.xcodeproj; path = "../node_modules/react-native-fcm/ios/RNFIRMessaging.xcodeproj"; sourceTree = "<group>"; };
 		385B31A55DE64CE5AF041B80 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		38F95B7A27964434942C5B59 /* libcxxreact.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libcxxreact.a; sourceTree = "<group>"; };
 		3F0B0B18D95A4F81B7315FB3 /* libyoga.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libyoga.a; sourceTree = "<group>"; };
@@ -407,7 +419,7 @@
 		4ECBCFB6265A44DA82451901 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/native-base/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		4FC6E6777F334B22BC29D664 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/native-base/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		51EBFAC7A8854A819B266D4A /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/native-base/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
-		551D040F2194F35BD4C59967 /* libPods-Pawpads.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Pawpads.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		551D040F2194F35BD4C59967 /* libPods-PawPads.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PawPads.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		56A0B229144D4477AF64C7F1 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		57EA39044E784A85AB81EA51 /* libRNFetchBlob.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFetchBlob.a; sourceTree = "<group>"; };
 		5CFB8020DC024166B62077FB /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
@@ -423,7 +435,7 @@
 		9CF55409041D481D8BC7DAA8 /* Proxima_Nova_Regular_Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Proxima_Nova_Regular_Italic.otf; path = ../assets/fonts/Proxima_Nova_Regular_Italic.otf; sourceTree = "<group>"; };
 		A417E889EF1248E6B0103E01 /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFetchBlob.xcodeproj; path = "../node_modules/react-native-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
-		AE42726F582ECC52CFCD7A09 /* Pods-Pawpads.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pawpads.release.xcconfig"; path = "Pods/Target Support Files/Pods-Pawpads/Pods-Pawpads.release.xcconfig"; sourceTree = "<group>"; };
+		AE42726F582ECC52CFCD7A09 /* Pods-PawPads.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PawPads.release.xcconfig"; path = "Pods/Target Support Files/Pods-PawPads/Pods-PawPads.release.xcconfig"; sourceTree = "<group>"; };
 		B8815E4B0BA44727B99D7484 /* Proxima_Nova_Regular_Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Proxima_Nova_Regular_Italic.otf; path = ../src/assets/fonts/Proxima_Nova_Regular_Italic.otf; sourceTree = "<group>"; };
 		BF2001321F1B4F768AC44DC1 /* Bellota_BoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Bellota_BoldItalic.otf; path = ../src/assets/fonts/Bellota_BoldItalic.otf; sourceTree = "<group>"; };
 		C48B6910A6B64076A9F677E5 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
@@ -436,7 +448,7 @@
 		F25BD4CFBBCB45AEA4260A88 /* Proxima_Nova_Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Proxima_Nova_Regular.otf; path = ../assets/fonts/Proxima_Nova_Regular.otf; sourceTree = "<group>"; };
 		F276C5388359449AA5D16D1A /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/native-base/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		F30AA1A3D2B94FFEB51EF925 /* libjschelpers.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libjschelpers.a; sourceTree = "<group>"; };
-		F8FC92B82A39734C1EB5AE70 /* Pods-Pawpads.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pawpads.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Pawpads/Pods-Pawpads.debug.xcconfig"; sourceTree = "<group>"; };
+		F8FC92B82A39734C1EB5AE70 /* Pods-PawPads.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PawPads.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PawPads/Pods-PawPads.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -444,6 +456,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35FF36FB20662A1000C5D3DC /* libRNFIRMessaging.a in Frameworks */,
+				3519ECA4202D7AB600476425 /* libRNImagePicker.a in Frameworks */,
 				35D7364D1FD952CE00B87455 /* libRNFirebase.a in Frameworks */,
 				35620A1F1FD94D130088941C /* FBSDKLoginKit.framework in Frameworks */,
 				35620A1A1FD94CAC0088941C /* Bolts.framework in Frameworks */,
@@ -465,7 +479,7 @@
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
-				61807501FCC1B282A912DB25 /* libPods-Pawpads.a in Frameworks */,
+				61807501FCC1B282A912DB25 /* libPods-PawPads.a in Frameworks */,
 				45C7F04F65F243B39FEEFAD0 /* libReact.a in Frameworks */,
 				65BDE9AA05EE48D9B83BAEAD /* libyoga.a in Frameworks */,
 				E5F0056D89E84DE2856526D0 /* libcxxreact.a in Frameworks */,
@@ -519,13 +533,13 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		00E356EF1AD99517003FC87E /* PawpadsTests */ = {
+		00E356EF1AD99517003FC87E /* PawPadsTests */ = {
 			isa = PBXGroup;
 			children = (
-				00E356F21AD99517003FC87E /* PawpadsTests.m */,
+				00E356F21AD99517003FC87E /* PawPadsTests.m */,
 				00E356F01AD99517003FC87E /* Supporting Files */,
 			);
-			path = PawpadsTests;
+			path = PawPadsTests;
 			sourceTree = "<group>";
 		};
 		00E356F01AD99517003FC87E /* Supporting Files */ = {
@@ -556,10 +570,11 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		13B07FAE1A68108700A75B9A /* Pawpads */ = {
+		13B07FAE1A68108700A75B9A /* PawPads */ = {
 			isa = PBXGroup;
 			children = (
-				35421AB31FD82045005B4D1F /* GoogleService-Info.plist */,
+				35ADA22B206E4D200042F780 /* GoogleService-Info.plist */,
+				35813C0220663D7200919D2F /* PawPads.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -568,7 +583,7 @@
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
-			name = Pawpads;
+			name = PawPads;
 			sourceTree = "<group>";
 		};
 		146834001AC3E56700842450 /* Products */ = {
@@ -637,7 +652,7 @@
 				35620A1C1FD94D130088941C /* FBSDKLoginKit.framework */,
 				35620A1B1FD94D130088941C /* FBSDKShareKit.framework */,
 				35620A191FD94CAC0088941C /* Bolts.framework */,
-				551D040F2194F35BD4C59967 /* libPods-Pawpads.a */,
+				551D040F2194F35BD4C59967 /* libPods-PawPads.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -670,6 +685,14 @@
 			isa = PBXGroup;
 			children = (
 				35F7F6EA1FE254F2002D0568 /* libRNFetchBlob.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		35FF36CE20662A0000C5D3DC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				35FF36F720662A0000C5D3DC /* libRNFIRMessaging.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -735,6 +758,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				35FF36CD20662A0000C5D3DC /* RNFIRMessaging.xcodeproj */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
@@ -770,9 +794,9 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				13B07FAE1A68108700A75B9A /* Pawpads */,
+				13B07FAE1A68108700A75B9A /* PawPads */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				00E356EF1AD99517003FC87E /* PawpadsTests */,
+				00E356EF1AD99517003FC87E /* PawPadsTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				56F87112A4AA43BC87D6E7F9 /* Resources */,
 				229AFF181F95BA3400EBFE37 /* Recovered References */,
@@ -787,7 +811,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* Pawpads.app */,
+				13B07F961A680F5B00A75B9A /* PawPads.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -804,8 +828,8 @@
 		FDD44697E31094AEE1BC2ED3 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				F8FC92B82A39734C1EB5AE70 /* Pods-Pawpads.debug.xcconfig */,
-				AE42726F582ECC52CFCD7A09 /* Pods-Pawpads.release.xcconfig */,
+				F8FC92B82A39734C1EB5AE70 /* Pods-PawPads.debug.xcconfig */,
+				AE42726F582ECC52CFCD7A09 /* Pods-PawPads.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -813,9 +837,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		13B07F861A680F5B00A75B9A /* Pawpads */ = {
+		13B07F861A680F5B00A75B9A /* PawPads */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Pawpads" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "PawPads" */;
 			buildPhases = (
 				3C0F538C53BB5EE1A82365EB /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
@@ -829,9 +853,9 @@
 			);
 			dependencies = (
 			);
-			name = Pawpads;
+			name = PawPads;
 			productName = "Hello World";
-			productReference = 13B07F961A680F5B00A75B9A /* Pawpads.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* PawPads.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -844,11 +868,20 @@
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = QV2N88PZ82;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "Pawpads" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "PawPads" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -925,6 +958,10 @@
 					ProjectRef = E71DE328F16C46D2945448EA /* RNFirebase.xcodeproj */;
 				},
 				{
+					ProductGroup = 35FF36CE20662A0000C5D3DC /* Products */;
+					ProjectRef = 35FF36CD20662A0000C5D3DC /* RNFIRMessaging.xcodeproj */;
+				},
+				{
 					ProductGroup = 229AFF341F95BA4B00EBFE37 /* Products */;
 					ProjectRef = 7ECE9F305C6949FEA8F9D292 /* RNImagePicker.xcodeproj */;
 				},
@@ -939,7 +976,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* Pawpads */,
+				13B07F861A680F5B00A75B9A /* PawPads */,
 			);
 		};
 /* End PBXProject section */
@@ -1099,6 +1136,13 @@
 			remoteRef = 35F7F6E91FE254F2002D0568 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		35FF36F720662A0000C5D3DC /* libRNFIRMessaging.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNFIRMessaging.a;
+			remoteRef = 35FF36F620662A0000C5D3DC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		3DAD3E841DF850E9000B6D8A /* libRCTImage-tvOS.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1232,6 +1276,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				350FB86620871F9900FF350E /* TwitterKitResources.bundle in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				D141C83E5F7249679EA06434 /* Entypo.ttf in Resources */,
@@ -1261,7 +1306,7 @@
 				E8AA7D194BDA452BBE22FB80 /* Proxima_Nova_Bold.otf in Resources */,
 				A3F1332B887048C9BD204DC4 /* Proxima_Nova_Regular_Italic.otf in Resources */,
 				31AB82FE468E42E7BA1FC1F7 /* Proxima_Nova_Regular.otf in Resources */,
-				35421AB41FD82045005B4D1F /* GoogleService-Info.plist in Resources */,
+				35ADA22C206E4D200042F780 /* GoogleService-Info.plist in Resources */,
 				6D60A536D226409DB4ADF484 /* Proxima_Nova_Semibold.otf in Resources */,
 				F8BEB4CF752A4FCA886C813B /* Bellota_BoldItalic.otf in Resources */,
 				45310CD2D179447AAF73EA6D /* Proxima_Nova_Bold.otf in Resources */,
@@ -1300,7 +1345,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Pawpads/Pods-Pawpads-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PawPads/Pods-PawPads-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		3C0F538C53BB5EE1A82365EB /* [CP] Check Pods Manifest.lock */ = {
@@ -1314,7 +1359,7 @@
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Pawpads-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-PawPads-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1333,7 +1378,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Pawpads/Pods-Pawpads-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PawPads/Pods-PawPads-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1357,7 +1402,7 @@
 				13B07FB21A68108700A75B9A /* Base */,
 			);
 			name = LaunchScreen.xib;
-			path = Pawpads;
+			path = PawPads;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -1365,15 +1410,17 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F8FC92B82A39734C1EB5AE70 /* Pods-Pawpads.debug.xcconfig */;
+			baseConfigurationReference = F8FC92B82A39734C1EB5AE70 /* Pods-PawPads.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PawPads/PawPads.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Saber Applications Inc. (QV2N88PZ82)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = QV2N88PZ82;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"~/Documents/FacebookSDK",
@@ -1390,28 +1437,29 @@
 					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
 					"$(SRCROOT)/../node_modules/react-native-twitter-signin/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 				);
-				INFOPLIST_FILE = Pawpads/Info.plist;
+				INFOPLIST_FILE = PawPads/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-lc++",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.saber.Pawpadsdev;
-				PRODUCT_NAME = Pawpads;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saber.PawPads;
+				PRODUCT_NAME = PawPads;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1420,14 +1468,16 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AE42726F582ECC52CFCD7A09 /* Pods-Pawpads.release.xcconfig */;
+			baseConfigurationReference = AE42726F582ECC52CFCD7A09 /* Pods-PawPads.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PawPads/PawPads.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Saber Applications Inc. (QV2N88PZ82)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = QV2N88PZ82;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"~/Documents/FacebookSDK",
@@ -1444,28 +1494,29 @@
 					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
 					"$(SRCROOT)/../node_modules/react-native-twitter-signin/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-fcm/ios",
 				);
-				INFOPLIST_FILE = Pawpads/Info.plist;
+				INFOPLIST_FILE = PawPads/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
-					"\"$(SRCROOT)/Pawpads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
+					"\"$(SRCROOT)/PawPads\"",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-lc++",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.saber.Pawpadsdev;
-				PRODUCT_NAME = Pawpads;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saber.PawPads;
+				PRODUCT_NAME = PawPads;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1558,7 +1609,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Pawpads" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "PawPads" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -1567,7 +1618,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "Pawpads" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "PawPads" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,

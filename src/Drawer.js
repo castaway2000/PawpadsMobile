@@ -34,4 +34,16 @@ const Drawer = DrawerNavigator(
     }
 );
 
+// const defaultGetStateForAction = Drawer.router.getStateForAction;
+//
+// Drawer.router.getStateForAction = (action, state) => {
+//
+//     //use 'DrawerOpen' to capture drawer open event
+//     if (state && action.type === 'Navigation/NAVIGATE' && action.routeName === 'DrawerClose') {
+//         console.log('DrawerClose');
+//         //write the code you want to deal with 'DrawerClose' event
+//     }
+//     return defaultGetStateForAction(action, state);
+// };
+
 export default Drawer;
