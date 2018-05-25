@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.pawpads"
+          xmlns:tools="http://schemas.android.com/tools"
+    package="saberapplications.pawpads"
     android:versionCode="1"
     android:versionName="1.0">
 
@@ -18,13 +19,12 @@
         android:targetSdkVersion="22" />
 
     <application
-
-      android:name=".MainApplication"
-      android:allowBackup="true"
-      android:label="Pawpads-Dev"
-      android:icon="@mipmap/ic_launcher"
-
-      android:theme="@style/AppTheme">
+        tools:replace="android:label"
+        android:name=".MainApplication"
+        android:allowBackup="true"
+        android:label="Pawpads-Dev"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@style/AppTheme">
         <receiver android:name="com.evollu.react.fcm.FIRLocalMessagingPublisher"/>
         <receiver android:enabled="true" android:exported="true"  android:name="com.evollu.react.fcm.FIRSystemBootEventReceiver">
             <intent-filter>
