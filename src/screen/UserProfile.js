@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, ActivityIndicator, TouchableHighlight,AsyncStorage } from 'react-native';
+import { Alert,View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, ActivityIndicator, TouchableHighlight,AsyncStorage } from 'react-native';
 import { Container, Header, Content, Button } from 'native-base';
 import Constant from '../common/Constant'
 import reactNativeKeyboardAwareScrollView from 'react-native-keyboard-aware-scroll-view';

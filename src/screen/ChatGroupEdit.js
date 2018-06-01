@@ -556,8 +556,7 @@ class ChatGroupEdit extends Component {
 
           this.setState({ loading: false, isGroupUpdated:true})
 
-
-          alert("Group Updated Successfully!")
+          Alert.alert("Pawpads", 'Group Updated Successfully!');
         });
       } else {
 
@@ -570,8 +569,7 @@ class ChatGroupEdit extends Component {
 
         this.setState({ loading: false, isGroupUpdated:true})
 
-
-        alert("Group Updated Successfully!")
+        Alert.alert("Pawpads", 'Group Updated Successfully!');
     }
   }
 
@@ -585,7 +583,7 @@ class ChatGroupEdit extends Component {
   onRemoveChannel = () => {
     Alert.alert(
       'Alert',
-      'Are you seure you want to delete this group?',
+      'Are you sure you want to delete this group?',
       [
         {text: 'Delete', onPress: () => {
           this.deleteGroup()
@@ -609,12 +607,15 @@ class ChatGroupEdit extends Component {
     ref.child(params.Dialog._id).remove();
 
     setTimeout(()=>{
+        
       this.setState({ loading: false })
-      alert("Channel deleted successfully")
+
+      Alert.alert("Pawpads", 'Channel deleted successfully.');
+
       this.props.navigation.goBack("Login")
 
-
       const navigateAction = NavigationActions.navigate({
+          
         routeName: 'Dashboard',
 
         params: {},

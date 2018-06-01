@@ -44,7 +44,7 @@ class Login extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            name: '', //cris 1BITJAY_1875640410  howsonanna stad //blaze - blaze2000
+            name: '', //cris 1BITJAY_1875640410  howsonanna stad //blaze - blaze2000 test52 Test@123
             password: '', //
             qb_token: '',
             loading: this.props.loading,
@@ -351,7 +351,8 @@ class Login extends Component {
                     this.setState({ loading: false })
 
                     if (isAccountDeleted) {
-                      alert('Account is deleted.')
+    
+                      Alert.alert("Pawpads", 'Account is deleted.');
                     } else {
                       //Decrypt password
                       var plaintextpassword = CryptoJS.AES.decrypt(password.toString(), Constant.FIREBASE_PASS_SECRET).toString(CryptoJS.enc.Utf8);
@@ -393,8 +394,7 @@ class Login extends Component {
                         }
 
                       } else {
-                        console.log("User entered wrong password");
-                        alert("Please enter correct password.")
+                        Alert.alert("Pawpads", 'Please enter correct password.');
                       }
                     }
                   } else {
@@ -457,7 +457,7 @@ class Login extends Component {
                       let isAccountDeleted = response[tableId]["isDeleted"]
 
                       if (isAccountDeleted) {
-                        alert('Account is deleted.')
+                        Alert.alert("Pawpads", "Account is deleted.");
                       } else {
                         //save pref
                         AsyncStorage.setItem(Constant.USER_TABEL_ID, tableId);
@@ -525,7 +525,9 @@ class Login extends Component {
 
                  if (error) {
                    console.log("Facebook:",error)
-                   alert('Error fetching data: ' + error.toString());
+
+                   Alert.alert("Pawpads", 'Error fetching data: ' + error.toString());
+                   
                  } else {
                    console.log("Facebook: Success fetching data:",result)
 
@@ -564,7 +566,9 @@ class Login extends Component {
                              let isAccountDeleted = response[tableId]["isDeleted"]
 
                              if (isAccountDeleted) {
-                               alert('Account is deleted.')
+
+                               Alert.alert("Pawpads", 'Account is deleted.');
+
                              } else {
                                //save pref
                                AsyncStorage.setItem(Constant.USER_TABEL_ID, tableId);
@@ -694,7 +698,8 @@ class Login extends Component {
 
             } else {
               console.log("Username Not found on Quickblox.")
-              alert("Please enter correct username or password.")
+
+              Alert.alert("Pawpads", 'Please enter correct username or password.');
             }
         }).catch((e) => {
             console.log(e)
@@ -1199,9 +1204,13 @@ const styles = StyleSheet.create({
         justifyContent:'center'
     },
     loadingView: {
-        flex: 1,
-        position: 'absolute',
-        top: Constant.HEIGHT_SCREEN/2
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      alignItems: 'center',
+      justifyContent: 'center'
     }
 });
 

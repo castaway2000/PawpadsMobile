@@ -323,7 +323,6 @@ class DataMigration extends Component {
           firebase.database().ref().child('dialog/group-chat-private/' + dialog._id).set(updates)
         } 
         
-
         //save dialog to user noBorder
         var newKey = firebase.database().ref().child('dialog/group-public').push().key;
         var updates = {"id":dialog._id,"type":dialog.type};

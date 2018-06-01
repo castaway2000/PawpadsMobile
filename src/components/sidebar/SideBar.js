@@ -175,7 +175,7 @@ class SideBar extends Component {
 
       if (route == "Logout") {
         Alert.alert(
-          'PawPads',
+          'Pawpads',
           'Are you sure you want to logout?',
           [
             {text: 'Cancel', onPress: () => {

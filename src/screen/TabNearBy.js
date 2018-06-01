@@ -1,6 +1,6 @@
 //import liraries
 import React, { Component } from 'react';
-import { StyleSheet, StatusBar, Image, TouchableOpacity, Platform,  RefreshControl, AsyncStorage,ActivityIndicator, ScrollView, Navigator} from 'react-native';
+import {Alert, StyleSheet, StatusBar, Image, TouchableOpacity, Platform,  RefreshControl, AsyncStorage,ActivityIndicator, ScrollView, Navigator} from 'react-native';
 import {
     Content,
 	Text,
@@ -289,7 +289,7 @@ class TabNearBy extends Component {
             },
             (error) => {
                 this.setState({loading: false,isLocationServiceEnabled: false})
-                alert("Location services is turned off! Please turn on from setting.")
+                Alert.alert("Pawpads","Location services is turned off! Please turn on from setting.")
             },
             {
               enableHighAccuracy: false, timeout: 500000, maximumAge: 1000000

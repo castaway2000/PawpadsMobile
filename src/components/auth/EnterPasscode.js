@@ -53,7 +53,7 @@ class Passwordrecovery extends Component {
               }else {
                 this.setState({loading:false})
 
-                Alert.alert('Code not match ! Please try again')
+                Alert.alert("Pawpads", 'Code not match! Please try again');
               }
           })
         }

@@ -84,8 +84,10 @@ class SearchQBUserBox extends Component {
         return list.filter(function(el) {
             if(el.full_name) {
                 return el.full_name.toLowerCase().indexOf(query) > -1
-            } else {
+            } else if(el.login) {
                 return el.login.toLowerCase().indexOf(query) > -1
+            } else {
+                return 0
             }
         })
     }

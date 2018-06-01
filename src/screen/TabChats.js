@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { StyleSheet, StatusBar, Image, TouchableOpacity, RefreshControl, AsyncStorage, ActivityIndicator, ScrollView} from 'react-native';
+import { Alert, StyleSheet, StatusBar, Image, TouchableOpacity, RefreshControl, AsyncStorage, ActivityIndicator, ScrollView} from 'react-native';
 import {
     Content,
 	Text,
@@ -62,6 +62,11 @@ class TabChats extends Component {
     }
 
     loadcData() {
+
+        console.log('====================================');
+        console.log("this.state.tableId",this.state.tableId);
+        console.log('====================================');
+        
         firebase.database()
         .ref(`/users/` + this.state.tableId + "/dialog")
         .once("value")
