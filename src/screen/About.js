@@ -35,7 +35,7 @@ class About extends Component {
                 <View style = {styles.bodyView}>
                     <View style = {{alignItems: 'center'}}>
                         <Text style = {styles.pawpads}>PawPads</Text>
-                        <Text style = {styles.version}>Version 1.1.9</Text>
+                        <Text style = {styles.version}>Version 2.0.43</Text>
                     </View>
                     <View style = {{justifyContent: 'center', alignItems: 'center', paddingBottom: 20}}>
                         <Text style = {[styles.lead, {marginTop: 20}]}>Lead Project Manager:</Text>
