@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { StyleSheet, StatusBar, Image, TouchableOpacity, RefreshControl, AsyncStorage, ActivityIndicator, ScrollView} from 'react-native';
+import { Alert, StyleSheet, StatusBar, Image, TouchableOpacity, RefreshControl, AsyncStorage, ActivityIndicator, ScrollView} from 'react-native';
 import {
     Content,
 	Text,
@@ -29,6 +29,8 @@ var currentPage = 0
 const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
+
 
 // create a component
 class TabChats extends Component {
@@ -60,6 +62,11 @@ class TabChats extends Component {
     }
 
     loadcData() {
+
+        console.log('====================================');
+        console.log("this.state.tableId",this.state.tableId);
+        console.log('====================================');
+        
         firebase.database()
         .ref(`/users/` + this.state.tableId + "/dialog")
         .once("value")
@@ -354,8 +361,10 @@ class TabChats extends Component {
                 }
 
                 if (profile) {
+                    
                   this.state.dialogs[index]['name'] = profile.full_name?profile.full_name:profile.login;
                   this.state.dialogs[index]['userid'] = profile.id;
+                  this.state.dialogs[index]['isonline'] = profile.isonline;
 
                   this.setState({ refresh: true});
 
@@ -465,6 +474,9 @@ class TabChats extends Component {
                       <CachedImage source = {{ uri: data.profileurl }}
                       defaultSource = {require('../assets/img/user_placeholder.png')}
                       style = {styles.menuIcon1} />
+
+                      {data.isonline ? <View style = {styles.onlinestatus}/> : null} 
+
                     </View>
                     <View style = {{flex: 1, marginLeft: 15, justifyContent:'center'}}>
                       <Text style = {styles.menuItem}>{data.name}</Text>
@@ -591,6 +603,15 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         padding: 10,
         justifyContent:'center',
+    },
+    onlinestatus: { 
+        borderRadius: 5,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#00ff00", 
+        width:10, 
+        height:10
     }
 });
 

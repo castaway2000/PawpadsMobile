@@ -36,19 +36,22 @@ class MyListItem extends React.PureComponent {
   render() {
     const data = this.props.item;
 
-    return (
-      <TouchableOpacity onPress={this._onPress}  style = {styles.friendsListCell} key = {this.props.index}>
-      <View style = {styles.menuIcon} >
-      <CachedImage source = {{
-        uri: data.profileurl
-      }}
-      defaultSource = {require('../assets/img/user_placeholder.png')}
-      style = {styles.menuIcon} />
-      </View>
-      <View style = {{flex: 1,justifyContent:'center'}}>
-      <Text style = {styles.menuItem}>{data.full_name? data.full_name : data.login}</Text></View>
-      </TouchableOpacity>
-    )
+      return (
+          <TouchableOpacity onPress={this._onPress} style={styles.friendsListCell} key={this.props.index}>
+              <View style={styles.menuIcon} >
+                  <CachedImage source={{
+                      uri: data.profileurl
+                  }}
+                      defaultSource={require('../assets/img/user_placeholder.png')}
+                      style={styles.menuIcon} />
+
+					{data.isonline ? <View style = {styles.onlinestatus}/> : null} 
+
+              </View>
+              <View style={{ flex: 1, justifyContent: 'center' }}>
+                  <Text style={styles.menuItem}>{data.full_name ? data.full_name : data.login}</Text></View>
+          </TouchableOpacity>
+      )
   }
 }
 
@@ -290,6 +293,15 @@ const styles = StyleSheet.create({
         color: 'gray',
         textAlign: 'center'
     },
+	onlinestatus: { 
+        borderRadius: 5,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#00ff00", 
+        width:10, 
+        height:10
+    }
 });
 
 //make this component available to the app

@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView,AsyncStorage,RefreshControl, ActivityIndicator } from 'react-native';
+import { Alert,View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView,AsyncStorage,RefreshControl, ActivityIndicator } from 'react-native';
 import {
     Content,
 	List,
@@ -152,7 +152,9 @@ class CreateGroupChat extends Component {
       }
 
       if (isCheckedCount< 1) {
-        alert('Please select at least two member to create group.')
+
+        Alert.alert("Pawpads", 'Please select at least two member to create group.');
+
         return
       }
 

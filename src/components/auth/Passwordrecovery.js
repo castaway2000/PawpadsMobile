@@ -78,7 +78,7 @@ class Passwordrecovery extends Component {
                   }else {
                     this.setState({ loading: false })
 
-                    Alert.alert('Email address not found!')
+                    Alert.alert("Pawpads", 'Email address not found!');
                   }
               })
 

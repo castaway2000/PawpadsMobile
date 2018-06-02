@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, RefreshControl, AsyncStorage } from 'react-native';
+import { Alert,StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView, RefreshControl, AsyncStorage } from 'react-native';
 import {
     Content,
 	Text,

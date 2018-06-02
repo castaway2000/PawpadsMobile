@@ -1,8 +1,8 @@
 # PawpadsMobile
-Pawpads in ReactNative
+Pawpads in ReactNative 
 
 ### Precurser
-This is the current generation of the pawpads mobile application.
+This is the current generation of the pawpads mobile application. 
 
 
 ## Description

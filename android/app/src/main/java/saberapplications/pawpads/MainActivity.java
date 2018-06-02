@@ -1,4 +1,4 @@
-package com.pawpads;
+package saberapplications.pawpads;
 
 import android.content.Intent;
 
@@ -12,7 +12,7 @@ public class MainActivity extends ReactActivity {
      */
     @Override
     protected String getMainComponentName() {
-        return "Pawpads";
+        return "PawPads";
     }
 
     @Override

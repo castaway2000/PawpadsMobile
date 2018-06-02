@@ -322,7 +322,8 @@ getChatMessage() {
 											if(keyA > keyB) return -1;
 											if(keyA < keyB) return 1;
 											return 0;
-									});}
+									});
+								}
 
 						  		console.log("messages :",messages);
 
@@ -662,6 +663,8 @@ getChatMessage() {
 					}}
 					defaultSource = {require('../assets/img/user_placeholder.png')}
 					style = {styles.menuIcon} />
+					
+					{this.state.userprofile.isonline ? <View style = {styles.onlinestatus}/> : null} 
 			</TouchableOpacity>
 		)
 	}
@@ -1104,7 +1107,16 @@ const styles = {
 	loginText:{
 		color: '#FFFFFF',
 		fontSize: 20
-	}
+	},
+	onlinestatus: { 
+        borderRadius: 5,
+        right: 8,
+        bottom:8, 
+        position: 'absolute',
+        backgroundColor: "#00ff00", 
+        width:10, 
+        height:10
+    }
 };
 
 

@@ -258,9 +258,11 @@ class ProfileEdit extends Component {
         .then((response) => response.json())
         .then((responseData) => {
             if(responseData.errors){
-                alert(responseData.errors.email[0])
+
+                Alert.alert("Pawpads", responseData.errors.email[0])
             }else{
-                alert('Profile Saved')
+
+                Alert.alert("Pawpads", "Your profile updated successfully.")
                 // this.props.navigation.goBack()
             }
         }).catch((e) => {
@@ -302,7 +304,9 @@ class ProfileEdit extends Component {
       firebase.database().ref().update(updatefullname)
 
       if (this.state.coverPictureLocalPath == '' && this.state.profilePictureLocalPath == '') {
-        alert("Profile Updated Successfully!")
+
+        Alert.alert("Pawpads", "Your profile updated successfully.")
+
         this.setState({
             loading: false,
           });
@@ -359,7 +363,8 @@ class ProfileEdit extends Component {
             this.setState({
                 loading: false,
               });
-            alert("Profile Updated Successfully!")
+
+            Alert.alert("Pawpads", "Your profile updated successfully.")
           }
         });
       } else {
@@ -417,6 +422,8 @@ class ProfileEdit extends Component {
               });
             isCoverphotoUpdated = false
             alert("Profile Updated Successfully!")
+
+            Alert.alert("Pawpads", "Your profile updated successfully.")
           }
         })
       } else {
