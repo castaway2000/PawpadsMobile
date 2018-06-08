@@ -421,7 +421,6 @@ class ProfileEdit extends Component {
                 loading: false,
               });
             isCoverphotoUpdated = false
-            alert("Profile Updated Successfully!")
 
             Alert.alert("Pawpads", "Your profile updated successfully.")
           }
@@ -571,13 +570,11 @@ class ProfileEdit extends Component {
 
     render() {
 
-      console.log("this.state.coverPictureURL", this.state.coverPictureURL);
-
         return (
-            <View style={styles.container}>
+    
                 <KeyboardAwareScrollView
                     contentContainerStyle = {styles.container}
-                    scrollEnabled = {false}
+                    scrollEnabled = {true}
                     style = {{backgroundColor: 'transparent'}}
                     resetScrollToCoords = {{x:0, y:0}}
                 >
@@ -689,7 +686,8 @@ class ProfileEdit extends Component {
                     </TouchableOpacity>
                     </View>
 
-                </KeyboardAwareScrollView>
+                
+
                 <PopupDialog
                     ref={(popupDialog) => { this.popupDialog = popupDialog; }}
                     //dialogStyle = {styles.dialogView}
@@ -736,7 +734,7 @@ class ProfileEdit extends Component {
                                 </TouchableOpacity>
                             </View>
                         </PopupDialog>
-            </View>
+                        </KeyboardAwareScrollView>
         );
     }
 }

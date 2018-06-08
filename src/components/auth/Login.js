@@ -32,6 +32,7 @@ const { RNTwitterSignIn } = NativeModules;
 var CryptoJS = require("crypto-js");
 firebase.database().goOnline()
 var tmp;
+var shouldblockAction = false
 
 // create a component
 class Login extends Component {
@@ -289,6 +290,18 @@ class Login extends Component {
     }
 
     _onLogin = () => {
+
+      /*
+      if (shouldblockAction) {
+
+        setTimeout(()=>{
+          shouldblockAction = false
+        }, 2000)
+        return
+      }
+
+      shouldblockAction = true
+*/
         if (this.state.name.length < 1) {
             this.setState({ isname: false })
         } else {
@@ -960,9 +973,33 @@ class Login extends Component {
     };
 
     _onRegister = () => {
+
+      /*
+      if (shouldblockAction) {
+
+        setTimeout(()=>{
+          shouldblockAction = false
+        }, 2000)
+        return
+      }
+
+      shouldblockAction = true
+      */
         this.props.navigation.navigate('Register')
     }
     _onForgot = () => {
+      /*
+      if (shouldblockAction) {
+
+        setTimeout(()=>{
+          shouldblockAction = false
+        }, 2000)
+        return
+      }
+
+      shouldblockAction = true
+      */
+
         this.props.navigation.navigate('Passwordrecovery')
     }
 
@@ -1210,7 +1247,8 @@ const styles = StyleSheet.create({
       top: 0,
       bottom: 0,
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      backgroundColor: 'transparent'
     }
 });
 

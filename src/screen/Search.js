@@ -102,12 +102,14 @@ class Search extends Component {
                     dataArray={ nearbySearchUsers == undefined ? this.state.searchResults : nearbySearchUsers}
                     renderRow={data =>
                         <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})} style = {{height:70}}>
+                            <View style = {styles.menuIcon1}>
                             <CachedImage source = {{
                                     uri: data.profileurl,
                                     }}
                                     defaultSource = {require('../assets/img/user_placeholder.png')}
                                     style = {styles.menuIcon}
                             />
+                            </View>
                             {data.full_name?
                                 <Text style = {styles.menuItem}>{data.full_name}</Text> :
                                 <Text style = {styles.menuItem}>{data.login}</Text> }
@@ -128,11 +130,14 @@ class Search extends Component {
                         return(
                         <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('Chat', {GroupName: data.name, GroupChatting: true, Dialog: data, Token: this.state.token})} key = {index}>
                             {/*{this.state.refresh == false? this.downloadLastUser(data.occupants_ids) : null}*/}
+
+                             <View style = {styles.menuIcon1}>
                             <CachedImage source = {{
                                     uri: data.profileurl,
                                     }}
                                     defaultSource = {require('../assets/img/user_placeholder.png')}
                                     style = {styles.menuIcon} />
+                                    </View>
                             <View style = {{flex: 1, marginLeft: 15, justifyContent:'center'}}>
                                 <Text style = {styles.menuItem1}>{data.name}</Text>
                                 <Text style = {styles.lastmessage} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
@@ -146,11 +151,13 @@ class Search extends Component {
                     chatsSearchUsers.map((data, index) => {
                         return(
                         <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('Chat', {GroupName: data.name, GroupChatting: true, Dialog: data, Token: this.state.token})} key = {index}>
+                             <View style = {styles.menuIcon1}>
                             <CachedImage source = {{
                                     uri: data.profileurl,
                                     }}
                                     defaultSource = {require('../assets/img/user_placeholder.png')}
                                     style = {styles.menuIcon} />
+                                    </View>
                             <View style = {{flex: 1, marginLeft: 15, justifyContent:'center'}}>
                                 <Text style = {styles.menuItem1}>{data.name}</Text>
                                 <Text style = {styles.lastmessage} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
@@ -168,6 +175,8 @@ class Search extends Component {
                     channelsUsers.map((data, index) => {
                         return(
                         <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})} key = {index}>
+                            
+                            <View style = {styles.menuIcon1}>
                             <Image source = {{
                                 uri: Constant.BLOB_URL + data.photo + '/download.json',
                                 method:'GET',
@@ -179,10 +188,12 @@ class Search extends Component {
 
                                 defaultSource = {require('../assets/img/user_placeholder.png')}
                                 style = {styles.menuIcon} />
+                                </View>
                             <View style = {{flex: 1, marginLeft: 15}}>
                                 <Text style = {styles.menuItem1}>{data.name}</Text>
                                 <View style = {{flexDirection:'row',marginTop: 5, alignItems:'center'}}>
 
+                                 <View style = {{width: 20, height: 20, borderRadius: 10,backgroundColor:'lightgray'}}>
                                     <Image source = {{
                                         uri: Constant.BLOB_URL + data.blob_id + '/download.json',
                                         method:'GET',
@@ -193,6 +204,7 @@ class Search extends Component {
                                         }}
                                         defaultSource = {require('../assets/img/user_placeholder.png')}
                                         style = {{width: 20, height: 20, borderRadius: 10}} />
+                                        </View>
                                     <Text style = {styles.lastmessage1} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
                                 </View>
                             </View>
@@ -206,6 +218,7 @@ class Search extends Component {
                         return(
                         <TouchableOpacity style = {styles.tabChannelListCell} onPress={() => this.props.navigation.navigate('ChatGroup', {GroupName: data.name, GroupChatting: true, Dialog: data})} key = {index}>
                             {/*{this.state.refresh == false? this.downloadLastUser(data.last_message_user_id) : null}*/}
+                            <View style = {styles.menuIcon1}>
                             <Image source = {{
                                 uri: Constant.BLOB_URL + data.photo + '/download.json',
                                 method:'GET',
@@ -216,10 +229,11 @@ class Search extends Component {
                                 }}
                                 defaultSource = {require('../assets/img/user_placeholder.png')}
                                 style = {styles.menuIcon} />
+                                </View>
                             <View style = {{flex: 1, marginLeft: 15}}>
                                 <Text style = {styles.menuItem1}>{data.name}</Text>
                                 <View style = {{flexDirection:'row',marginTop: 5}}>
-
+                                <View style = {{width: 20, height: 20, borderRadius: 10,backgroundColor:'lightgray'}} >
                                     <Image source = {{
                                         uri: Constant.BLOB_URL + data.blob_id + '/download.json',
                                         method:'GET',
@@ -230,6 +244,7 @@ class Search extends Component {
                                         }}
                                         defaultSource = {require('../assets/img/user_placeholder.png')}
                                         style = {{width: 20, height: 20, borderRadius: 10}} />
+                                        </View>
                                     <Text style = {styles.lastmessage1} numberOfLines = {1} ellipsizeMode = 'tail' >{data.last_message}</Text>
                                 </View>
                             </View>
@@ -286,11 +301,7 @@ class Search extends Component {
                     {this.showSearchUserBox()}
                 </View>
                 <View style = {styles.bodyView}>
-                  <ScrollView>
-                    <Content bounces={false} contentContainerStyle={{ flex: 1, backgroundColor: 'white',alignItems:'center'}}>
-                      {this.showSearchResultView()}
-                    </Content>
-                  </ScrollView>
+                 {this.showSearchResultView()}
                </View>
             </View>
         );
@@ -376,6 +387,12 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
+    },
+    menuIcon1: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'lightgray'
     },
     distance: {
         color: 'gray',

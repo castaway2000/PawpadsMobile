@@ -222,9 +222,14 @@ const styles = StyleSheet.create({
         marginTop: 70
     },
     loadingView: {
-        flex: 1,
         position: 'absolute',
-        top: Constant.HEIGHT_SCREEN/2
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'transparent'
     }
 });
 

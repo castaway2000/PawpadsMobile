@@ -221,7 +221,9 @@ class Settings extends Component {
       this.popupDialog.dismiss()
 
       var updatescontent2 = {};
+      
       updatescontent2['/users/' + this.state.tableId + '/' + "isDeleted"] = 'true'
+
       firebase.database().ref().update(updatescontent2)
 
       Alert.alert('Your account deleted successfully.','',
@@ -230,6 +232,17 @@ class Settings extends Component {
       ],
   {cancelable: false}
 )
+    }
+
+    validateDistance = (distance) => {
+        console.log("distance",distance);
+        
+        if (parseFloat(distance) > 100.0) {
+            this.setState({searchRange:"100"})
+        } else {
+            this.setState({searchRange:distance})
+        }
+        
     }
 
     render() {
@@ -259,7 +272,7 @@ class Settings extends Component {
                                 <View style = {styles.lineTop}/>
                                 <TextInput
                                     style = {styles.inputText}
-                                    onChangeText = {(text) => this.setState({searchRange:text})}
+                                    onChangeText = {(text) => this.validateDistance(text)}
                                     value = {this.state.searchRange}
                                     placeholderTextColor = {Constant.APP_COLOR}
                                     keyboardType = 'numeric'

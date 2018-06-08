@@ -17,6 +17,8 @@ const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 registerKilledListener();
 
+var shouldOpenNotifications = true
+
 // create a component
 class Dashboard extends Component {
     static navigationOptions = {
@@ -49,7 +51,13 @@ class Dashboard extends Component {
 
               setTimeout(() => {
 
-                if (notif) {
+                if (notif && shouldOpenNotifications) {
+
+                    shouldOpenNotifications = false
+                    
+                    setTimeout(() => {
+                        shouldOpenNotifications = true
+                      }, 5000);
 
                     if (notif.data) {
 
@@ -83,7 +91,13 @@ class Dashboard extends Component {
         
             if(notif.opened_from_tray) {
 
-                if (notif) {
+                if (notif && shouldOpenNotifications) {
+
+                    shouldOpenNotifications = false
+
+                    setTimeout(() => {
+                        shouldOpenNotifications = true
+                      }, 5000);
 
                     if (notif.data) {
 
@@ -97,7 +111,7 @@ class Dashboard extends Component {
                     }
                 }
             }
-        
+            
             if(Platform.OS ==='ios'){
                     //optional
                     //iOS requires developers to call completionHandler to end notification process. If you do not call it your background remote notifications could be throttled, to read more about it see the above documentation link.

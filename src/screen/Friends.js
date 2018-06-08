@@ -34,25 +34,26 @@ class MyListItem extends React.PureComponent {
   };
 
   render() {
+      
     const data = this.props.item;
 
       return (
           <TouchableOpacity onPress={this._onPress} style={styles.friendsListCell} key={this.props.index}>
-              <View style={styles.menuIcon} >
+              <View style={styles.menuIcon1} >
                   <CachedImage source={{
                       uri: data.profileurl
                   }}
                       defaultSource={require('../assets/img/user_placeholder.png')}
                       style={styles.menuIcon} />
 
-					{data.isonline ? <View style = {styles.onlinestatus}/> : null} 
+					{data.isonline ? <View style = {styles.onlinestatus}/> : <View style = {styles.offlinestatus}/>} 
 
               </View>
               <View style={{ flex: 1, justifyContent: 'center' }}>
                   <Text style={styles.menuItem}>{data.full_name ? data.full_name : data.login}</Text></View>
           </TouchableOpacity>
       )
-  }
+    }
 }
 
 // create a component
@@ -94,13 +95,19 @@ class Friends extends Component {
     _keyExtractor = (item, index) => index;
 
     handleLoadMore = () => {
-      if (!this.state.loading) {
-        //this.loadDataFromFirebase(this.state.pagekey,this.state.pagetimestamp);
+      if (!this.state.refreshing) {
+        
       }
     }
 
     checkAlreadyFriend = () => {
       var {params} = this.props.navigation.state
+
+      this.setState({
+        refreshing: false
+    })
+      this.setState({friendList: []})
+
       firebase.database()
           .ref(`/friendlist`)
           .orderByChild("user_id")
@@ -173,14 +180,14 @@ class Friends extends Component {
             }
 
     onRefresh() {
-      this.setState({refreshing: true});
-      setTimeout(() => {
-          this.setState({
-              refreshing: false
-          })
+        if (!this.state.refreshing) {
 
-      }, 3000)
-    }
+            this.setState({refreshing: true});
+
+            this.checkAlreadyFriend()
+            
+          }
+        }
 
     renderFriends() {
         if (this.state.friendList.length > 0) {
@@ -277,6 +284,11 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
+    },
+    menuIcon1: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
         backgroundColor: '#f1eff0',
     },
     menuItem:{
@@ -293,15 +305,29 @@ const styles = StyleSheet.create({
         color: 'gray',
         textAlign: 'center'
     },
-	onlinestatus: { 
-        borderRadius: 5,
+    onlinestatus: { 
+        borderRadius: 7,
         right: 0,
         bottom:0, 
         position: 'absolute',
         backgroundColor: "#00ff00", 
-        width:10, 
-        height:10
+        width:14, 
+        height:14,
+        borderWidth: 2,
+        borderColor: "#ffffff",
+    },
+    offlinestatus: { 
+        borderRadius: 7,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#D3D3D3", 
+        width:14, 
+        height:14,
+        borderWidth: 2,
+        borderColor: "#ffffff",
     }
+
 });
 
 //make this component available to the app
