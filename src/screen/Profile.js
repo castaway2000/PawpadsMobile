@@ -335,8 +335,20 @@ class Profile extends Component {
                 if (snapshot.val()) {
                     let response = snapshot.val()
                     var keys = Object.keys(response);
+
+                    console.log('====================================');
+                    console.log("keys",keys);
+                    console.log('====================================');
+                    
                     for (var i = 0; i < keys.length; i++) {
-                        firebase.database().ref(`/friendlist`).child(response[keys[i]]._id).remove();
+                        console.log('====================================');
+                        console.log("response[keys[i]]._id",response[keys[i]]._id);
+                        console.log('====================================');
+
+                        if (response[keys[i]].friend_id == params.UserInfo.id) {
+                            firebase.database().ref(`/friendlist`).child(response[keys[i]]._id).remove();
+                        }
+                        
                     }
                 }
             })
@@ -561,11 +573,6 @@ class Profile extends Component {
         }).catch(function (error) {
             console.error("Write failed: " + error)
         });
-
-
-
-
-
     }
 
     renderBlockUnblock = () => {
@@ -828,7 +835,7 @@ class Profile extends Component {
                         <Text style={{ textAlign: 'center', marginTop: 20 }}>You are about to add <Text style={{ fontWeight: 'bold' }}>{this.showAlertUserName()}</Text> to friends</Text>
                         <View style={{ width: Constant.WIDTH_SCREEN * 0.7, height: 1, backgroundColor: '#e4e4e4', marginTop: 25 }} />
                         <TouchableOpacity style={{ marginTop: 12 }} onPress={() => this.popupDialog.dismiss()}>
-                            <Text style={{ textAlign: 'center', color: '#fb5e33' }}>Cancel</Text>
+                            <Text style={{ textAlign: 'center', color: '#fb5e33',width:Constant.WIDTH_SCREEN * 0.75 }}>Cancel</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={{ width: Constant.WIDTH_SCREEN * 0.7, backgroundColor: 'transparent', marginTop: 5 }} />
@@ -991,7 +998,7 @@ const styles = StyleSheet.create({
         marginTop: 20
     },
     buttonView: {
-        marginTop: 60
+        marginTop: 10
     },
     dialogView: {
         width: Constant.WIDTH_SCREEN * 0.75,

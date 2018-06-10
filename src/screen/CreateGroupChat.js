@@ -47,12 +47,18 @@ class CreateGroupChat extends Component {
             userID: '',
             refreshing: false,
             loading: true,
+            tableId:''
         }
     }
 
     componentWillMount() {
         currentPage = 0
         datas = []
+
+        AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+            this.setState({ tableId: value })
+        })
+
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
             this.setState({ userID: value })
             
@@ -202,9 +208,18 @@ class CreateGroupChat extends Component {
         updates['/dialog/group-chat-private/' + newKey] = dialog;
         firebase.database().ref().update(updates)
 
-        const { navigation } = this.props;
-        navigation.goBack();
-        navigation.state.params.onRefresh({ isRefresh: true });
+        var updates1 = { "id": newKey, "type": 3 };
+        firebase.database().ref().child('/users/' + this.state.tableId + '/dialog/' + newKey).set(updates1).then(() => {
+                        
+            const { navigation } = this.props;
+            navigation.goBack();
+            navigation.state.params.onRefresh({ isRefresh: true });
+
+        }).catch(function (error) {
+
+            console.error("Write failed: " + error)
+
+        });
       }
     }
 

@@ -17,6 +17,7 @@ import {
 	getTheme,
 	variables,
 } from 'native-base'
+
 import Constant from '../common/Constant'
 import { connect } from 'react-redux'
 
@@ -476,7 +477,7 @@ class TabNearBy extends Component {
                                 defaultSource = {require('../assets/img/user_placeholder.png')}
                                 style = {styles.menuIcon1}/>
 
-                               {data.isonline ? <View style = {styles.onlinestatus}/> : null} 
+                               {data.isonline ? <View style = {styles.onlinestatus}/> : <View style = {styles.offlinestatus}/>} 
 
                             </View>
 
@@ -561,13 +562,26 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     onlinestatus: { 
-        borderRadius: 5,
+        borderRadius: 7,
         right: 0,
         bottom:0, 
         position: 'absolute',
         backgroundColor: "#00ff00", 
-        width:10, 
-        height:10
+        width:14, 
+        height:14,
+        borderWidth: 2,
+        borderColor: "#ffffff",
+    },
+    offlinestatus: { 
+        borderRadius: 7,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#D3D3D3", 
+        width:14, 
+        height:14,
+        borderWidth: 2,
+        borderColor: "#ffffff",
     }
 });
 

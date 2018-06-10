@@ -30,8 +30,6 @@ const firebase = RNFirebase.initializeApp({ debug: false, persistence: true })
 
 //Type of dialog. Possible values: 1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
 
-
-
 // create a component
 class TabChats extends Component {
 
@@ -84,7 +82,6 @@ class TabChats extends Component {
                     }
                 }
 
-
                 const videoPromises = dialogs.map(id => {
                     return firebase.database()
                     .ref(`/dialog/group-chat-private/` + id)
@@ -122,12 +119,22 @@ class TabChats extends Component {
         
                     this.setState({dialogs:this.state.dialogs})
 
+                    this.setState({
+                        refreshing: false,
+                        refresh: false
+                    })
+
                   })
                   .catch(err => {
                     // handle error
                     this.setState({ loading: false })
         
                     this.setState({dialogs:this.state.dialogs})
+
+                    this.setState({
+                        refreshing: false,
+                        refresh: false
+                    })
 
                   })
 
@@ -255,16 +262,10 @@ class TabChats extends Component {
     }
 
     _onRefresh() {
-        this.loadData()
+        this.loadcData()
+        
         this.setState({refreshing: true});
-        setTimeout(() => {
-
-            this.loadDataFromFirebase()
-            this.setState({
-                refreshing: false,
-                refresh: false
-            })
-        }, 2000)
+        
     }
 
     downloadLastUserFirebase(data, index) {
@@ -475,7 +476,7 @@ class TabChats extends Component {
                       defaultSource = {require('../assets/img/user_placeholder.png')}
                       style = {styles.menuIcon1} />
 
-                      {data.isonline ? <View style = {styles.onlinestatus}/> : null} 
+                      {data.type == 3 ? (data.isonline ? <View style = {styles.onlinestatus}/> : <View style = {styles.offlinestatus}/>) : null} 
 
                     </View>
                     <View style = {{flex: 1, marginLeft: 15, justifyContent:'center'}}>
@@ -495,8 +496,6 @@ class TabChats extends Component {
         }
     }
 }
-
-
     render() {
         return (
             <Container>
@@ -520,19 +519,9 @@ class TabChats extends Component {
     }
 
     onRefresh = (isRefresh) => {
-
-      if (isRefresh) {
-        this.state.dialogs = []
-        currentPage = 0
-        datas = []
-        this.setState({
-          refreshing: false,
-          loading: true,
-          dialogs: [],
-          token: '',
-          refresh: false})
-      }
-      this.loadDataFromFirebase()
+        this.loadcData()
+        
+        this.setState({refreshing: true});
     };
 }
 
@@ -605,14 +594,28 @@ const styles = StyleSheet.create({
         justifyContent:'center',
     },
     onlinestatus: { 
-        borderRadius: 5,
+        borderRadius: 7,
         right: 0,
         bottom:0, 
         position: 'absolute',
         backgroundColor: "#00ff00", 
-        width:10, 
-        height:10
+        width:14, 
+        height:14,
+        borderWidth: 2,
+        borderColor: "#ffffff",
+    },
+    offlinestatus: { 
+        borderRadius: 7,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#D3D3D3", 
+        width:14, 
+        height:14,
+        borderWidth: 2,
+        borderColor: "#ffffff",
     }
+
 });
 
 //make this component available to the app

@@ -175,7 +175,6 @@ class ChatGroup extends Component {
         })
     }
 
-
 		getChatMessageFirebase() {
 					var {params} = this.props.navigation.state
 					messages = []

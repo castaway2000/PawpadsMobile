@@ -657,14 +657,14 @@ getChatMessage() {
 	createGroup() {
 		var {params} = this.props.navigation.state
 		return(
-			<TouchableOpacity style = {[styles.backButton, {position:'absolute', right: 10}]} onPress = {() => this.props.navigation.navigate('Profile', {UserInfo: this.state.userprofile, ChatVC: this})}>
+			<TouchableOpacity style = {styles.menuIconButton} onPress = {() => this.props.navigation.navigate('Profile', {UserInfo: this.state.userprofile, ChatVC: this})}>
 				<CachedImage source = {{
 					uri: this.state.userprofile["profileurl"],
 					}}
 					defaultSource = {require('../assets/img/user_placeholder.png')}
 					style = {styles.menuIcon} />
 					
-					{this.state.userprofile.isonline ? <View style = {styles.onlinestatus}/> : null} 
+					{this.state.userprofile.isonline ? <View style = {styles.onlinestatus}/> : <View style = {styles.offlinestatus}/>} 
 			</TouchableOpacity>
 		)
 	}
@@ -1094,6 +1094,14 @@ const styles = {
 		borderRadius: 15,
 		resizeMode: 'stretch'
 	},
+	menuIconButton: {
+		width: 30,
+		height: 30,
+		borderRadius: 15,
+		resizeMode: 'stretch',
+		position:'absolute', 
+		right: 10
+	},
 
 	loginScreenButton: {
 		alignItems: 'center',
@@ -1110,15 +1118,27 @@ const styles = {
 	},
 	onlinestatus: { 
         borderRadius: 5,
-        right: 8,
-        bottom:8, 
+        right: 0,
+        bottom:0, 
         position: 'absolute',
         backgroundColor: "#00ff00", 
         width:10, 
-        height:10
+        height:10,
+        borderWidth: 2,
+        borderColor: "#ffffff",
+    },
+    offlinestatus: { 
+        borderRadius: 5,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#D3D3D3", 
+        width:10, 
+        height:10,
+        borderWidth: 2,
+        borderColor: "#ffffff",
     }
 };
-
 
 const mapStateToProps = ({chat}) => {
 	const {loading, chatMessages, error, userId, doctorId, profile} = chat;

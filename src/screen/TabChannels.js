@@ -271,7 +271,7 @@ class TabChannels extends Component {
           .then(snapshot => {
               if (snapshot.val()) {
                 resolve(snapshot.val());
-              } else {
+              } else {                          
                 resolve(null);
               }
           });
