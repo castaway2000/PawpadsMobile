@@ -17,6 +17,10 @@
         {
           "client_id": "637762013744-q3arg3458m2nu9f2t13dfluguhjl4128.apps.googleusercontent.com",
           "client_type": 3
+        },
+        {
+          "client_id": "637762013744-q3arg3458m2nu9f2t13dfluguhjl4128.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -46,6 +50,18 @@
       },
       "oauth_client": [
         {
+          "client_id": "637762013744-upbgeqf3et1es22hcqqqgptcfru1j4cv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "saberapplications.pawpads",
+            "certificate_hash": "b73ad63de0bb4bb47136d30afdebced86bd0e7a1"
+          }
+        },
+        {
+          "client_id": "637762013744-q3arg3458m2nu9f2t13dfluguhjl4128.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
           "client_id": "637762013744-q3arg3458m2nu9f2t13dfluguhjl4128.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -60,8 +76,20 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "637762013744-q3arg3458m2nu9f2t13dfluguhjl4128.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "637762013744-hjied8kc4hchh1rk7vv1mrkd6led1480.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.saber.Pawpadsdev"
+              }
+            }
+          ]
         },
         "ads_service": {
           "status": 2
