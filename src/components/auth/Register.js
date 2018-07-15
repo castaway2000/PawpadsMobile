@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView,Keyboard,AsyncStorage } from 'react-native';
+import {ActivityIndicator, View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView,Keyboard,AsyncStorage, Alert } from 'react-native';
 import Constant from '../../common/Constant'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import hmacSHA1 from 'crypto-js/hmac-sha1'
@@ -33,6 +33,7 @@ class Register extends Component {
             isPassword: false,
             isConfirm: false,
             qb_token: '',
+            loading: false
         }
     }
     componentWillMount() {
@@ -41,6 +42,7 @@ class Register extends Component {
         var signature = ''
         signature = hmacSHA1(signatureParams, Constant.QB_AUTH_SECRET).toString()
         this.getQB_Token(time, signature)
+
     }
 
     getQB_Token(time, signature){
@@ -126,19 +128,19 @@ class Register extends Component {
         if (this.state.email.length > 0) {
 
           if (!this.validateEmail(this.state.email)) {
-            alert('Wrong email format')
+            Alert.alert("Pawpads", 'Please enter correct email address.');
           } else {
 
             if ((this.state.password.length > 0)) {
               if (this.state.password.length < 8) {
-                  alert('Password is to short (mimimum 8 characters).')
+                  Alert.alert("Pawpads", 'Password is to short (mimimum 8 characters).');
               } else {
                   if(this.state.password == this.state.confirm){
                       // const { navigate } = this.props.navigation
                       // navigate ('Register')
                       this._signupWithFirebase()
                   } else {
-                      alert('Passwords do not match')
+                      Alert.alert("Pawpads", 'Passwords do not match.');
                   }
               }
             }
@@ -159,8 +161,20 @@ class Register extends Component {
 
     }
 
+    showLoading(){
+        if (this.state.loading) {
+			return (
+				<View style={styles.loadingView}>
+					<ActivityIndicator color={'black'} size={'large'}/>
+				</View>
+			);
+		}
+    }
+
     _signupWithFirebase = () => {
 
+        this.setState({ loading: true })
+  
       var rootRef = firebase.database().ref().child('users').push().key;
 
       //Check username regestred
@@ -170,9 +184,10 @@ class Register extends Component {
           .equalTo(this.state.name.toLowerCase())
           .once("value")
           .then(snapshot => {
-            this.setState({ loading: false })
+            
               if (snapshot.val()) {
-                alert("Username already registred.")
+                Alert.alert("Pawpads", 'Username already registred.');
+                this.setState({ loading: false })
               } else {
                 console.log("Username not registred.")
 
@@ -185,7 +200,7 @@ class Register extends Component {
                     .then(snapshot => {
                       this.setState({ loading: false })
                         if (snapshot.val()) {
-                          alert("Email already registred.")
+                          Alert.alert("Pawpads", 'Email already registred.');
                         } else {
                           console.log("Email not registred.");
                           //Register on Firebase as new user
@@ -225,8 +240,7 @@ class Register extends Component {
                           //AsyncStorage.setItem(Constant.USER_LOGIN, this.state.name);
                           //AsyncStorage.setItem(Constant.USER_EMAIL, this.state.email);
 
-                          alert('Registration Successful.')
-
+                          Alert.alert("Pawpads", 'Registration Successful.');
                           this.props.navigation.goBack()
                         }
                     })
@@ -254,6 +268,7 @@ class Register extends Component {
           console.log("register responce:",responseData);
             if(responseData.errors){
                 alert(responseData.errors.email[0])
+                
             } else {
                 this.props.navigation.goBack()
             }
@@ -270,6 +285,7 @@ class Register extends Component {
     render() {
         return (
             <View style={styles.container}>
+            
                 <View style = {styles.tabView}>
                     <TouchableOpacity style = {styles.backButton} onPress = {this._onback}>
                         <Image source = {require('../../assets/img/back.png')} style = {{width: 18, height: 18}}/>
@@ -355,7 +371,12 @@ class Register extends Component {
                         </TouchableOpacity>
                     </View>
                 </KeyboardAwareScrollView>
+
+               {this.showLoading()}
+
             </View>
+
+             
         );
     }
 }
@@ -441,6 +462,16 @@ const styles = StyleSheet.create({
         fontSize: 15,
         backgroundColor: 'transparent'
     },
+    loadingView: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'transparent'
+    }
 });
 
 //make this component available to the app

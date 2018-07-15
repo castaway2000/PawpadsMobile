@@ -54,7 +54,7 @@ class Passwordrecovery extends Component {
 
                 if(this.state.password.length < 8) {
 
-                    Alert.alert('Password is too short (Minimum 8 characters).')
+                    Alert.alert("Pawpads", 'Password is too short (Minimum 8 characters).');
 
                 } else {
 
@@ -66,13 +66,15 @@ class Passwordrecovery extends Component {
 
                   firebase.database().ref('users/'+name).update({password:ciphertext});
                   this.props.navigation.navigate('Login')
-                  Alert.alert("Your password has been change successfully.\nNow login using your new password")
+
+                  Alert.alert("Pawpads", "Your password has been change successfully.\nNow login using your new password");
+
                   this.setState({loading:false})
                 }
-
+                
             } else {
 
-              Alert.alert('Password does not match')
+              Alert.alert("Pawpads", 'Password does not match');
               
             }
         }
@@ -236,9 +238,14 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     loadingView: {
-        flex: 1,
         position: 'absolute',
-        top: Constant.HEIGHT_SCREEN/2
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'transparent'
     }
 });
 

@@ -1,6 +1,6 @@
 //import liraries
 import React, { Component } from 'react';
-import { StyleSheet, StatusBar, Image, TouchableOpacity, Platform,  RefreshControl, AsyncStorage,ActivityIndicator, ScrollView, Navigator} from 'react-native';
+import {Alert, StyleSheet, StatusBar, Image, TouchableOpacity, Platform,  RefreshControl, AsyncStorage,ActivityIndicator, ScrollView, Navigator} from 'react-native';
 import {
     Content,
 	Text,
@@ -17,6 +17,7 @@ import {
 	getTheme,
 	variables,
 } from 'native-base'
+
 import Constant from '../common/Constant'
 import { connect } from 'react-redux'
 
@@ -289,7 +290,7 @@ class TabNearBy extends Component {
             },
             (error) => {
                 this.setState({loading: false,isLocationServiceEnabled: false})
-                alert("Location services is turned off! Please turn on from setting.")
+                Alert.alert("Pawpads","Location services is turned off! Please turn on from setting.")
             },
             {
               enableHighAccuracy: false, timeout: 500000, maximumAge: 1000000
@@ -316,13 +317,14 @@ class TabNearBy extends Component {
 
             var onKeyEnteredRegistration = geoQuery.on("key_entered", function (key, location) {
 
+                if (key != datamigrationobj.state.tableId) {
+                        
                 let data = { 'latitude': location[0], 'longitude': location[1] }
 
                 let distance = datamigrationobj.calculateDistance(data)
 
                 datamigrationobj.state.geofireKeyAndLoc.push({ 'key': key, 'distance': distance })
-
-                console.log(key + " onKeyEnteredRegistration. Hi " + key + "!" + distance);
+                }
 
             });
 
@@ -347,8 +349,8 @@ class TabNearBy extends Component {
                 });
 
                 for (let index = 0; index < datamigrationobj.state.geofireKeyAndLoc.length; index++) {
+
                     const obj = datamigrationobj.state.geofireKeyAndLoc[index];
-                    console.log('After sort',obj.distance)
                     datamigrationobj._setProfileData(obj.key, index)
                 }
 
@@ -469,11 +471,16 @@ class TabNearBy extends Component {
                         dataArray={this.state.nearByUsers}
                         renderRow={data =>
                             <ListItem button noBorder onPress={() => this.props.navigation.navigate('Profile', {UserInfo: data})} style = {{height:70}}>
+                            
                             <View style = {styles.menuIcon} >
                                <CachedImage source={{uri: data["profileurl"]}}
                                 defaultSource = {require('../assets/img/user_placeholder.png')}
                                 style = {styles.menuIcon1}/>
+
+                               {data.isonline ? <View style = {styles.onlinestatus}/> : <View style = {styles.offlinestatus}/>} 
+
                             </View>
+
                                 {data.full_name?
                                     <Text style = {styles.menuItem}>{data.full_name}</Text> :
                                     <Text style = {styles.menuItem}>{data.login}</Text> }
@@ -553,6 +560,28 @@ const styles = StyleSheet.create({
     placesText: {
         color: 'gray',
         textAlign: 'center'
+    },
+    onlinestatus: { 
+        borderRadius: 7,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#00ff00", 
+        width:14, 
+        height:14,
+        borderWidth: 2,
+        borderColor: "#ffffff",
+    },
+    offlinestatus: { 
+        borderRadius: 7,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#D3D3D3", 
+        width:14, 
+        height:14,
+        borderWidth: 2,
+        borderColor: "#ffffff",
     }
 });
 

@@ -175,7 +175,7 @@ class SideBar extends Component {
 
       if (route == "Logout") {
         Alert.alert(
-          'PawPads',
+          'Pawpads',
           'Are you sure you want to logout?',
           [
             {text: 'Cancel', onPress: () => {
@@ -204,6 +204,7 @@ class SideBar extends Component {
       AsyncStorage.multiRemove(keys, (err) => {
 
         firebase.database().ref('/users').child(this.state.tableId).child('FCMToken').remove()
+        firebase.database().ref('users/' + this.state.tableId).update({"isonline": 0});
 
         this.props.navigation.navigate(route)
       });

@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { StyleSheet, StatusBar, Image, TouchableOpacity, RefreshControl, AsyncStorage, ActivityIndicator, ScrollView} from 'react-native';
+import { Alert, StyleSheet, StatusBar, Image, TouchableOpacity, RefreshControl, AsyncStorage, ActivityIndicator, ScrollView} from 'react-native';
 import {
     Content,
 	Text,
@@ -60,6 +60,11 @@ class TabChats extends Component {
     }
 
     loadcData() {
+
+        console.log('====================================');
+        console.log("this.state.tableId",this.state.tableId);
+        console.log('====================================');
+        
         firebase.database()
         .ref(`/users/` + this.state.tableId + "/dialog")
         .once("value")
@@ -76,7 +81,6 @@ class TabChats extends Component {
                         dialogs.push(d.id)
                     }
                 }
-
 
                 const videoPromises = dialogs.map(id => {
                     return firebase.database()
@@ -115,12 +119,22 @@ class TabChats extends Component {
         
                     this.setState({dialogs:this.state.dialogs})
 
+                    this.setState({
+                        refreshing: false,
+                        refresh: false
+                    })
+
                   })
                   .catch(err => {
                     // handle error
                     this.setState({ loading: false })
         
                     this.setState({dialogs:this.state.dialogs})
+
+                    this.setState({
+                        refreshing: false,
+                        refresh: false
+                    })
 
                   })
 
@@ -248,16 +262,10 @@ class TabChats extends Component {
     }
 
     _onRefresh() {
-        this.loadData()
+        this.loadcData()
+        
         this.setState({refreshing: true});
-        setTimeout(() => {
-
-            this.loadDataFromFirebase()
-            this.setState({
-                refreshing: false,
-                refresh: false
-            })
-        }, 2000)
+        
     }
 
     downloadLastUserFirebase(data, index) {
@@ -354,8 +362,10 @@ class TabChats extends Component {
                 }
 
                 if (profile) {
+                    
                   this.state.dialogs[index]['name'] = profile.full_name?profile.full_name:profile.login;
                   this.state.dialogs[index]['userid'] = profile.id;
+                  this.state.dialogs[index]['isonline'] = profile.isonline;
 
                   this.setState({ refresh: true});
 
@@ -465,6 +475,9 @@ class TabChats extends Component {
                       <CachedImage source = {{ uri: data.profileurl }}
                       defaultSource = {require('../assets/img/user_placeholder.png')}
                       style = {styles.menuIcon1} />
+
+                      {data.type == 3 ? (data.isonline ? <View style = {styles.onlinestatus}/> : <View style = {styles.offlinestatus}/>) : null} 
+
                     </View>
                     <View style = {{flex: 1, marginLeft: 15, justifyContent:'center'}}>
                       <Text style = {styles.menuItem}>{data.name}</Text>
@@ -483,8 +496,6 @@ class TabChats extends Component {
         }
     }
 }
-
-
     render() {
         return (
             <Container>
@@ -508,19 +519,9 @@ class TabChats extends Component {
     }
 
     onRefresh = (isRefresh) => {
-
-      if (isRefresh) {
-        this.state.dialogs = []
-        currentPage = 0
-        datas = []
-        this.setState({
-          refreshing: false,
-          loading: true,
-          dialogs: [],
-          token: '',
-          refresh: false})
-      }
-      this.loadDataFromFirebase()
+        this.loadcData()
+        
+        this.setState({refreshing: true});
     };
 }
 
@@ -591,7 +592,30 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         padding: 10,
         justifyContent:'center',
+    },
+    onlinestatus: { 
+        borderRadius: 7,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#00ff00", 
+        width:14, 
+        height:14,
+        borderWidth: 2,
+        borderColor: "#ffffff",
+    },
+    offlinestatus: { 
+        borderRadius: 7,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#D3D3D3", 
+        width:14, 
+        height:14,
+        borderWidth: 2,
+        borderColor: "#ffffff",
     }
+
 });
 
 //make this component available to the app

@@ -8,6 +8,7 @@ import {
 	TouchableOpacity,
 	Navigator
 } from 'react-native';
+
 import {colors} from '../../actions/const';
 import Constant from '../../common/Constant'
 import RNFirebase from 'react-native-firebase';
@@ -159,12 +160,15 @@ class ChatBoxDoctor extends Component {
 	showUserphoto() {
 		if(this.props.messageSenderPhoto){
 			return(
+
 				<TouchableOpacity onPress = {() => this.showUserProfiel()}>
 					<Image source = {{
 						uri: this.state.profileurl
 						}}
 						style={styles.messagePhoto}
 						defaultSource = {require('../../assets/img/user_placeholder.png')} />
+						
+						{this.state.userprofile.isonline ? <View style = {styles.onlinestatus}/> : <View style = {styles.offlinestatus}/>} 
 				</TouchableOpacity>
 			)
 		}
@@ -350,7 +354,29 @@ const styles = {
 		width: 220,
 		height: 220,
 		resizeMode: 'contain',
-	}
+	},
+	onlinestatus: { 
+        borderRadius: 5,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#00ff00", 
+        width:10, 
+        height:10,
+        borderWidth: 2,
+        borderColor: "#ffffff",
+    },
+    offlinestatus: { 
+        borderRadius: 5,
+        right: 0,
+        bottom:0, 
+        position: 'absolute',
+        backgroundColor: "#D3D3D3", 
+        width:10, 
+        height:10,
+        borderWidth: 2,
+        borderColor: "#ffffff",
+    }
 };
 
 export {ChatBoxDoctor};

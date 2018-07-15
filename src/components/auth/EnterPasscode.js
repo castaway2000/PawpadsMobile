@@ -53,7 +53,7 @@ class Passwordrecovery extends Component {
               }else {
                 this.setState({loading:false})
 
-                Alert.alert('Code not match ! Please try again')
+                Alert.alert("Pawpads", 'Code not match! Please try again');
               }
           })
         }
@@ -199,9 +199,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     loadingView: {
-        flex: 1,
         position: 'absolute',
-        top: Constant.HEIGHT_SCREEN/2
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'transparent'
     }
 });
 

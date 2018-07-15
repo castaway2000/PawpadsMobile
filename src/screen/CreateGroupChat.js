@@ -1,6 +1,6 @@
 //import libraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView,AsyncStorage,RefreshControl, ActivityIndicator } from 'react-native';
+import { Alert,View, Text, StyleSheet, Image, TextInput, TouchableOpacity, StatusBar, Platform, ScrollView,AsyncStorage,RefreshControl, ActivityIndicator } from 'react-native';
 import {
     Content,
 	List,
@@ -47,12 +47,18 @@ class CreateGroupChat extends Component {
             userID: '',
             refreshing: false,
             loading: true,
+            tableId:''
         }
     }
 
     componentWillMount() {
         currentPage = 0
         datas = []
+
+        AsyncStorage.getItem(Constant.USER_TABEL_ID).then((value) => {
+            this.setState({ tableId: value })
+        })
+
         AsyncStorage.getItem(Constant.QB_USERID).then((value) => {
             this.setState({ userID: value })
             
@@ -152,7 +158,9 @@ class CreateGroupChat extends Component {
       }
 
       if (isCheckedCount< 1) {
-        alert('Please select at least two member to create group.')
+
+        Alert.alert("Pawpads", 'Please select at least two member to create group.');
+
         return
       }
 
@@ -200,9 +208,18 @@ class CreateGroupChat extends Component {
         updates['/dialog/group-chat-private/' + newKey] = dialog;
         firebase.database().ref().update(updates)
 
-        const { navigation } = this.props;
-        navigation.goBack();
-        navigation.state.params.onRefresh({ isRefresh: true });
+        var updates1 = { "id": newKey, "type": 3 };
+        firebase.database().ref().child('/users/' + this.state.tableId + '/dialog/' + newKey).set(updates1).then(() => {
+                        
+            const { navigation } = this.props;
+            navigation.goBack();
+            navigation.state.params.onRefresh({ isRefresh: true });
+
+        }).catch(function (error) {
+
+            console.error("Write failed: " + error)
+
+        });
       }
     }
 

@@ -175,7 +175,6 @@ class ChatGroup extends Component {
         })
     }
 
-
 		getChatMessageFirebase() {
 					var {params} = this.props.navigation.state
 					messages = []
@@ -788,9 +787,9 @@ class ChatGroup extends Component {
 		//Upload Image to firebase
 
 		firebase.storage().ref("content/" + this.state.tableId + "/" + fileName).putFile(source) .then(uploadedFile => {
+
 			console.log('Uploaded to firebase:', uploadedFile)
 			console.log("Image uploaded successfully.");
-
 
 			var updates = {};
 			var newKey = firebase.database().ref().child('chats').push().key;
@@ -855,7 +854,6 @@ class ChatGroup extends Component {
 			var updatescontent1 = {};
 			updatescontent1['/users/' + this.state.tableId  + '/content/'+ newKeyUsercontent] = content;
 			firebase.database().ref().update(updatescontent1)
-
 
 			//TODO: update chat dialog
 			var diloagDict = {

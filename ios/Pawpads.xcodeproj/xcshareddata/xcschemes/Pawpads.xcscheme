@@ -31,7 +31,7 @@
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
                BuildableName = "PawPads.app"
                BlueprintName = "PawPads"
-               ReferencedContainer = "container:PawPads.xcodeproj">
+               ReferencedContainer = "container:Pawpads.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -45,7 +45,7 @@
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
                BuildableName = "PawPadsTests.xctest"
                BlueprintName = "PawPadsTests"
-               ReferencedContainer = "container:PawPads.xcodeproj">
+               ReferencedContainer = "container:Pawpads.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -64,7 +64,7 @@
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
                BuildableName = "PawPadsTests.xctest"
                BlueprintName = "PawPadsTests"
-               ReferencedContainer = "container:PawPads.xcodeproj">
+               ReferencedContainer = "container:Pawpads.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -74,7 +74,7 @@
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
             BuildableName = "PawPads.app"
             BlueprintName = "PawPads"
-            ReferencedContainer = "container:PawPads.xcodeproj">
+            ReferencedContainer = "container:Pawpads.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -98,7 +98,7 @@
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
             BuildableName = "PawPads.app"
             BlueprintName = "PawPads"
-            ReferencedContainer = "container:PawPads.xcodeproj">
+            ReferencedContainer = "container:Pawpads.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -117,7 +117,7 @@
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
             BuildableName = "PawPads.app"
             BlueprintName = "PawPads"
-            ReferencedContainer = "container:PawPads.xcodeproj">
+            ReferencedContainer = "container:Pawpads.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

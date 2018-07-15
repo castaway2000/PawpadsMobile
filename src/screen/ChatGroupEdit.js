@@ -401,16 +401,27 @@ class ChatGroupEdit extends Component {
 
     _onSaveProfile = () => {
 
+        //1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
       this.setState({ loading: true })
 
       var {params} = this.props.navigation.state
+    
+    var dialogname =  ''
+
+    if (params.Dialog.type == 1) {
+        dialogname = 'group-chat-public'
+    } else {
+        dialogname = 'group-chat-private'
+    }
 
       if (params.IsCreated) {
+          
         if (params.IsCreated == true) {
 
           var updates = {};
 
-          updates['/dialog/group-chat-public/' + params.Dialog._id] = params.Dialog;
+          updates['/dialog/'+ dialogname + '/' + params.Dialog._id] = params.Dialog;
 
           var ref = firebase.database().ref().update(updates).then( () => {
 
@@ -506,6 +517,16 @@ class ChatGroupEdit extends Component {
       var {params} = this.props.navigation.state
       this.setState({ loading: true })
 
+      var {params} = this.props.navigation.state
+    
+      var dialogname =  ''
+  
+      if (params.Dialog.type == 1) {
+          dialogname = 'group-chat-public'
+      } else {
+          dialogname = 'group-chat-private'
+      }
+
       if (this.state.userPhotoPath != '') {
         let imagename = "groutphoto_" + params.Dialog._id +".jpg"
 
@@ -549,29 +570,32 @@ class ChatGroupEdit extends Component {
 
           //Update custom_data
           var updatescontent2 = {};
-          updatescontent2['/dialog/group-chat-public/' + params.Dialog._id + '/photo'] = milliseconds.toString()
+          updatescontent2['/dialog/' + dialogname + '/' + params.Dialog._id + '/photo'] = milliseconds.toString()
           firebase.database().ref().update(updatescontent2)
 
           params.Dialog.name = this.state.groupName
 
+
+          var updatescontent3 = {};
+          updatescontent3['/dialog/' + dialogname + '/' + params.Dialog._id + '/name' ] = this.state.groupName
+          firebase.database().ref().update(updatescontent3)
+
           this.setState({ loading: false, isGroupUpdated:true})
 
-
-          alert("Group Updated Successfully!")
+          Alert.alert("Pawpads", 'Group Updated Successfully!');
         });
       } else {
 
         //Update custom_data
         var updatescontent2 = {};
-        updatescontent2['/dialog/group-chat-public/' + params.Dialog._id + '/name' ] = this.state.groupName
+        updatescontent2['/dialog/' + dialogname + '/' + params.Dialog._id + '/name' ] = this.state.groupName
         firebase.database().ref().update(updatescontent2)
 
         params.Dialog.name = this.state.groupName
 
         this.setState({ loading: false, isGroupUpdated:true})
 
-
-        alert("Group Updated Successfully!")
+        Alert.alert("Pawpads", 'Group Updated Successfully!');
     }
   }
 
@@ -583,9 +607,22 @@ class ChatGroupEdit extends Component {
   }
 
   onRemoveChannel = () => {
+
+    var {params} = this.props.navigation.state
+    
+    var name =  ''
+
+    //1(PUBLIC_GROUP), 2(GROUP), 3(PRIVATE)
+
+    if (params.Dialog.type == 1) {
+        name = 'channel'
+    } else {
+        name = 'group'
+    }
+
     Alert.alert(
-      'Alert',
-      'Are you seure you want to delete this group?',
+      'Pawpads',
+      'Are you sure you want to delete this ' + name + '?',
       [
         {text: 'Delete', onPress: () => {
           this.deleteGroup()
@@ -603,18 +640,31 @@ class ChatGroupEdit extends Component {
     this.setState({ loading: true })
 
     var {params} = this.props.navigation.state
+    
+    var {params} = this.props.navigation.state
+    
+    var dialogname =  ''
 
-    var ref = firebase.database().ref(`/dialog/group-chat-public`)
+    if (params.Dialog.type == 1) {
+        dialogname = 'group-chat-public'
+    } else {
+        dialogname = 'group-chat-private'
+    }
 
-    ref.child(params.Dialog._id).remove();
+    firebase.database().ref(`/dialog/` + dialogname).child(params.Dialog._id).remove();
+
+    firebase.database().ref('/users/' + this.state.tableId  + '/dialog/').child(params.Dialog._id).remove();
 
     setTimeout(()=>{
+        
       this.setState({ loading: false })
-      alert("Channel deleted successfully")
+
+      Alert.alert("Pawpads", 'Group deleted successfully.');
+
       this.props.navigation.goBack("Login")
 
-
       const navigateAction = NavigationActions.navigate({
+          
         routeName: 'Dashboard',
 
         params: {},
@@ -990,9 +1040,14 @@ const styles = StyleSheet.create({
         marginTop: 15,
     },
     loadingView: {
-        flex: 1,
         position: 'absolute',
-        top: Constant.HEIGHT_SCREEN/2
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'transparent'
     },
     removeBtn: {
         width: Constant.WIDTH_SCREEN,

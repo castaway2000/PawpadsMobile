@@ -1,6 +1,6 @@
 //import liraries
 import React, { Component } from 'react';
-import { StyleSheet, StatusBar, Image, TouchableOpacity, RefreshControl, AsyncStorage,ActivityIndicator, ScrollView} from 'react-native';
+import { Alert, StyleSheet, StatusBar, Image, TouchableOpacity, RefreshControl, AsyncStorage,ActivityIndicator, ScrollView} from 'react-native';
 import {
     Content,
 	Text,
@@ -91,6 +91,7 @@ class TabChannels extends Component {
             pagetimestamp:null,
             userID: '',
         }
+        
         this.onPullRelease = this.onPullRelease.bind(this);
         this.topIndicatorRender = this.topIndicatorRender.bind(this);
     }
@@ -270,7 +271,7 @@ class TabChannels extends Component {
           .then(snapshot => {
               if (snapshot.val()) {
                 resolve(snapshot.val());
-              } else {
+              } else {                          
                 resolve(null);
               }
           });
