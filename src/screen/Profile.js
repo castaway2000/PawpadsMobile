@@ -171,10 +171,11 @@ class Profile extends Component {
     }
 
     showUserName() {
-        var { params } = this.props.navigation.state
+        var { params } = this.props.navigation.state;
         return (
-            <Text style={styles.name}>
-                {params.UserInfo.full_name ?
+            <Text style={[{fontFamily: "Roboto"} , styles.name]} >
+                {
+                    params.UserInfo.full_name ?
                     params.UserInfo.full_name :
                     params.UserInfo.login
                 }
