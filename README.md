@@ -1,6 +1,9 @@
 # PawpadsMobile
 Pawpads in ReactNative 
 
+## News:
+As of earlier this year it was discovered that a security vulnerability was able to leak personal information about users. There have been no cases where this has been found to have actually happened though for sake of  user security this application was scrubbed of all user data and sunset. I really appreicate everyone who took the time to use and give feedback on this application. Other better applications with lower risk factors have been produced and I for one am happy to sunset pawpads in favor of adoption of platofrms that are much more appreciated and supported.
+
 ### Precurser
 This is the current generation of the pawpads mobile application. 
 
